@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { uploadWithProgress } from '@/lib/upload-with-progress';
 
 interface BrandingRecord {
   primary_color: string;
@@ -170,6 +171,7 @@ function AssetUploadField({
   onUploaded: () => void;
 }) {
   const [pending, setPending] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -177,17 +179,19 @@ function AssetUploadField({
     if (!file) return;
 
     setPending(true);
+    setProgress(0);
     setError(null);
 
     try {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch(uploadPath, { method: 'POST', body: formData });
+      const { ok, body } = await uploadWithProgress(uploadPath, formData, setProgress);
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        setError(body?.errors?.file?.[0] ?? body?.errors?.[0]?.message ?? `Could not upload ${label.toLowerCase()}.`);
+      if (!ok) {
+        const errors = (body as { errors?: { file?: string[] } | { message?: string }[] } | null)?.errors;
+        const fileError = Array.isArray(errors) ? errors[0]?.message : errors?.file?.[0];
+        setError(fileError ?? `Could not upload ${label.toLowerCase()}.`);
         return;
       }
 
@@ -210,10 +214,20 @@ function AssetUploadField({
             None
           </div>
         )}
-        <label className="cursor-pointer rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
-          {pending ? 'Uploading…' : 'Upload'}
-          <input type="file" accept={accept} onChange={handleFile} disabled={pending} className="hidden" />
-        </label>
+        <div>
+          <label className="cursor-pointer rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+            {pending ? `Uploading… ${progress}%` : 'Upload'}
+            <input type="file" accept={accept} onChange={handleFile} disabled={pending} className="hidden" />
+          </label>
+          {pending && (
+            <div className="mt-1.5 h-1.5 w-32 overflow-hidden rounded-full bg-neutral-100">
+              <div
+                className="h-full rounded-full bg-[var(--tenant-primary)] transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
+        </div>
       </div>
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>

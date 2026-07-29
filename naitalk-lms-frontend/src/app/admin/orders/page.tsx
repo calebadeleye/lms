@@ -6,6 +6,7 @@ import { DashboardShell } from '@/components/dashboard-shell';
 import { tenantAdminNav } from '@/lib/nav';
 import { formatPrice } from '@/lib/learning-types';
 import { RefundButton } from '@/components/admin/refund-button';
+import { ReconcileButton } from '@/components/admin/reconcile-button';
 
 interface AdminOrder {
   id: number;
@@ -65,6 +66,9 @@ export default async function AdminOrdersPage() {
                     {order.status.replace('_', ' ')}
                   </span>
                   <span className="text-sm font-semibold text-neutral-900">{formatPrice(order.total_cents, order.currency)}</span>
+                  {me.permissions.includes('payments.refund') && order.status === 'pending' && (
+                    <ReconcileButton orderId={order.id} />
+                  )}
                   {me.permissions.includes('payments.refund') && order.payment?.status === 'success' && (
                     <RefundButton paymentId={order.payment.id} maxAmountCents={order.payment.gross_amount_cents} />
                   )}

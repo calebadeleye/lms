@@ -74,4 +74,14 @@ class TenantPaymentConfig extends Model
     {
         return $this->commission_percent ?? (float) config('services.platform_billing.default_commission_percent');
     }
+
+    /** The URL the tenant must paste into their Paystack/Flutterwave
+     * dashboard's webhook settings — without it, a payment can succeed on
+     * the provider's side and this app never finds out, leaving the order
+     * stuck in "pending" forever. See routes/api.php's
+     * /webhooks/{provider}/{webhookToken} and WebhookController. */
+    public function webhookUrl(): string
+    {
+        return url("/api/v1/webhooks/{$this->provider}/{$this->webhook_token}");
+    }
 }

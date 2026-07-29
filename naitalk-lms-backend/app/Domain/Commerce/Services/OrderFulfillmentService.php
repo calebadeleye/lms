@@ -3,9 +3,11 @@
 namespace App\Domain\Commerce\Services;
 
 use App\Domain\Coaching\Models\Booking;
+use App\Domain\Commerce\Contracts\PaymentProviderInterface;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\Payment;
 use App\Domain\Commerce\Models\PaymentAllocation;
+use App\Domain\Commerce\Models\TenantPaymentConfig;
 use App\Domain\Learning\Models\Course;
 use App\Domain\Learning\Services\EnrolmentService;
 use App\Domain\Membership\Models\LearnerMembershipPlan;
@@ -24,6 +26,70 @@ class OrderFulfillmentService
         private EnrolmentService $enrolments,
         private MembershipService $memberships,
     ) {}
+
+    /**
+     * Manual fallback for an order stuck in "pending" because its webhook
+     * never arrived (misconfigured URL on the provider's dashboard, lost
+     * delivery, etc.) — re-checks the real status directly with the
+     * provider using the order's own provider_reference and fulfils it if
+     * it actually succeeded, exactly like ProcessPaymentWebhookJob would
+     * have. Deliberately a separate, simpler code path rather than a
+     * shared abstraction with that job — the two have different error
+     * handling needs (async retry-and-log vs a synchronous admin action
+     * that needs to return a plain result), and this one is short enough
+     * that forcing them together isn't worth the coupling.
+     */
+    public function reconcileWithProvider(
+        Order $order,
+        TenantPaymentConfig $config,
+        PaymentProviderInterface $provider,
+        CommissionService $commission,
+    ): string {
+        if ($order->isPaid()) {
+            return 'already_paid';
+        }
+
+        if (! $order->provider_reference) {
+            return 'no_reference';
+        }
+
+        $verified = $provider->verifyPayment($order->provider_reference);
+
+        if ($verified['status'] !== 'success') {
+            return 'not_paid';
+        }
+
+        $split = $commission->calculate($config, $verified['amount_cents'], $verified['provider_fee_cents']);
+
+        $payment = Payment::create([
+            'order_id' => $order->id,
+            'provider' => $config->provider,
+            'provider_reference' => $verified['provider_reference'],
+            'status' => 'success',
+            'gross_amount_cents' => $verified['amount_cents'],
+            'currency' => $verified['currency'],
+            'provider_fee_cents' => $verified['provider_fee_cents'],
+            'platform_commission_cents' => $split['commission_cents'],
+            'tenant_net_cents' => $split['tenant_net_cents'],
+            'fee_bearer' => $config->fee_bearer,
+            'paid_at' => now(),
+            'raw_response' => $this->stripSecrets($verified['raw']),
+        ]);
+
+        $order->markPaid();
+        $this->fulfill($order, $payment);
+
+        return 'fulfilled';
+    }
+
+    /** Never persist card/authorization details in raw_response — matches
+     * ProcessPaymentWebhookJob's own stripSecrets(). */
+    private function stripSecrets(array $raw): array
+    {
+        unset($raw['authorization'], $raw['card'], $raw['customer']['phone']);
+
+        return $raw;
+    }
 
     public function fulfill(Order $order, Payment $payment): void
     {

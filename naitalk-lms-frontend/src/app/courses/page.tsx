@@ -23,7 +23,7 @@ export default async function CourseCataloguePage({
   if (search) query.set('search', search);
 
   const [categories, courses] = await Promise.all([
-    apiFetch<{ data: CourseCategory[] }>('/api/v1/course-categories'),
+    apiFetch<{ data: CourseCategory[] }>('/api/v1/course-categories?only_with_published=1'),
     apiFetch<{ data: CourseSummary[] }>(`/api/v1/courses?${query.toString()}`),
   ]);
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import type { AdminLesson } from '@/lib/admin-course-types';
 import { QuizBuilder } from '@/components/admin/quiz-builder';
 import { AssignmentBuilder } from '@/components/admin/assignment-builder';
+import { uploadWithProgress } from '@/lib/upload-with-progress';
 
 const lessonTypes = ['video', 'rich_text', 'audio', 'file', 'external_link', 'quiz', 'assignment', 'live'] as const;
 
@@ -21,6 +22,7 @@ export function LessonRow({ lesson }: { lesson: AdminLesson }) {
   const [meetingUrl, setMeetingUrl] = useState(lesson.content?.meeting_url ?? '');
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [materialFilename, setMaterialFilename] = useState(lesson.content?.material_filename ?? null);
 
@@ -65,17 +67,18 @@ export function LessonRow({ lesson }: { lesson: AdminLesson }) {
     if (!file) return;
 
     setUploading(true);
+    setUploadProgress(0);
     setUploadError(null);
 
     try {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch(`/api/v1/admin/lessons/${lesson.id}/material`, { method: 'POST', body: formData });
+      const { ok, body } = await uploadWithProgress(`/api/v1/admin/lessons/${lesson.id}/material`, formData, setUploadProgress);
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        setUploadError(body?.errors?.file?.[0] ?? body?.errors?.[0]?.message ?? 'Could not upload the file.');
+      if (!ok) {
+        const errors = (body as { errors?: { file?: string[] } } | null)?.errors;
+        setUploadError(errors?.file?.[0] ?? 'Could not upload the file.');
         return;
       }
 
@@ -189,7 +192,7 @@ export function LessonRow({ lesson }: { lesson: AdminLesson }) {
                   {materialFilename ?? <span className="text-neutral-400">No file uploaded yet</span>}
                 </span>
                 <label className="cursor-pointer rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50">
-                  {uploading ? 'Uploading…' : materialFilename ? 'Replace file' : 'Upload file'}
+                  {uploading ? `Uploading… ${uploadProgress}%` : materialFilename ? 'Replace file' : 'Upload file'}
                   <input
                     type="file"
                     accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.zip"
@@ -199,6 +202,14 @@ export function LessonRow({ lesson }: { lesson: AdminLesson }) {
                   />
                 </label>
               </div>
+              {uploading && (
+                <div className="mt-1.5 h-1.5 w-40 overflow-hidden rounded-full bg-neutral-100">
+                  <div
+                    className="h-full rounded-full bg-[var(--tenant-primary)] transition-all"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              )}
               <p className="mt-1 text-xs text-neutral-400">PDF, PowerPoint, Word, Excel, or a zip — up to 20MB.</p>
               {uploadError && <p className="mt-1 text-xs text-red-600">{uploadError}</p>}
             </div>

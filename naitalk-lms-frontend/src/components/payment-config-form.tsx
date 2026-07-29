@@ -28,7 +28,8 @@ export function PaymentConfigForm({ initial }: { initial: PaymentConfig | null }
   const [config, setConfig] = useState(initial);
   const [tab, setTab] = useState<Tab>(initial?.mode ?? 'client_owned');
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<string | null>(null);
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   async function testConnection() {
     setTesting(true);
@@ -37,14 +38,25 @@ export function PaymentConfigForm({ initial }: { initial: PaymentConfig | null }
       const res = await fetch('/api/v1/admin/payment-config/test-connection', { method: 'POST' });
       const body = await res.json().catch(() => null);
       if (!res.ok) {
-        setTestResult(body?.errors?.provider?.[0] ?? 'Could not test the connection.');
+        setTestResult({ ok: false, message: body?.errors?.provider?.[0] ?? 'Could not test the connection.' });
         return;
       }
-      setTestResult(body.data.connected ? 'Connection verified.' : 'Could not verify the connection with the provider.');
+      setTestResult(
+        body.data.connected
+          ? { ok: true, message: 'Connection verified.' }
+          : { ok: false, message: 'Could not verify the connection with the provider.' }
+      );
       router.refresh();
     } finally {
       setTesting(false);
     }
+  }
+
+  async function copyWebhookUrl() {
+    if (!config) return;
+    await navigator.clipboard.writeText(config.webhook_url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (
@@ -78,7 +90,35 @@ export function PaymentConfigForm({ initial }: { initial: PaymentConfig | null }
               {testing ? 'Testing…' : 'Test connection'}
             </button>
           </div>
-          {testResult && <p className="mt-2 text-xs text-neutral-600">{testResult}</p>}
+          {testResult && (
+            <p
+              className={`mt-2 inline-block rounded-md px-2.5 py-1 text-xs font-semibold ${
+                testResult.ok ? 'bg-green-600 text-white' : 'bg-red-50 text-red-700'
+              }`}
+            >
+              {testResult.message}
+            </p>
+          )}
+
+          <div className="mt-4 rounded-md bg-amber-50 px-3 py-2.5">
+            <p className="text-xs font-semibold text-amber-900">Webhook URL — required for payments to confirm</p>
+            <p className="mt-0.5 text-xs text-amber-800">
+              Paste this into your {config.provider === 'paystack' ? 'Paystack' : 'Flutterwave'} dashboard&apos;s webhook
+              settings. Without it, a successful payment on their side never reaches this app — the order stays stuck
+              &quot;confirming&quot; forever.
+            </p>
+            <div className="mt-2 flex items-center gap-2">
+              <code className="flex-1 truncate rounded border border-amber-200 bg-white px-2 py-1.5 text-xs text-neutral-700">
+                {config.webhook_url}
+              </code>
+              <button
+                onClick={copyWebhookUrl}
+                className="shrink-0 rounded-md border border-amber-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-100"
+              >
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

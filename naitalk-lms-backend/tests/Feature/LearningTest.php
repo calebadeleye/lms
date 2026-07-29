@@ -78,6 +78,22 @@ it('does not list draft courses in the public catalogue', function () {
     expect(collect($response->json('data'))->pluck('slug'))->not->toContain('draft-course');
 });
 
+it('hides a category with no published courses from the public catalogue sidebar, but not from admin category management', function () {
+    app(TenantContext::class)->set($this->tenant);
+    $emptyCategory = CourseCategory::create(['name' => 'Empty Category', 'slug' => 'empty-category']);
+    Course::create([
+        'category_id' => $emptyCategory->id, 'title' => 'Still A Draft', 'slug' => 'still-a-draft',
+        'status' => 'draft', 'pricing_type' => 'free',
+    ]);
+    app(TenantContext::class)->clear();
+
+    $public = $this->getJson(($this->url)('/api/v1/course-categories?only_with_published=1'))->assertOk();
+    expect(collect($public->json('data'))->pluck('name'))->toContain('HR')->not->toContain('Empty Category');
+
+    $admin = $this->getJson(($this->url)('/api/v1/course-categories'))->assertOk();
+    expect(collect($admin->json('data'))->pluck('name'))->toContain('HR', 'Empty Category');
+});
+
 it('enrols a student in a free course', function () {
     $this->postJson(($this->url)("/api/v1/courses/{$this->course->id}/enrol"), [], [
         'Authorization' => "Bearer {$this->studentToken}",

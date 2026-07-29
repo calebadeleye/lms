@@ -26,7 +26,7 @@ export async function DashboardShell({
   const logoUrl = config?.branding?.logo_url ?? null;
 
   return (
-    <div className="flex min-h-full">
+    <div className="flex min-h-screen">
       <aside className="hidden w-64 shrink-0 flex-col bg-[var(--tenant-primary)] text-white md:flex">
         <div className="flex items-center px-5 py-5">
           {logoUrl ? (

@@ -18,7 +18,7 @@ interface AdminMembershipPlan {
 const emptyForm = {
   name: '',
   billing_period: 'monthly' as 'monthly' | 'annual' | 'free',
-  price_cents: '0',
+  priceNaira: '0',
   currency: 'NGN',
   benefits: '',
 };
@@ -48,7 +48,7 @@ export function AdminMembershipsManager({ initial }: { initial: AdminMembershipP
         body: JSON.stringify({
           name: form.name,
           billing_period: form.billing_period,
-          price_cents: form.billing_period === 'free' ? 0 : Number(form.price_cents),
+          price_cents: form.billing_period === 'free' ? 0 : Math.round(Number(form.priceNaira) * 100),
           currency: form.currency,
           benefits: form.benefits
             .split('\n')
@@ -124,12 +124,12 @@ export function AdminMembershipsManager({ initial }: { initial: AdminMembershipP
             {form.billing_period !== 'free' && (
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-medium text-neutral-700">Price (cents)</label>
+                  <label className="block text-xs font-medium text-neutral-700">Price (₦)</label>
                   <input
                     type="number"
                     min={0}
-                    value={form.price_cents}
-                    onChange={(e) => setForm((f) => ({ ...f, price_cents: e.target.value }))}
+                    value={form.priceNaira}
+                    onChange={(e) => setForm((f) => ({ ...f, priceNaira: e.target.value }))}
                     className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
                   />
                 </div>

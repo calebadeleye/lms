@@ -141,6 +141,7 @@ class PaymentConfigController extends Controller
             'fee_bearer' => $config->fee_bearer,
             'status' => $config->status,
             'last_verified_at' => $config->last_verified_at,
+            'webhook_url' => $config->webhookUrl(),
         ];
     }
 }

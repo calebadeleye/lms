@@ -41,6 +41,7 @@ export function AdminCoursesManager({
   const [error, setError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
+  const [rowPending, setRowPending] = useState<Set<number>>(new Set());
 
   async function loadCourses(page: number) {
     const res = await fetch(`/api/v1/admin/courses?page=${page}&per_page=${PER_PAGE}`);
@@ -124,21 +125,39 @@ export function AdminCoursesManager({
 
   async function togglePublish(course: AdminCourse) {
     const action = course.status === 'published' ? 'unpublish' : 'publish';
-    const res = await fetch(`/api/v1/admin/courses/${course.id}/${action}`, { method: 'POST' });
-    const body = await res.json();
-    if (res.ok) {
-      setError(null);
-      setCourses((prev) => prev.map((c) => (c.id === course.id ? { ...c, status: body.data.status } : c)));
-      router.refresh();
-    } else {
-      setError(body?.errors?.course?.[0] ?? `Could not ${action} this course.`);
+    setRowPending((prev) => new Set(prev).add(course.id));
+    try {
+      const res = await fetch(`/api/v1/admin/courses/${course.id}/${action}`, { method: 'POST' });
+      const body = await res.json();
+      if (res.ok) {
+        setError(null);
+        setCourses((prev) => prev.map((c) => (c.id === course.id ? { ...c, status: body.data.status } : c)));
+        router.refresh();
+      } else {
+        setError(body?.errors?.course?.[0] ?? `Could not ${action} this course.`);
+      }
+    } finally {
+      setRowPending((prev) => {
+        const next = new Set(prev);
+        next.delete(course.id);
+        return next;
+      });
     }
   }
 
   async function remove(courseId: number) {
     if (!window.confirm('Delete this course? This cannot be undone.')) return;
-    await fetch(`/api/v1/admin/courses/${courseId}`, { method: 'DELETE' });
-    await loadCourses(meta.page);
+    setRowPending((prev) => new Set(prev).add(courseId));
+    try {
+      await fetch(`/api/v1/admin/courses/${courseId}`, { method: 'DELETE' });
+      await loadCourses(meta.page);
+    } finally {
+      setRowPending((prev) => {
+        const next = new Set(prev);
+        next.delete(courseId);
+        return next;
+      });
+    }
   }
 
   return (
@@ -293,11 +312,25 @@ export function AdminCoursesManager({
                   <Link href={`/admin/courses/${course.id}`} className="mr-3 font-semibold text-[var(--tenant-primary)] hover:underline">
                     Edit
                   </Link>
-                  <button onClick={() => togglePublish(course)} className="mr-3 text-neutral-700 hover:underline">
-                    {course.status === 'published' ? 'Unpublish' : 'Publish'}
+                  <button
+                    onClick={() => togglePublish(course)}
+                    disabled={rowPending.has(course.id)}
+                    className="mr-3 text-neutral-700 hover:underline disabled:opacity-50"
+                  >
+                    {rowPending.has(course.id)
+                      ? course.status === 'published'
+                        ? 'Unpublishing…'
+                        : 'Publishing…'
+                      : course.status === 'published'
+                        ? 'Unpublish'
+                        : 'Publish'}
                   </button>
-                  <button onClick={() => remove(course.id)} className="text-red-600 hover:underline">
-                    Delete
+                  <button
+                    onClick={() => remove(course.id)}
+                    disabled={rowPending.has(course.id)}
+                    className="text-red-600 hover:underline disabled:opacity-50"
+                  >
+                    {rowPending.has(course.id) ? 'Deleting…' : 'Delete'}
                   </button>
                 </td>
               </tr>

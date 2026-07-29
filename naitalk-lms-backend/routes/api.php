@@ -309,6 +309,7 @@ Route::prefix('admin')->middleware(['tenant', 'auth:sanctum'])->group(function (
 
     Route::middleware('permission:payments.refund')->group(function () {
         Route::post('/payments/{paymentId}/refund', [RefundController::class, 'store']);
+        Route::post('/orders/{orderId}/reconcile', [OrderController::class, 'reconcile']);
     });
 
     Route::middleware('permission:memberships.manage')->group(function () {

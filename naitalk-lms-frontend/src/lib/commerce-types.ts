@@ -26,4 +26,5 @@ export interface PaymentConfig {
   fee_bearer: 'tenant' | 'learner' | 'platform';
   status: string;
   last_verified_at: string | null;
+  webhook_url: string;
 }

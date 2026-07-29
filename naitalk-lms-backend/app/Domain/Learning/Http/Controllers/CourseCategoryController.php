@@ -10,9 +10,21 @@ use Illuminate\Validation\Rule;
 
 class CourseCategoryController extends Controller
 {
-    public function index()
+    /** Shared by the admin category picker (needs every category, to assign
+     * a course still in draft) and the public course catalogue's sidebar
+     * (only_with_published=1 — showing a category with nothing publicly
+     * browsable in it just reads as a dead link). */
+    public function index(Request $request)
     {
-        return response()->json(['data' => CourseCategory::orderBy('name')->get()]);
+        $categories = CourseCategory::query()
+            ->when(
+                $request->boolean('only_with_published'),
+                fn ($q) => $q->whereHas('courses', fn ($c) => $c->where('status', 'published'))
+            )
+            ->orderBy('name')
+            ->get();
+
+        return response()->json(['data' => $categories]);
     }
 
     public function store(Request $request)

@@ -150,7 +150,6 @@ Route::prefix('tenant')->middleware(['tenant', 'auth:sanctum'])->group(function 
 Route::middleware('tenant')->group(function () {
     Route::get('/course-categories', [CourseCategoryController::class, 'index']);
     Route::get('/courses', [CourseController::class, 'index']);
-    Route::get('/courses/{slug}', [CourseController::class, 'show']);
     Route::get('/courses/{courseId}/reviews', [ReviewController::class, 'index'])->whereNumber('courseId');
 
     Route::get('/membership-plans', [MembershipPlanController::class, 'index']);
@@ -158,6 +157,14 @@ Route::middleware('tenant')->group(function () {
     Route::get('/coaches/{coachId}', [CoachController::class, 'show']);
     Route::get('/coaching-services', [CoachingServiceController::class, 'index']);
     Route::get('/coaching-services/{serviceId}/sessions', [CoachingSessionController::class, 'index']);
+});
+
+// Public, but personalizes the response (unlocks already-enrolled lessons)
+// when the visitor happens to be logged in — needs 'optional-auth' ahead of
+// 'tenant' so both this route and ResolveTenant's own membership check see
+// the correctly resolved user. See TryAuthenticateSanctum's docblock.
+Route::middleware(['optional-auth', 'tenant'])->group(function () {
+    Route::get('/courses/{slug}', [CourseController::class, 'show']);
 });
 
 /*

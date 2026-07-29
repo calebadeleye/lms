@@ -5,6 +5,7 @@ use App\Domain\Identity\Http\Middleware\EnsureEmailIsVerified;
 use App\Domain\Identity\Http\Middleware\PlatformStaffOnly;
 use App\Domain\Tenancy\Http\Middleware\ResolveTenant;
 use App\Support\Api\Http\Middleware\AssignRequestId;
+use App\Support\Api\Http\Middleware\TryAuthenticateSanctum;
 use App\Support\Api\Http\Middleware\VerifyFrontendSecret;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -28,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant' => ResolveTenant::class,
             'platform' => PlatformStaffOnly::class,
             'permission' => CheckPermission::class,
+            'optional-auth' => TryAuthenticateSanctum::class,
             // Overrides Laravel's default `verified` alias, which returns a
             // differently-shaped `{"message": "..."}` body — this app's
             // other 403s (CheckPermission) always shape errors as

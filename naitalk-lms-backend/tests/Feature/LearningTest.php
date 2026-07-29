@@ -68,6 +68,28 @@ it('lists published courses publicly with no auth required', function () {
         ->assertJsonPath('data.0.slug', 'hr-fundamentals');
 });
 
+it('unlocks lessons and reports is_enrolled on the public course detail page for a logged-in enrolled student', function () {
+    $this->postJson(($this->url)("/api/v1/courses/{$this->course->id}/enrol"), [], [
+        'Authorization' => "Bearer {$this->studentToken}",
+    ])->assertCreated();
+
+    $response = $this->getJson(($this->url)("/api/v1/courses/{$this->course->slug}"), [
+        'Authorization' => "Bearer {$this->studentToken}",
+    ])->assertOk();
+
+    expect($response->json('data.is_enrolled'))->toBeTrue();
+    $lessons = collect($response->json('data.modules'))->flatMap(fn ($m) => $m['lessons']);
+    expect($lessons->pluck('locked')->unique()->all())->toBe([false]);
+});
+
+it('still shows a published course to an anonymous visitor, with non-preview lessons locked', function () {
+    $response = $this->getJson(($this->url)("/api/v1/courses/{$this->course->slug}"))->assertOk();
+
+    expect($response->json('data.is_enrolled'))->toBeFalse();
+    $lessons = collect($response->json('data.modules'))->flatMap(fn ($m) => $m['lessons']);
+    expect($lessons->pluck('locked')->unique()->all())->toBe([true]);
+});
+
 it('does not list draft courses in the public catalogue', function () {
     app(TenantContext::class)->set($this->tenant);
     Course::create(['title' => 'Draft Course', 'slug' => 'draft-course', 'status' => 'draft', 'pricing_type' => 'free']);

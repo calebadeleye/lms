@@ -10,6 +10,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
   const router = useRouter();
   const [status, setStatus] = useState(lesson.progress?.status ?? 'not_started');
   const [marking, setMarking] = useState(false);
+  const [markError, setMarkError] = useState<string | null>(null);
   const lastReported = useRef(0);
   const videoEmbed = resolveVideoEmbed(lesson.video_path);
 
@@ -32,12 +33,17 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
 
   async function markComplete() {
     setMarking(true);
+    setMarkError(null);
     try {
       const res = await fetch(`/api/v1/lessons/${lesson.id}/progress/complete`, { method: 'POST' });
       if (res.ok) {
         setStatus('completed');
         router.refresh();
+      } else {
+        setMarkError('Could not mark this lesson complete. Please try again.');
       }
+    } catch {
+      setMarkError('Could not mark this lesson complete. Please try again.');
     } finally {
       setMarking(false);
     }
@@ -151,13 +157,16 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
       {(['rich_text', 'file', 'external_link', 'live'].includes(lesson.type) ||
         (lesson.type === 'video' && videoEmbed.kind !== 'direct')) &&
         status !== 'completed' && (
-        <button
-          onClick={markComplete}
-          disabled={marking}
-          className="mt-4 rounded-md bg-[var(--tenant-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
-        >
-          {marking ? 'Marking…' : 'Mark as Complete'}
-        </button>
+        <div className="mt-4">
+          <button
+            onClick={markComplete}
+            disabled={marking}
+            className="rounded-md bg-[var(--tenant-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          >
+            {marking ? 'Marking…' : 'Mark as Complete'}
+          </button>
+          {markError && <p className="mt-2 text-sm text-red-600">{markError}</p>}
+        </div>
       )}
     </div>
   );

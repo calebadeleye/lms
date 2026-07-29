@@ -61,7 +61,15 @@ class ProgressService
 
     public function markComplete(Enrolment $enrolment, Lesson $lesson): LessonProgress
     {
-        if (in_array($lesson->type, ['video', 'audio', 'quiz', 'assignment'], true)) {
+        // A directly-hosted video/audio file completes via the 90%-watched
+        // position tracking above, not this endpoint. An externally-embedded
+        // video (YouTube/Vimeo/Google Drive) is the one 'video' exception —
+        // there's no way to read playback position out of that cross-origin
+        // iframe, so manual completion is the only option it has, and the
+        // frontend's lesson player only ever shows this button for that case.
+        $isDirectVideoOrAudio = in_array($lesson->type, ['video', 'audio'], true) && ! $lesson->hasExternalVideoEmbed();
+
+        if ($isDirectVideoOrAudio || in_array($lesson->type, ['quiz', 'assignment'], true)) {
             throw new \LogicException("Lesson type '{$lesson->type}' cannot be marked complete directly.");
         }
 

@@ -48,4 +48,22 @@ class Lesson extends Model
 
         return $enrolment->enrolled_at->addDays($this->available_after_days)->isPast();
     }
+
+    /** Mirrors the frontend's resolveVideoEmbed() (src/lib/learning-types.ts)
+     * — a YouTube/Vimeo/Google Drive link is a cross-origin iframe with no
+     * way to read playback position, unlike a directly-hosted file. Keep
+     * these patterns in sync with that function; ProgressService::markComplete()
+     * needs this to know whether manual completion is the only option this
+     * lesson has, or whether it should only ever complete via the
+     * watch-90%-of-it position tracking a direct file gets. */
+    public function hasExternalVideoEmbed(): bool
+    {
+        if (! $this->video_path) {
+            return false;
+        }
+
+        return (bool) preg_match('#(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)[a-zA-Z0-9_-]{6,}#', $this->video_path)
+            || (bool) preg_match('#vimeo\.com/(?:video/)?\d+#', $this->video_path)
+            || (bool) preg_match('#drive\.google\.com/(?:file/d/|open\?id=|uc\?id=)[a-zA-Z0-9_-]+#', $this->video_path);
+    }
 }

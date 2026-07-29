@@ -164,6 +164,32 @@ it('does not mark a video lesson complete below the 90% watched threshold', func
     expect($response->json('data.status'))->toBe('in_progress');
 });
 
+it('lets a student manually mark an externally-embedded video lesson complete, since its playback position cannot be tracked', function () {
+    app(TenantContext::class)->set($this->tenant);
+    $this->videoLesson->update(['video_path' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ']);
+    app(TenantContext::class)->clear();
+
+    $this->postJson(($this->url)("/api/v1/courses/{$this->course->id}/enrol"), [], [
+        'Authorization' => "Bearer {$this->studentToken}",
+    ])->assertCreated();
+
+    $response = $this->postJson(($this->url)("/api/v1/lessons/{$this->videoLesson->id}/progress/complete"), [], [
+        'Authorization' => "Bearer {$this->studentToken}",
+    ])->assertOk();
+
+    expect($response->json('data.status'))->toBe('completed');
+});
+
+it('refuses to manually mark a directly-hosted video lesson complete — that only completes via watched position', function () {
+    $this->postJson(($this->url)("/api/v1/courses/{$this->course->id}/enrol"), [], [
+        'Authorization' => "Bearer {$this->studentToken}",
+    ])->assertCreated();
+
+    $this->postJson(($this->url)("/api/v1/lessons/{$this->videoLesson->id}/progress/complete"), [], [
+        'Authorization' => "Bearer {$this->studentToken}",
+    ])->assertStatus(500);
+});
+
 it('computes course completion percentage across mandatory lessons and completes the enrolment at 100%', function () {
     $this->postJson(($this->url)("/api/v1/courses/{$this->course->id}/enrol"), [], [
         'Authorization' => "Bearer {$this->studentToken}",

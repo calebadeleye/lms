@@ -33,6 +33,7 @@ export const platformNav: PlatformNavItem[] = [
 
 export const tenantAdminNav: NavItem[] = [
   { href: '/admin', label: 'Dashboard' },
+  { href: '/admin/subscription', label: 'Plan & Usage' },
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/students', label: 'Students' },
   { href: '/admin/courses', label: 'Courses' },

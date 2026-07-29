@@ -17,10 +17,8 @@ interface Domain {
 }
 
 export default async function DomainsPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('domains.manage')) redirect('/dashboard');
 
   const domains = await apiFetch<{ data: Domain[] }>('/api/v1/tenant/domains');

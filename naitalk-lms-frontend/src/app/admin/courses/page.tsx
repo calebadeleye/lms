@@ -10,10 +10,8 @@ import type { PaginationMeta } from '@/components/pagination';
 import type { CourseCategory } from '@/lib/admin-course-types';
 
 export default async function AdminCoursesPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('courses.update') && !me.permissions.includes('courses.create')) {
     redirect('/dashboard');
   }

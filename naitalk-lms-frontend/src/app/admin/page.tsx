@@ -6,6 +6,7 @@ import { DashboardShell } from '@/components/dashboard-shell';
 import { tenantAdminNav } from '@/lib/nav';
 
 const SECTIONS: { permission: string; href: string; title: string; description: string }[] = [
+  { permission: 'subscription.manage', href: '/admin/subscription', title: 'Plan & Usage', description: 'Your current plan and how close you are to each limit.' },
   { permission: 'users.manage', href: '/admin/users', title: 'Users', description: 'Invite staff and manage admin access.' },
   { permission: 'students.manage', href: '/admin/students', title: 'Students', description: 'Your learner roster, enrolments, and completion.' },
   { permission: 'courses.update', href: '/admin/courses', title: 'Courses', description: 'Build and publish your course catalogue.' },
@@ -20,10 +21,8 @@ const SECTIONS: { permission: string; href: string; title: string; description: 
 ];
 
 export default async function AdminDashboardPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (me.permissions.length === 0) redirect('/dashboard');
 
   const visibleSections = SECTIONS.filter((section) => me.permissions.includes(section.permission));

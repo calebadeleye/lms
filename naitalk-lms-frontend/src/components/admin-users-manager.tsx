@@ -74,7 +74,7 @@ export function AdminUsersManager({
       const body = await res.json().catch(() => null);
 
       if (!res.ok) {
-        setError(body?.errors?.email?.[0] ?? body?.errors?.[0]?.message ?? 'Could not send invitation.');
+        setError(body?.errors?.email?.[0] ?? body?.errors?.role_id?.[0] ?? body?.errors?.[0]?.message ?? 'Could not send invitation.');
         return;
       }
 
@@ -93,17 +93,21 @@ export function AdminUsersManager({
   }
 
   async function changeRole(userId: number, newRoleId: string) {
+    setError(null);
     const res = await fetch(`/api/v1/admin/tenant-users/${userId}/role`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role_id: Number(newRoleId) }),
     });
+    const body = await res.json().catch(() => null);
     if (res.ok) {
       const roleName = roles.find((r) => r.id === Number(newRoleId))?.name ?? '';
       setMembers((prev) =>
         prev.map((m) => (m.id === userId ? { ...m, role_id: Number(newRoleId), role: roleName } : m))
       );
       router.refresh();
+    } else {
+      setError(body?.errors?.role_id?.[0] ?? 'Could not change this person\'s role.');
     }
   }
 
@@ -115,9 +119,15 @@ export function AdminUsersManager({
   }
 
   async function reactivate(userId: number) {
-    await fetch(`/api/v1/admin/tenant-users/${userId}/reactivate`, { method: 'POST' });
-    await loadMembers();
-    router.refresh();
+    setError(null);
+    const res = await fetch(`/api/v1/admin/tenant-users/${userId}/reactivate`, { method: 'POST' });
+    if (res.ok) {
+      await loadMembers();
+      router.refresh();
+    } else {
+      const body = await res.json().catch(() => null);
+      setError(body?.errors?.user?.[0] ?? 'Could not reactivate this person.');
+    }
   }
 
   async function revokeInvitation(invitationId: number) {

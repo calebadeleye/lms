@@ -18,10 +18,8 @@ interface AdminMembershipPlan {
 }
 
 export default async function AdminMembershipsPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('memberships.manage')) redirect('/dashboard');
 
   const plans = await apiFetch<{ data: AdminMembershipPlan[] }>('/api/v1/admin/membership-plans');

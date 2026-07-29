@@ -23,6 +23,7 @@ export function PlatformTenantsManager({ initialTenants, plans }: { initialTenan
   const router = useRouter();
   const [tenants, setTenants] = useState(initialTenants);
   const [name, setName] = useState('');
+  const [ownerName, setOwnerName] = useState('');
   const [ownerEmail, setOwnerEmail] = useState('');
   const [planId, setPlanId] = useState<string>(plans[0]?.id.toString() ?? '');
   const [pending, setPending] = useState(false);
@@ -39,6 +40,7 @@ export function PlatformTenantsManager({ initialTenants, plans }: { initialTenan
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
+          owner_name: ownerName || undefined,
           owner_email: ownerEmail || undefined,
           plan_id: planId ? Number(planId) : undefined,
           subscription_status: 'trialing',
@@ -53,6 +55,7 @@ export function PlatformTenantsManager({ initialTenants, plans }: { initialTenan
 
       setTenants((prev) => [body.data, ...prev]);
       setName('');
+      setOwnerName('');
       setOwnerEmail('');
       router.refresh();
     } finally {
@@ -85,12 +88,24 @@ export function PlatformTenantsManager({ initialTenants, plans }: { initialTenan
         className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl sm:grid-cols-4"
       >
         <div className="sm:col-span-2">
-          <label className="block text-xs font-medium text-white/60">Tenant name</label>
+          <label className="block text-xs font-medium text-white/60">Academy / business name</label>
           <input
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Acme Academy"
+            className="mt-1 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-[var(--naitalk-green)] focus:outline-none"
+          />
+          <p className="mt-1 text-xs text-white/40">
+            Their brand, not their personal name — this becomes their live web address, e.g. acme-academy.lms.naitalk.com.
+          </p>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-white/60">Owner&apos;s full name (optional)</label>
+          <input
+            value={ownerName}
+            onChange={(e) => setOwnerName(e.target.value)}
+            placeholder="Jane Doe"
             className="mt-1 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-[var(--naitalk-green)] focus:outline-none"
           />
         </div>

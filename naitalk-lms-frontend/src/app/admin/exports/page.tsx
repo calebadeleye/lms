@@ -14,10 +14,8 @@ interface ExportJob {
 }
 
 export default async function TenantExportsPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('exports.request')) redirect('/dashboard');
 
   const exports = await apiFetch<{ data: ExportJob[] }>('/api/v1/admin/exports');

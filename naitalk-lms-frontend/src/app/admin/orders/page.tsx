@@ -29,10 +29,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function AdminOrdersPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('payments.view')) redirect('/dashboard');
 
   const orders = await apiFetch<{ data: AdminOrder[]; meta: { pagination: { total: number } } }>(

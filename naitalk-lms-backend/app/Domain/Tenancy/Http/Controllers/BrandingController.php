@@ -2,16 +2,21 @@
 
 namespace App\Domain\Tenancy\Http\Controllers;
 
+use App\Domain\Billing\Services\TenantUsageService;
 use App\Domain\Tenancy\Models\TenantBranding;
 use App\Domain\Tenancy\Services\TenantContext;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
 
 class BrandingController extends Controller
 {
-    public function __construct(private TenantContext $tenantContext) {}
+    public function __construct(
+        private TenantContext $tenantContext,
+        private TenantUsageService $usage,
+    ) {}
 
     public function show()
     {
@@ -81,6 +86,13 @@ class BrandingController extends Controller
     private function storeAsset(UploadedFile $file, string $column, string $baseName)
     {
         $tenant = $this->tenantContext->tenant();
+
+        if (! $this->usage->hasCapacity($tenant, 'storage_gb', $file->getSize() / 1_073_741_824)) {
+            throw ValidationException::withMessages([
+                'file' => ["Your plan's storage limit has been reached. Upgrade your plan for more space."],
+            ]);
+        }
+
         $extension = $file->extension() ?: $file->getClientOriginalExtension();
         $directory = "{$tenant->id}/branding";
 
@@ -90,6 +102,7 @@ class BrandingController extends Controller
         $branding->update([$column => "{$directory}/{$baseName}.{$extension}"]);
 
         Cache::forget("tenant:{$tenant->id}:public-config");
+        $this->usage->forget($tenant, 'storage_gb');
 
         return response()->json(['data' => $branding->fresh()]);
     }

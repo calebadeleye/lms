@@ -14,10 +14,8 @@ import type { AdminCourseDetail, CourseCategory } from '@/lib/admin-course-types
 import type { TenantMember } from '@/lib/admin-coaching-types';
 
 export default async function AdminCourseBuilderPage({ params }: { params: Promise<{ courseId: string }> }) {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('courses.update')) redirect('/dashboard');
 
   const { courseId } = await params;

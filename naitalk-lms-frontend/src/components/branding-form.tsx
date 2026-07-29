@@ -37,7 +37,19 @@ export function BrandingForm({
       const res = await fetch('/api/v1/tenant/branding', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        // Send only the fields this form actually owns. `form` state was
+        // seeded from the full branding record at page load, which also
+        // carries logo_path/favicon_path/hero_image_path — serializing the
+        // whole object would resend those as stale nulls (from before an
+        // asset was ever uploaded, since uploads refresh the server props
+        // but don't resync this already-mounted state) and wipe out
+        // whatever was uploaded via the separate upload endpoints.
+        body: JSON.stringify({
+          primary_color: form.primary_color,
+          secondary_color: form.secondary_color,
+          accent_color: form.accent_color,
+          email_sender_name: form.email_sender_name,
+        }),
       });
 
       if (!res.ok) {
@@ -175,7 +187,7 @@ function AssetUploadField({
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        setError(body?.errors?.[0]?.message ?? `Could not upload ${label.toLowerCase()}.`);
+        setError(body?.errors?.file?.[0] ?? body?.errors?.[0]?.message ?? `Could not upload ${label.toLowerCase()}.`);
         return;
       }
 

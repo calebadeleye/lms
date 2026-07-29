@@ -2,6 +2,7 @@
 
 namespace App\Domain\Learning\Http\Controllers;
 
+use App\Domain\Billing\Services\TenantUsageService;
 use App\Domain\Learning\Models\CourseModule;
 use App\Domain\Learning\Models\Enrolment;
 use App\Domain\Learning\Models\Lesson;
@@ -13,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class LessonController extends Controller
 {
@@ -118,7 +120,7 @@ class LessonController extends Controller
      * wrong here) so the existing student-facing lesson player needs no
      * changes at all.
      */
-    public function uploadMaterial(Request $request, string $lessonId)
+    public function uploadMaterial(Request $request, string $lessonId, TenantUsageService $usage)
     {
         $lesson = Lesson::findOrFail($lessonId);
 
@@ -127,6 +129,14 @@ class LessonController extends Controller
         ]);
 
         $file = $request->file('file');
+        $tenant = $lesson->tenant;
+
+        if (! $usage->hasCapacity($tenant, 'storage_gb', $file->getSize() / 1_073_741_824)) {
+            throw ValidationException::withMessages([
+                'file' => ["Your plan's storage limit has been reached. Upgrade your plan for more space."],
+            ]);
+        }
+
         $directory = "{$lesson->tenant_id}/course-materials/{$lesson->id}";
         $storedName = Str::uuid().'.'.$file->extension();
 
@@ -140,6 +150,8 @@ class LessonController extends Controller
                 'material_filename' => $file->getClientOriginalName(),
             ],
         ]);
+
+        $usage->forget($tenant, 'storage_gb');
 
         return response()->json(['data' => $lesson->fresh()]);
     }

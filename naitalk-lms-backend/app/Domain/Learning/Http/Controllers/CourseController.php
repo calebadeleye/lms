@@ -2,6 +2,7 @@
 
 namespace App\Domain\Learning\Http\Controllers;
 
+use App\Domain\Billing\Services\TenantUsageService;
 use App\Domain\Learning\Models\Course;
 use App\Domain\Learning\Models\Enrolment;
 use App\Domain\Learning\Services\EnrolmentService;
@@ -17,6 +18,7 @@ class CourseController extends Controller
     public function __construct(
         private EnrolmentService $enrolments,
         private TenantContext $tenantContext,
+        private TenantUsageService $usage,
     ) {}
 
     /** Public catalogue — published courses only. */
@@ -141,6 +143,13 @@ class CourseController extends Controller
         $extension = $file->extension() ?: $file->getClientOriginalExtension();
         $directory = "{$course->tenant_id}/courses/{$course->id}";
 
+        $tenant = $this->tenantContext->tenant();
+        if (! $this->usage->hasCapacity($tenant, 'storage_gb', $file->getSize() / 1_073_741_824)) {
+            throw ValidationException::withMessages([
+                'file' => ["Your plan's storage limit has been reached. Upgrade your plan for more space."],
+            ]);
+        }
+
         // Old thumbnail cleaned up first so a re-upload in a different
         // format (e.g. .png replacing a .jpg) doesn't leave the stale file
         // sitting on disk under a filename nothing points to anymore.
@@ -150,6 +159,7 @@ class CourseController extends Controller
 
         $file->storeAs($directory, "thumbnail.{$extension}", ['disk' => 'tenants']);
         $course->update(['thumbnail_path' => "{$directory}/thumbnail.{$extension}"]);
+        $this->usage->forget($tenant, 'storage_gb');
 
         return response()->json(['data' => ['thumbnail_url' => $course->fresh()->thumbnailUrl()]]);
     }
@@ -157,7 +167,16 @@ class CourseController extends Controller
     public function publish(string $courseId)
     {
         $course = Course::findOrFail($courseId);
+        $tenant = $this->tenantContext->tenant();
+
+        if ($course->status !== 'published' && ! $this->usage->hasCapacity($tenant, 'max_published_courses')) {
+            throw ValidationException::withMessages([
+                'course' => ["Your plan's published-course limit has been reached. Upgrade your plan to publish more."],
+            ]);
+        }
+
         $course->update(['status' => 'published', 'published_at' => $course->published_at ?? now()]);
+        $this->usage->forget($tenant, 'max_published_courses');
 
         return response()->json(['data' => $course->fresh()]);
     }
@@ -166,6 +185,7 @@ class CourseController extends Controller
     {
         $course = Course::findOrFail($courseId);
         $course->update(['status' => 'draft']);
+        $this->usage->forget($this->tenantContext->tenant(), 'max_published_courses');
 
         return response()->json(['data' => $course->fresh()]);
     }
@@ -225,10 +245,28 @@ class CourseController extends Controller
 
         $source = $course->pricing_type === 'membership_only' ? 'membership' : 'free';
 
+        // Only gated here (free/membership self-enrolment), deliberately
+        // not inside EnrolmentService::enroll() itself — that method is
+        // shared with OrderFulfillmentService's paid-checkout path, and
+        // blocking a completed payment's fulfilment because of a plan
+        // limit would leave a paying customer charged with no access.
+        $tenant = $this->tenantContext->tenant();
+        $alreadyActiveStudent = Enrolment::where('user_id', $request->user()->id)->where('status', 'active')->exists();
+
+        if (! $alreadyActiveStudent && ! $this->usage->hasCapacity($tenant, 'max_active_students')) {
+            throw ValidationException::withMessages([
+                'course' => ['This academy has reached its plan\'s active-student limit. Please contact them directly.'],
+            ]);
+        }
+
         try {
             $enrolment = $this->enrolments->enroll($request->user(), $course, $source);
         } catch (\App\Domain\Learning\Exceptions\CourseNotFreeException $e) {
             throw ValidationException::withMessages(['course' => [$e->getMessage()]]);
+        }
+
+        if (! $alreadyActiveStudent) {
+            $this->usage->forget($tenant, 'max_active_students');
         }
 
         return response()->json(['data' => $enrolment], 201);

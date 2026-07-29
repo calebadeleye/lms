@@ -9,10 +9,8 @@ import { AdminAddCoachForm } from '@/components/admin-add-coach-form';
 import type { AdminCoach, TenantMember } from '@/lib/admin-coaching-types';
 
 export default async function AdminCoachingPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('coaching.manage')) redirect('/dashboard');
 
   const [coaches, members] = await Promise.all([

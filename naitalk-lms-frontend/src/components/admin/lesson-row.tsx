@@ -75,7 +75,7 @@ export function LessonRow({ lesson }: { lesson: AdminLesson }) {
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        setUploadError(body?.errors?.[0]?.message ?? 'Could not upload the file.');
+        setUploadError(body?.errors?.file?.[0] ?? body?.errors?.[0]?.message ?? 'Could not upload the file.');
         return;
       }
 

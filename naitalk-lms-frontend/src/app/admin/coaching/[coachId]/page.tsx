@@ -15,10 +15,8 @@ interface CoachWithRelations extends AdminCoach {
 }
 
 export default async function AdminCoachDetailPage({ params }: { params: Promise<{ coachId: string }> }) {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('coaching.manage')) redirect('/dashboard');
 
   const { coachId } = await params;

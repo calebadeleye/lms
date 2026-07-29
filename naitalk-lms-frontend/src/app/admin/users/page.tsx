@@ -9,10 +9,8 @@ import type { PaginationMeta } from '@/components/pagination';
 import type { TenantMemberDetail, TenantRole, PendingInvitation } from '@/lib/admin-users-types';
 
 export default async function AdminUsersPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('users.manage')) redirect('/dashboard');
 
   const [members, invitations, roles] = await Promise.all([

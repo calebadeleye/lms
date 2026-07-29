@@ -13,10 +13,8 @@ interface AdminCertificate extends CertificateSummary {
 }
 
 export default async function AdminCertificatesPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('certificates.issue')) redirect('/dashboard');
 
   const certificates = await apiFetch<{ data: AdminCertificate[] }>('/api/v1/admin/certificates');

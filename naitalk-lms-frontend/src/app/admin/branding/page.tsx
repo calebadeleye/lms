@@ -14,10 +14,8 @@ interface BrandingRecord {
 }
 
 export default async function BrandingPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('branding.manage')) redirect('/dashboard');
 
   const branding = await apiFetch<{ data: BrandingRecord }>('/api/v1/tenant/branding');

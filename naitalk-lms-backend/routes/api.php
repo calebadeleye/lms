@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Billing\Http\Controllers\TenantSubscriptionController;
 use App\Domain\Coaching\Http\Controllers\AvailabilityController;
 use App\Domain\Coaching\Http\Controllers\BookingController;
 use App\Domain\Coaching\Http\Controllers\CoachController;
@@ -122,6 +123,8 @@ Route::prefix('auth')->middleware('tenant')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('tenant')->middleware(['tenant', 'auth:sanctum'])->group(function () {
+    Route::get('/subscription', [TenantSubscriptionController::class, 'show'])->middleware('permission:subscription.manage');
+
     Route::get('/branding', [BrandingController::class, 'show']);
     Route::put('/branding', [BrandingController::class, 'update'])->middleware('permission:branding.manage');
     Route::post('/branding/logo', [BrandingController::class, 'uploadLogo'])->middleware('permission:branding.manage');

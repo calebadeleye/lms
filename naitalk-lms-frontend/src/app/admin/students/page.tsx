@@ -9,10 +9,8 @@ import type { PaginationMeta } from '@/components/pagination';
 import type { AdminStudent } from '@/lib/admin-users-types';
 
 export default async function AdminStudentsPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('students.manage')) redirect('/dashboard');
 
   const students = await apiFetch<{ data: AdminStudent[]; meta?: { pagination: PaginationMeta } }>(

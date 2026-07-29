@@ -127,8 +127,11 @@ export function AdminCoursesManager({
     const res = await fetch(`/api/v1/admin/courses/${course.id}/${action}`, { method: 'POST' });
     const body = await res.json();
     if (res.ok) {
+      setError(null);
       setCourses((prev) => prev.map((c) => (c.id === course.id ? { ...c, status: body.data.status } : c)));
       router.refresh();
+    } else {
+      setError(body?.errors?.course?.[0] ?? `Could not ${action} this course.`);
     }
   }
 

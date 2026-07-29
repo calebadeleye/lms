@@ -18,10 +18,8 @@ interface EnrolmentRosterItem {
 }
 
 export default async function CourseEnrolmentsPage({ params }: { params: Promise<{ courseId: string }> }) {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('students.manage')) redirect('/dashboard');
 
   const { courseId } = await params;

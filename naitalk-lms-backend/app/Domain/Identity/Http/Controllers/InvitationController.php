@@ -2,6 +2,7 @@
 
 namespace App\Domain\Identity\Http\Controllers;
 
+use App\Domain\Billing\Services\TenantUsageService;
 use App\Domain\Identity\Models\Invitation;
 use App\Domain\Identity\Models\Role;
 use App\Domain\Identity\Models\TenantUser;
@@ -23,6 +24,7 @@ class InvitationController extends Controller
     public function __construct(
         private TenantContext $tenantContext,
         private AuthService $auth,
+        private TenantUsageService $usage,
     ) {}
 
     /** Admin — pending invitations for this tenant. */
@@ -50,6 +52,13 @@ class InvitationController extends Controller
         $role = Role::forTenant($tenant->id)->findOrFail($data['role_id']);
         $existingUser = User::where('email', $data['email'])->first();
 
+        $metric = $this->usage->metricForRole($role->slug);
+        if ($metric && ! $this->usage->hasCapacity($tenant, $metric)) {
+            throw ValidationException::withMessages([
+                'role_id' => ["Your plan's limit for this role has been reached. Upgrade your plan to add more."],
+            ]);
+        }
+
         if ($existingUser) {
             if (TenantUser::where('user_id', $existingUser->id)->exists()) {
                 throw ValidationException::withMessages(['email' => ['This person is already a member of this tenant.']]);
@@ -58,6 +67,10 @@ class InvitationController extends Controller
             TenantUser::create([
                 'user_id' => $existingUser->id, 'role_id' => $role->id, 'status' => 'active', 'joined_at' => now(),
             ]);
+
+            if ($metric) {
+                $this->usage->forget($tenant, $metric);
+            }
 
             Notification::route('mail', $existingUser->email)->notify(new AddedToTenantNotification($tenant, $role));
 
@@ -77,6 +90,10 @@ class InvitationController extends Controller
             'expires_at' => now()->addDays(7),
         ]);
 
+        if ($metric) {
+            $this->usage->forget($tenant, $metric);
+        }
+
         Notification::route('mail', $data['email'])->notify(new TenantInvitationNotification($invitation));
 
         return response()->json(['data' => $invitation->load('role:id,name')], 201);
@@ -86,6 +103,10 @@ class InvitationController extends Controller
     {
         $invitation = Invitation::where('status', 'pending')->findOrFail($invitationId);
         $invitation->update(['status' => 'revoked']);
+
+        if ($metric = $this->usage->metricForRole($invitation->role->slug)) {
+            $this->usage->forget($this->tenantContext->tenant(), $metric);
+        }
 
         return response()->json(['data' => ['success' => true]]);
     }

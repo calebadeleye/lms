@@ -8,10 +8,8 @@ import { PaymentConfigForm } from '@/components/payment-config-form';
 import type { PaymentConfig } from '@/lib/commerce-types';
 
 export default async function PaymentSettingsPage() {
-  const config = await getTenantConfig();
+  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
   if (!config) notFound();
-
-  const me = await requireUser();
   if (!me.permissions.includes('payment_gateway.manage')) redirect('/dashboard');
 
   const paymentConfig = await apiFetch<{ data: PaymentConfig | null }>('/api/v1/admin/payment-config');

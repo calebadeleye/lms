@@ -53,6 +53,7 @@ class PlatformTenantController extends Controller
             ownerName: $data['owner_name'] ?? null,
             plan: $plan,
             subscriptionStatus: $data['subscription_status'] ?? 'trialing',
+            invitedByUserId: $request->user()->id,
         );
 
         $this->auditLogger->log('tenant.created', tenantId: $tenant->id, metadata: ['name' => $tenant->name]);

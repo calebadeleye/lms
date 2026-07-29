@@ -24,7 +24,7 @@ class HrGemsTenantSeeder extends Seeder
             return;
         }
 
-        $plan = PlatformPlan::where('code', 'growth-annual')->firstOrFail();
+        $plan = PlatformPlan::where('code', 'academy-annual')->firstOrFail();
 
         $tenant = app(TenantProvisioningService::class)->provision(
             name: 'HR GEMS',

@@ -103,6 +103,9 @@ export function PlatformTenantsManager({ initialTenants, plans }: { initialTenan
             placeholder="owner@acme.com"
             className="mt-1 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-[var(--naitalk-green)] focus:outline-none"
           />
+          <p className="mt-1 text-xs text-white/40">
+            If set, they&apos;ll receive an email to accept an invitation and set their own password.
+          </p>
         </div>
         <div>
           <label className="block text-xs font-medium text-white/60">Plan</label>

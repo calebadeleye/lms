@@ -142,6 +142,10 @@ class InvitationController extends Controller
                 'joined_at' => now(),
             ]);
 
+            if ($invitation->role->slug === 'tenant-owner' && ! $tenant->owner_user_id) {
+                $tenant->update(['owner_user_id' => $user->id]);
+            }
+
             $invitation->update(['status' => 'accepted', 'accepted_at' => now()]);
 
             return $user;

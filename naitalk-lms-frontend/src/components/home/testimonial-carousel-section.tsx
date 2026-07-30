@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HOME_CONTENT } from '@/lib/home-content';
 
 const PER_PAGE = 3;
+const AUTO_ADVANCE_MS = 6000;
 
 export function TestimonialCarouselSection() {
   const { moreStories } = HOME_CONTENT;
@@ -15,6 +16,12 @@ export function TestimonialCarouselSection() {
   function go(delta: number) {
     setPage((p) => (p + delta + pageCount) % pageCount);
   }
+
+  useEffect(() => {
+    const timer = setInterval(() => go(1), AUTO_ADVANCE_MS);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageCount]);
 
   return (
     <section className="relative isolate overflow-hidden bg-[#005f61] text-white">
@@ -63,7 +70,7 @@ export function TestimonialCarouselSection() {
           {current.map((quote, i) => (
             <p
               key={page * PER_PAGE + i}
-              className="min-h-[112px] rounded-md border border-white/25 bg-white/5 p-4 text-[11px] font-semibold leading-relaxed text-white/95"
+              className="min-h-[140px] rounded-md border border-white/25 bg-white/5 p-5 text-base font-medium leading-relaxed text-white"
             >
               &ldquo;{quote}&rdquo;
             </p>

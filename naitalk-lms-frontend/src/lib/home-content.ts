@@ -121,7 +121,6 @@ export const HOME_CONTENT = {
       'My overall experience personality assessment session is ways to find purpose. I found it interesting and loved the purpose behind sharing it',
       'It was impactful and eye opening',
       'Awesome and eye opening. It was a positive and insightful experience. The assessment was easy to follow and provided valuable insights into my personality and work style.',
-      'Good',
       'My overall experience was insightful and engaging. It helped me better understand my personality, strengths, and areas for growth, making the session both enjoyable and valuable.',
       "Wonderful and it's resonates exactly with my personality",
       'It was really an eye opener to who i really am.',

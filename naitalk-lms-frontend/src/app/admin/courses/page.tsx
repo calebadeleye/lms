@@ -26,7 +26,7 @@ export default async function AdminCoursesPage() {
       <h1 className="text-xl font-bold text-neutral-900">Courses</h1>
       <p className="mt-1 text-sm text-neutral-500">Create, publish, and manage your course catalogue.</p>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_18rem]">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <AdminCoursesManager
           initial={courses.data}
           initialMeta={courses.meta?.pagination ?? { page: 1, per_page: 20, total: courses.data.length }}

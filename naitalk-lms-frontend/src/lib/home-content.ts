@@ -8,7 +8,9 @@
 
 export interface PhotoSlot {
   /** null until a real asset is supplied — every consumer falls back to the
-   * site's teal-to-gold gradient placeholder. */
+   * site's teal-to-gold gradient placeholder. Currently populated from
+   * Pexels via scripts/fetch-marketing-images.mjs (see public/marketing/CREDITS.md);
+   * swap for the client's own photography whenever it's supplied. */
   src: string | null;
   alt: string;
 }
@@ -25,7 +27,7 @@ export const HOME_CONTENT = {
     ctaSecondary: { label: 'Join HR GEMs', href: '/register' },
     audiences: ['Recent Graduates', 'Career Explorers', 'Professionals Seeking a New Direction'],
     quote: 'Understand yourself. Discover your purpose. Build a career that fits.',
-    photo: { src: null, alt: 'HR GEMs coaching session' } as PhotoSlot,
+    photo: { src: '/marketing/hero.jpg', alt: 'HR GEMs coaching session' } as PhotoSlot,
   },
 
   whoWeAre: {
@@ -39,7 +41,7 @@ export const HOME_CONTENT = {
         'Programming, Cognitive Behavioural Therapy, and other transformational techniques to positively ' +
         'influence individuals, organisations, and society.',
     ],
-    photo: { src: null, alt: 'A group of hands joined together' } as PhotoSlot,
+    photo: { src: '/marketing/who-we-are.jpg', alt: 'A group of hands joined together' } as PhotoSlot,
   },
 
   whyItMatters: {
@@ -94,12 +96,12 @@ export const HOME_CONTENT = {
     eyebrow: 'Our Community Experience',
     heading: 'Learn. Connect. Grow. Create Impact.',
     items: [
-      { caption: 'Group Coaching Sessions', photo: { src: null, alt: 'Group coaching session' } as PhotoSlot },
-      { caption: 'Peer Learning', photo: { src: null, alt: 'Peer learning session' } as PhotoSlot },
-      { caption: 'Mentorship', photo: { src: null, alt: 'Mentorship conversation' } as PhotoSlot },
-      { caption: 'Professional Networking', photo: { src: null, alt: 'Professional networking event' } as PhotoSlot },
-      { caption: 'Transformational Workshops', photo: { src: null, alt: 'Transformational workshop' } as PhotoSlot },
-      { caption: 'Personal & Career Development', photo: { src: null, alt: 'Personal and career development session' } as PhotoSlot },
+      { caption: 'Group Coaching Sessions', photo: { src: '/marketing/community-1.jpg', alt: 'Group coaching session' } as PhotoSlot },
+      { caption: 'Peer Learning', photo: { src: '/marketing/community-2.jpg', alt: 'Peer learning session' } as PhotoSlot },
+      { caption: 'Mentorship', photo: { src: '/marketing/community-3.jpg', alt: 'Mentorship conversation' } as PhotoSlot },
+      { caption: 'Professional Networking', photo: { src: '/marketing/community-4.jpg', alt: 'Professional networking event' } as PhotoSlot },
+      { caption: 'Transformational Workshops', photo: { src: '/marketing/community-5.jpg', alt: 'Transformational workshop' } as PhotoSlot },
+      { caption: 'Personal & Career Development', photo: { src: '/marketing/community-6.jpg', alt: 'Personal and career development session' } as PhotoSlot },
     ],
   },
 
@@ -110,7 +112,7 @@ export const HOME_CONTENT = {
       { quote: 'I came for the course, but stayed for the people. This community feels like family.', author: 'Esther I., Aspiring Coach' },
       { quote: 'The mentorship and practical learning here are simply outstanding.', author: 'David M., Career Changer' },
     ],
-    photo: { src: null, alt: 'A member reflecting on their journey' } as PhotoSlot,
+    photo: { src: '/marketing/more-stories.jpg', alt: 'A member reflecting on their journey' } as PhotoSlot,
     moreLink: { label: 'View More Testimonials', href: '/testimonials' },
   },
 

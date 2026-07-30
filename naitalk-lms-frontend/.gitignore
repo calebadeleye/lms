@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# scripts/fetch-marketing-images.mjs's API response cache — not project assets
+/.pexels-cache/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

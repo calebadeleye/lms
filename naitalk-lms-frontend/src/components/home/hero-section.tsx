@@ -43,8 +43,16 @@ export function HeroSection() {
         <PhotoSlotImage photo={hero.photo} className="h-full w-full" />
 
         <div
-          className="absolute bottom-0 right-0 flex w-3/5 items-end p-6 text-white sm:w-1/2"
-          style={{ background: 'linear-gradient(135deg, transparent 0%, transparent 30%, var(--brand-primary) 55%)' }}
+          className={[
+            // Mobile: a full-width bottom caption band (vertical fade) so the
+            // quote has real room to breathe. sm+: reverts to a diagonal
+            // wedge in the corner, closer to the original design — there's
+            // enough photo width by then for a narrower panel to still read
+            // comfortably.
+            'absolute inset-x-0 bottom-0 flex h-2/5 items-end bg-gradient-to-t from-[var(--brand-primary)] to-transparent p-6 text-white',
+            'sm:inset-x-auto sm:right-0 sm:h-full sm:w-3/5 sm:bg-gradient-to-bl sm:from-[var(--brand-primary)] sm:from-45% sm:to-transparent',
+            'md:w-1/2',
+          ].join(' ')}
         >
           <p className="text-sm italic leading-relaxed">
             <span aria-hidden className="mr-1 text-2xl leading-none text-[var(--brand-accent)]">

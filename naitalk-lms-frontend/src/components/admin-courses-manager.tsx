@@ -161,7 +161,7 @@ export function AdminCoursesManager({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <form onSubmit={createCourse} className="grid gap-3 rounded-xl border border-neutral-200 bg-white p-4 sm:grid-cols-4">
         <div className="sm:col-span-2">
           <label className="block text-xs font-medium text-neutral-700">Course title</label>

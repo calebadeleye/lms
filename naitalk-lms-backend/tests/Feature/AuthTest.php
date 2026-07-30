@@ -20,7 +20,11 @@ it('registers a new applicant with a pending status and a membership application
         'ack_positive_impact' => '1',
     ])->assertCreated();
 
-    expect($response->json('data.token'))->not->toBeEmpty();
+    // No session/token — an applicant isn't logged in until the
+    // registration fee is paid. payment_token authenticates that one
+    // checkout call in its place (see CheckoutController::startRegistrationFee()).
+    expect($response->json('data'))->not->toHaveKey('token');
+    expect($response->json('data.payment_token'))->not->toBeEmpty();
     expect($response->json('data.membership_status'))->toBe('pending');
 
     $user = User::where('email', 'jane@example.com')->firstOrFail();
@@ -35,15 +39,28 @@ it('registers a new applicant with a pending status and a membership application
     expect($application->ack_impact_beyond_earning)->toBeTrue();
 });
 
-it('rejects registration missing an acknowledgement', function () {
+it('accepts registration with just a single acknowledgement checked', function () {
     $this->postJson('/api/v1/auth/register', [
         'name' => 'Jane Learner',
         'email' => 'jane@example.com',
         'password' => 'Passw0rd123',
         'password_confirmation' => 'Passw0rd123',
         'ack_impact_beyond_earning' => '1',
+    ])->assertCreated();
+
+    $application = MembershipApplication::firstOrFail();
+    expect($application->ack_impact_beyond_earning)->toBeTrue();
+    expect($application->ack_growth_mindset)->toBeFalse();
+});
+
+it('rejects registration with no acknowledgement checked at all', function () {
+    $this->postJson('/api/v1/auth/register', [
+        'name' => 'Jane Learner',
+        'email' => 'jane@example.com',
+        'password' => 'Passw0rd123',
+        'password_confirmation' => 'Passw0rd123',
     ])->assertStatus(422)
-        ->assertJsonValidationErrors(['ack_growth_mindset', 'ack_interest_in_coaching', 'ack_positive_impact']);
+        ->assertJsonValidationErrors(['ack_impact_beyond_earning']);
 });
 
 it('blocks an unverified student from member actions but not from checking their own status', function () {

@@ -93,7 +93,6 @@ export const HOME_CONTENT = {
       { quote: "The coaching skills I've gained are transforming not only my career but also the lives of others I support.", author: 'Tunde B., Coach in Training' },
       { quote: 'A supportive community that challenges me to grow, learn, and make a real difference in the world.', author: 'Funmi A., Career Explorer' },
     ],
-    moreLink: { label: 'Read more stories', href: '/testimonials' },
   },
 
   communityExperience: {

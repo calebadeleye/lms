@@ -77,7 +77,12 @@ export function SiteFooter({ tenantName }: { tenantName: string }) {
                 {link.label}
               </Link>
             ))}
-            <span className="text-white/60">Made by NAI TALK</span>
+            <span className="text-white/60">
+              Made by{' '}
+              <a href="https://naitalk.com" className="hover:text-white">
+                NAI TALK
+              </a>
+            </span>
           </div>
         </div>
       </div>

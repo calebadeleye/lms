@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { HOME_CONTENT } from '@/lib/home-content';
 import { CheckIcon, MEMBERSHIP_BENEFIT_ICONS } from '@/components/home/home-icons';
 
@@ -60,9 +59,6 @@ export function JoinSection() {
               </li>
             ))}
           </ul>
-          <Link href={memberVoices.moreLink.href} className="mt-4 inline-block text-xs font-semibold text-[var(--brand-primary)] hover:underline">
-            {memberVoices.moreLink.label} &rarr;
-          </Link>
         </div>
       </div>
     </section>

@@ -8,7 +8,15 @@ import { formatPrice } from '@/lib/learning-types';
 const POLL_INTERVAL_MS = 2500;
 const MAX_POLLS = 12; // ~30s — long enough for the webhook to usually land
 
-export function CheckoutStatus({ orderId }: { orderId: number | null }) {
+export function CheckoutStatus({
+  orderId,
+  reference,
+  isAuthenticated,
+}: {
+  orderId: number | null;
+  reference: string;
+  isAuthenticated: boolean;
+}) {
   const [order, setOrder] = useState<OrderStatus | null>(null);
   const [attempts, setAttempts] = useState(0);
   const [notFound, setNotFound] = useState(false);
@@ -19,7 +27,13 @@ export function CheckoutStatus({ orderId }: { orderId: number | null }) {
     let cancelled = false;
 
     async function poll() {
-      const res = await fetch(`/api/v1/checkout/orders/${orderId}`);
+      // No session yet on a first-time registration-fee payment (register()
+      // deliberately doesn't log the applicant in) — use the public,
+      // reference-scoped status check instead of the authenticated one.
+      const url = isAuthenticated
+        ? `/api/v1/checkout/orders/${orderId}`
+        : `/api/v1/checkout/registration-fee/status?reference=${encodeURIComponent(reference)}`;
+      const res = await fetch(url);
       if (cancelled) return;
 
       if (!res.ok) {
@@ -35,7 +49,7 @@ export function CheckoutStatus({ orderId }: { orderId: number | null }) {
     return () => {
       cancelled = true;
     };
-  }, [orderId, attempts]);
+  }, [orderId, reference, isAuthenticated, attempts]);
 
   useEffect(() => {
     if (!order || order.status !== 'pending' || attempts >= MAX_POLLS) return;
@@ -58,12 +72,19 @@ export function CheckoutStatus({ orderId }: { orderId: number | null }) {
   }
 
   if (order.status === 'paid') {
+    const type = order.items[0]?.itemable_type;
+    const isRegistrationFee = type === 'membership_application';
+
     return (
       <StatusCard
         icon="✅"
         title="Payment successful"
-        message={`You paid ${formatPrice(order.total_cents, order.currency)}. Access has been unlocked.`}
-        action={{ href: itemDestination(order), label: 'Continue' }}
+        message={
+          isRegistrationFee && !isAuthenticated
+            ? `You paid ${formatPrice(order.total_cents, order.currency)}. Log in to check your application's status.`
+            : `You paid ${formatPrice(order.total_cents, order.currency)}. Access has been unlocked.`
+        }
+        action={{ href: itemDestination(order, isAuthenticated), label: isRegistrationFee && !isAuthenticated ? 'Log in' : 'Continue' }}
       />
     );
   }
@@ -93,11 +114,11 @@ export function CheckoutStatus({ orderId }: { orderId: number | null }) {
   );
 }
 
-function itemDestination(order: OrderStatus): string {
+function itemDestination(order: OrderStatus, isAuthenticated: boolean): string {
   const type = order.items[0]?.itemable_type;
   if (type === 'membership_plan') return '/membership';
   if (type === 'booking') return '/my/bookings';
-  if (type === 'membership_application') return '/onboarding/pending';
+  if (type === 'membership_application') return isAuthenticated ? '/onboarding/pending' : '/login';
   return '/my/courses';
 }
 

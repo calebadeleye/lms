@@ -23,20 +23,78 @@ class CheckoutController extends Controller
     ) {}
 
     /** The applicant pays this before their registration is reviewable —
-     * see MembershipApplicationService::approve()'s payment_status guard. */
+     * see MembershipApplicationService::approve()'s payment_status guard.
+     * Authenticated variant: used by the "Pay registration fee" retry
+     * button on /onboarding/pending, reached only after the applicant has
+     * since logged in normally (register() itself no longer creates a
+     * session — see startRegistrationFee() below for the first attempt). */
     public function registrationFee(Request $request)
     {
         $application = MembershipApplication::where('user_id', $request->user()->id)->firstOrFail();
 
+        $result = $this->initiateRegistrationFeeCheckout($request, $application);
+
+        return response()->json(['data' => $result]);
+    }
+
+    /**
+     * Public (no session) variant for the applicant's very first payment
+     * attempt, immediately after registering — identified by the
+     * unguessable payment_token from that response rather than a bearer
+     * token, since no session exists yet at that point.
+     */
+    public function startRegistrationFee(Request $request)
+    {
+        $data = $request->validate(['payment_token' => ['required', 'uuid'], 'callback_url' => ['required', 'url']]);
+
+        $application = MembershipApplication::where('payment_token', $data['payment_token'])->firstOrFail();
+
+        $result = $this->initiateRegistrationFeeCheckout($request, $application);
+
+        return response()->json(['data' => $result]);
+    }
+
+    /**
+     * Public (no session) status check for the same first-attempt flow —
+     * safe without auth because the reference embeds the order's own
+     * unguessable idempotency key, and this is scoped to registration-fee
+     * orders only (never leaks the status of a course/membership/booking
+     * order, which do require a session via status() below).
+     */
+    public function registrationFeeStatus(Request $request)
+    {
+        $data = $request->validate(['reference' => ['required', 'string']]);
+
+        if (! preg_match('/^order_(\d+)_/', $data['reference'], $matches)) {
+            throw ValidationException::withMessages(['reference' => ['Invalid reference.']]);
+        }
+
+        $order = Order::whereHas('items', fn ($q) => $q->where('itemable_type', 'membership_application'))
+            ->with('items', 'payment')
+            ->findOrFail($matches[1]);
+
+        if ($order->status === 'pending') {
+            $this->fulfillment->reconcileRegistrationFee($order, $this->providers->forManagedPaystack());
+            $order = $order->fresh(['items', 'payment']);
+        }
+
+        return response()->json(['data' => [
+            'status' => $order->status,
+            'total_cents' => $order->total_cents,
+            'currency' => $order->currency,
+            'items' => $order->items,
+        ]]);
+    }
+
+    private function initiateRegistrationFeeCheckout(Request $request, MembershipApplication $application): array
+    {
         if ($application->isPaid()) {
             throw ValidationException::withMessages(['payment' => ['The registration fee has already been paid.']]);
         }
 
         $data = $request->validate(['callback_url' => ['required', 'url']]);
 
-        $result = $this->checkout->checkoutRegistrationFee($request->user(), $application, $data['callback_url']);
-
-        return response()->json(['data' => $result]);
+        return $this->checkout->checkoutRegistrationFee($application->user, $application, $data['callback_url']);
     }
 
     public function course(Request $request, string $courseId)

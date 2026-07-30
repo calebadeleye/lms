@@ -181,7 +181,96 @@ it('refuses to approve an application that has not paid the registration fee', f
     expect($applicant->fresh()->status)->toBe('pending');
 });
 
-it('lets a pending applicant start the registration-fee checkout via the platform Paystack account, split code included', function () {
+it('does not log the applicant in at registration — no token, and the checkout must be started with the payment_token instead', function () {
+    $response = registerApplicant()->assertCreated();
+
+    expect($response->json('data'))->not->toHaveKey('token');
+    $paymentToken = $response->json('data.payment_token');
+    expect($paymentToken)->not->toBeEmpty();
+
+    // No Authorization header at all — this must still work.
+    $this->getJson('/api/v1/auth/me')->assertStatus(401);
+});
+
+it('lets a not-yet-logged-in applicant start the registration-fee checkout using only the payment_token', function () {
+    Http::fake([
+        'api.paystack.co/transaction/initialize' => Http::response(['data' => [
+            'authorization_url' => 'https://checkout.paystack.com/abc123', 'reference' => 'order_1_ref',
+        ]], 200),
+    ]);
+
+    $response = registerApplicant()->assertCreated();
+    $paymentToken = $response->json('data.payment_token');
+
+    // Deliberately no Authorization header — this is the point.
+    $start = $this->postJson('/api/v1/checkout/registration-fee/start', [
+        'payment_token' => $paymentToken,
+        'callback_url' => 'https://app.test/checkout/callback',
+    ])->assertOk();
+
+    expect($start->json('data.authorization_url'))->toBe('https://checkout.paystack.com/abc123');
+
+    Http::assertSent(fn ($request) => $request->url() === 'https://api.paystack.co/transaction/initialize'
+        && $request['split_code'] === config('services.paystack.registration_split_code'));
+});
+
+it('refuses to start the registration-fee checkout with a bogus payment_token', function () {
+    $this->postJson('/api/v1/checkout/registration-fee/start', [
+        'payment_token' => (string) \Illuminate\Support\Str::uuid(),
+        'callback_url' => 'https://app.test/checkout/callback',
+    ])->assertStatus(404);
+});
+
+it('marks the registration fee paid via the public reference-based status check, no session or webhook needed', function () {
+    Http::fake([
+        'api.paystack.co/transaction/initialize' => Http::response(['data' => [
+            'authorization_url' => 'https://checkout.paystack.com/abc123', 'reference' => 'order_1_ref',
+        ]], 200),
+        'api.paystack.co/transaction/verify/*' => Http::response(['data' => [
+            'status' => 'success', 'amount' => config('services.paystack.registration_fee_cents'),
+            'currency' => 'NGN', 'reference' => 'order_1_ref', 'fees' => 0, 'paid_at' => now()->toIso8601String(),
+        ]], 200),
+    ]);
+
+    $registerResponse = registerApplicant()->assertCreated();
+    $paymentToken = $registerResponse->json('data.payment_token');
+    $applicant = User::where('email', 'jane@example.com')->firstOrFail();
+
+    $this->postJson('/api/v1/checkout/registration-fee/start', [
+        'payment_token' => $paymentToken,
+        'callback_url' => 'https://app.test/checkout/callback',
+    ])->assertOk();
+
+    $order = Order::firstOrFail();
+    $reference = "order_{$order->id}_{$order->idempotency_key}";
+
+    // No Authorization header — this is the whole point of this endpoint.
+    $this->getJson('/api/v1/checkout/registration-fee/status?reference='.urlencode($reference))
+        ->assertOk()
+        ->assertJsonPath('data.status', 'paid');
+
+    expect(MembershipApplication::where('user_id', $applicant->id)->firstOrFail()->payment_status)->toBe('paid');
+});
+
+it('refuses the public status check for an order that is not a registration fee', function () {
+    $student = makeUserWithRole('student');
+    $order = Order::create([
+        'user_id' => $student->id, 'status' => 'paid', 'currency' => 'NGN',
+        'subtotal_cents' => 500000, 'fee_cents' => 0, 'total_cents' => 500000,
+        'payment_mode' => 'managed', 'provider' => 'paystack', 'provider_reference' => 'order_x_ref',
+    ]);
+    $order->items()->create([
+        'itemable_type' => 'membership_plan', 'itemable_id' => 1, 'name' => 'Some Plan',
+        'unit_price_cents' => 500000, 'quantity' => 1,
+    ]);
+
+    $reference = "order_{$order->id}_{$order->idempotency_key}";
+
+    $this->getJson('/api/v1/checkout/registration-fee/status?reference='.urlencode($reference))
+        ->assertStatus(404);
+});
+
+it('lets a logged-in pending applicant retry the registration-fee checkout via the authenticated route', function () {
     Http::fake([
         'api.paystack.co/transaction/initialize' => Http::response(['data' => [
             'authorization_url' => 'https://checkout.paystack.com/abc123', 'reference' => 'order_1_ref',
@@ -207,7 +296,7 @@ it('lets a pending applicant start the registration-fee checkout via the platfor
         && $request['amount'] === (int) config('services.paystack.registration_fee_cents'));
 });
 
-it('marks the registration fee paid the moment the applicant polls checkout status, no webhook needed', function () {
+it('marks the registration fee paid via the authenticated status check once retried and logged in', function () {
     Http::fake([
         'api.paystack.co/transaction/initialize' => Http::response(['data' => [
             'authorization_url' => 'https://checkout.paystack.com/abc123', 'reference' => 'order_1_ref',

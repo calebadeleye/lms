@@ -42,7 +42,7 @@ export function RegisterForm() {
   const [errors, setErrors] = useState<Errors>({});
   const [pending, setPending] = useState(false);
 
-  const allAcknowledged = REQUIREMENTS.every((r) => acks[r.key]);
+  const hasAcknowledged = REQUIREMENTS.some((r) => acks[r.key]);
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
@@ -55,7 +55,7 @@ export function RegisterForm() {
 
   function goToAccount(e: React.FormEvent) {
     e.preventDefault();
-    if (!allAcknowledged) return;
+    if (!hasAcknowledged) return;
     setStep('account');
   }
 
@@ -101,14 +101,15 @@ export function RegisterForm() {
         return;
       }
 
-      // The account and application now exist (status: pending) — the
-      // registration fee is what actually finishes the submission, so we
-      // go straight to Paystack rather than a "you're done" screen.
+      // The account and application now exist (status: pending), but
+      // there's no session yet — register() deliberately doesn't log the
+      // applicant in until the fee is paid. payment_token authenticates
+      // this one checkout-initiation call in its place.
       const callback_url = `${window.location.origin}/checkout/callback`;
-      const feeRes = await fetch('/api/v1/checkout/registration-fee', {
+      const feeRes = await fetch('/api/v1/checkout/registration-fee/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callback_url }),
+        body: JSON.stringify({ payment_token: body.data.payment_token, callback_url }),
       });
       const feeBody = await feeRes.json().catch(() => null);
 
@@ -117,9 +118,9 @@ export function RegisterForm() {
         return;
       }
 
-      // Account was created either way — let them retry payment from the
-      // pending page rather than stranding them on this form.
-      router.push('/onboarding/pending');
+      // Account was created either way — they can log in and retry payment
+      // from the pending page rather than being stranded on this form.
+      router.push('/login');
       router.refresh();
     } finally {
       setPending(false);
@@ -167,7 +168,7 @@ export function RegisterForm() {
           </div>
           <button
             type="submit"
-            disabled={!allAcknowledged}
+            disabled={!hasAcknowledged}
             className="w-full rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-40"
           >
             Continue

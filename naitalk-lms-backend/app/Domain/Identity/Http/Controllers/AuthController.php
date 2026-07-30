@@ -44,7 +44,7 @@ class AuthController extends Controller
 
         $studentRole = Role::where('slug', 'student')->firstOrFail();
 
-        $user = DB::transaction(function () use ($request, $studentRole) {
+        [$user, $application] = DB::transaction(function () use ($request, $studentRole) {
             $user = User::create([
                 'name' => $request->string('name'),
                 'email' => $request->string('email'),
@@ -63,7 +63,7 @@ class AuthController extends Controller
                 $photoPath = "{$directory}/photo.{$extension}";
             }
 
-            MembershipApplication::create([
+            $application = MembershipApplication::create([
                 'user_id' => $user->id,
                 'ack_impact_beyond_earning' => $request->boolean('ack_impact_beyond_earning'),
                 'ack_growth_mindset' => $request->boolean('ack_growth_mindset'),
@@ -74,19 +74,22 @@ class AuthController extends Controller
                 'status' => 'pending',
             ]);
 
-            return $user;
+            return [$user, $application];
         });
 
         $user->sendEmailVerificationNotification();
 
-        $issued = $this->auth->issueToken($user, $request);
-
+        // Deliberately no session/token here — the applicant isn't "logged
+        // in" until the registration fee is paid (see
+        // CheckoutController::startRegistrationFee()/registrationFeeStatus(),
+        // which use the application's own payment_token instead of a
+        // Sanctum token). They log in normally, with the password they just
+        // set, once they're ready to check their status or retry payment.
         return response()->json([
             'data' => [
                 'user' => $user->only(['id', 'public_id', 'name', 'email']),
                 'membership_status' => 'pending',
-                'token' => $issued['token'],
-                'expires_at' => $issued['expires_at'],
+                'payment_token' => $application->payment_token,
             ],
         ], 201);
     }

@@ -83,12 +83,21 @@ Route::prefix('auth')->group(function () {
 // course thumbnail.
 Route::middleware('auth:sanctum')->get('/members/{userId}/photo', [MemberPhotoController::class, 'show']);
 
+// Public — register() no longer creates a session, so the applicant's very
+// first payment attempt has no bearer token to authenticate with. Identified
+// by the application's own unguessable payment_token / order reference
+// instead — see CheckoutController's docblocks on these two methods.
+Route::post('/checkout/registration-fee/start', [CheckoutController::class, 'startRegistrationFee']);
+Route::get('/checkout/registration-fee/status', [CheckoutController::class, 'registrationFeeStatus']);
+
 // Reachable by a still-pending (not yet `approved`) applicant: paying the
 // registration fee, and checking on that payment, are exactly what a
 // pending applicant needs to do before they can ever become approved. Order
 // status is scoped to `$request->user()->id` inside the controller
 // regardless, so this is safe for a pending user to hit for any of their
-// own orders, not just the registration fee.
+// own orders, not just the registration fee. Used for the retry path, once
+// an applicant who didn't finish paying the first time has logged in
+// normally with the password they set at registration.
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/checkout/registration-fee', [CheckoutController::class, 'registrationFee']);
     Route::get('/checkout/orders/{orderId}', [CheckoutController::class, 'status']);

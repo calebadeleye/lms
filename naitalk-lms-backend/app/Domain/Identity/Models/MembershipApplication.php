@@ -5,6 +5,7 @@ namespace App\Domain\Identity\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class MembershipApplication extends Model
 {
@@ -22,6 +23,13 @@ class MembershipApplication extends Model
         'ack_positive_impact' => 'boolean',
         'reviewed_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (MembershipApplication $application) {
+            $application->payment_token ??= (string) Str::uuid();
+        });
+    }
 
     public function user(): BelongsTo
     {

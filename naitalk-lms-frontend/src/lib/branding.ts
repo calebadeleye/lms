@@ -15,12 +15,10 @@ export interface BrandingConfig {
   branding: {
     logo_url: string | null;
     favicon_url: string | null;
-    hero_image_url: string | null;
     primary_color: string;
     secondary_color: string;
     accent_color: string;
     font_family: string;
-    homepage: Record<string, unknown> | null;
     email_sender_name: string;
     pwa: { name: string; theme_color: string; icon_url: string | null };
   };
@@ -35,19 +33,15 @@ export const BRANDING: BrandingConfig = {
     // than eyeballed: teal #008080 dominates the wordmark/icon, gold
     // #F5D908 is the accent dot. secondary_color is a lighter tint of that
     // same gold (not a separately-supplied colour) used as the far end of
-    // decorative gradients. No square-crop favicon/hero asset exists yet —
-    // those stay null/default until one is supplied.
+    // decorative gradients. No square-crop favicon asset exists yet — it
+    // stays default until one is supplied. Homepage marketing copy
+    // (hero/etc.) lives in src/lib/home-content.ts, not here.
     logo_url: '/branding/logo.png',
     favicon_url: '/favicon.ico',
-    hero_image_url: null,
     primary_color: '#008080',
     secondary_color: '#F9E86B',
     accent_color: '#F5D908',
     font_family: 'var(--font-inter), system-ui, sans-serif',
-    homepage: {
-      hero_title: 'Grow with HR GEMs.',
-      hero_subtitle: 'Coaching, learning, and community for Change Agents in the Work of Now.',
-    },
     email_sender_name: 'HR GEMs Coach Network',
     pwa: { name: 'HR GEMs Coach Network', theme_color: '#008080', icon_url: null },
   },

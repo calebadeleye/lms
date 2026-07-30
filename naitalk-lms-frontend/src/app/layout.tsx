@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { BRANDING } from '@/lib/branding';
+import { HOME_CONTENT } from '@/lib/home-content';
 import { QueryProvider } from '@/components/query-provider';
 import './globals.css';
 
@@ -11,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: config.tenant.name,
-    description: (config.branding.homepage?.hero_subtitle as string | undefined) ?? config.tenant.name,
+    description: HOME_CONTENT.hero.subheading,
     icons: config.branding.favicon_url ? [{ url: config.branding.favicon_url }] : undefined,
     manifest: '/manifest.webmanifest',
   };

@@ -26,7 +26,7 @@ export function EnrollButton({
     return (
       <button
         onClick={() => router.push('/my/courses')}
-        className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90"
+        className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90"
       >
         Continue Learning
       </button>
@@ -38,7 +38,7 @@ export function EnrollButton({
       return (
         <button
           onClick={() => router.push(`/login?redirect=/courses`)}
-          className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90"
+          className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90"
         >
           Log in to Purchase
         </button>
@@ -82,7 +82,7 @@ export function EnrollButton({
       <button
         onClick={handleEnroll}
         disabled={pending}
-        className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
       >
         {pending ? 'Enrolling…' : isMembershipOnly ? 'Enrol with Membership' : 'Enrol Now — Free'}
       </button>

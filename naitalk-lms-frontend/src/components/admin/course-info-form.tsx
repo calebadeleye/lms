@@ -82,7 +82,7 @@ export function CourseInfoForm({ course, categories }: { course: AdminCourseDeta
         <button
           type="submit"
           disabled={saving}
-          className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
         >
           {saving ? 'Saving…' : 'Save course details'}
         </button>

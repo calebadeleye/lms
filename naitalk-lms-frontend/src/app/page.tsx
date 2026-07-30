@@ -51,7 +51,7 @@ export default async function HomePage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/courses"
-                className="rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:opacity-90"
+                className="rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 shadow-sm hover:opacity-90"
               >
                 {homepage.hero_cta_primary ?? 'Explore Courses'}
               </Link>

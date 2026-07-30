@@ -98,7 +98,7 @@ export function InstructorManager({
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-[var(--brand-accent)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="rounded-md bg-[var(--brand-accent)] px-3 py-1.5 text-xs font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
           >
             {pending ? 'Adding…' : 'Add'}
           </button>

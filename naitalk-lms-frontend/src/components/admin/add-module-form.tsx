@@ -35,7 +35,7 @@ export function AddModuleForm({ courseId }: { courseId: number }) {
       <button
         type="submit"
         disabled={pending || !title}
-        className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
       >
         + Add module
       </button>

@@ -30,24 +30,26 @@ export interface BrandingConfig {
 export const BRANDING: BrandingConfig = {
   tenant: { name: 'HR GEMs Coach Network' },
   branding: {
-    // No logo/hero asset has been supplied yet — leave null rather than
-    // pointing at a file that doesn't exist. Every consumer already falls
-    // back gracefully (dashboard-shell's initial-letter badge, the
-    // homepage's plain hero background). Drop in real files under
-    // public/branding/ and point these at them when the client supplies one.
-    logo_url: null,
+    // Real logo supplied 2026-07-30 (public/branding/logo.png). Colours were
+    // sampled directly from it (see git history for the extraction) rather
+    // than eyeballed: teal #008080 dominates the wordmark/icon, gold
+    // #F5D908 is the accent dot. secondary_color is a lighter tint of that
+    // same gold (not a separately-supplied colour) used as the far end of
+    // decorative gradients. No square-crop favicon/hero asset exists yet —
+    // those stay null/default until one is supplied.
+    logo_url: '/branding/logo.png',
     favicon_url: '/favicon.ico',
     hero_image_url: null,
-    primary_color: '#3B0F32',
-    secondary_color: '#F5B84B',
-    accent_color: '#E8A33D',
+    primary_color: '#008080',
+    secondary_color: '#F9E86B',
+    accent_color: '#F5D908',
     font_family: 'var(--font-inter), system-ui, sans-serif',
     homepage: {
       hero_title: 'Grow with HR GEMs.',
       hero_subtitle: 'Coaching, learning, and community for Change Agents in the Work of Now.',
     },
     email_sender_name: 'HR GEMs Coach Network',
-    pwa: { name: 'HR GEMs Coach Network', theme_color: '#3B0F32', icon_url: null },
+    pwa: { name: 'HR GEMs Coach Network', theme_color: '#008080', icon_url: null },
   },
   domain: { primary_hostname: (process.env.NEXT_PUBLIC_APP_HOSTNAME ?? 'hrgemscoachnetwork.com') },
 };

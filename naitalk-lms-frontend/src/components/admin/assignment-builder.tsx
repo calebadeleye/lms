@@ -63,7 +63,7 @@ export function AssignmentBuilder({
       <button
         onClick={save}
         disabled={saving || !title}
-        className="rounded-md bg-[var(--brand-accent)] px-4 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="rounded-md bg-[var(--brand-accent)] px-4 py-1.5 text-xs font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
       >
         {saving ? 'Saving…' : 'Save assignment'}
       </button>

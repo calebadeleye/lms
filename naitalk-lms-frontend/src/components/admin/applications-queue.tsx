@@ -177,7 +177,7 @@ export function ApplicationsQueue({ initial }: { initial: MembershipApplication[
                     <button
                       onClick={() => review(application, 'approve')}
                       disabled={pending}
-                      className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+                      className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
                     >
                       Approve
                     </button>

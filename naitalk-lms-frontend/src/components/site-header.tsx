@@ -78,7 +78,7 @@ export function SiteHeader({
               </Link>
               <Link
                 href="/register"
-                className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90"
+                className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 shadow-sm hover:opacity-90"
               >
                 Sign Up
               </Link>
@@ -117,7 +117,7 @@ export function SiteHeader({
                   >
                     Dashboard
                   </Link>
-                  <LogoutButton className="flex-1 rounded-md bg-[var(--brand-accent)] px-3 py-2 text-center font-semibold text-white" />
+                  <LogoutButton className="flex-1 rounded-md bg-[var(--brand-accent)] px-3 py-2 text-center font-semibold text-neutral-900" />
                 </>
               ) : (
                 <>
@@ -126,7 +126,7 @@ export function SiteHeader({
                   </Link>
                   <Link
                     href="/register"
-                    className="flex-1 rounded-md bg-[var(--brand-accent)] px-3 py-2 text-center font-semibold text-white"
+                    className="flex-1 rounded-md bg-[var(--brand-accent)] px-3 py-2 text-center font-semibold text-neutral-900"
                   >
                     Sign Up
                   </Link>

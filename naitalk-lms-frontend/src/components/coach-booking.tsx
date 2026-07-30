@@ -96,7 +96,7 @@ export function OneToOneBookingForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
       >
         {pending ? 'Booking…' : service.is_free ? 'Book — Free' : `Book — ${formatPrice(service.price_cents, service.currency)}`}
       </button>
@@ -163,7 +163,7 @@ export function GroupSessionList({
           <button
             onClick={() => book(session.id)}
             disabled={pendingId === session.id}
-            className="rounded-md bg-[var(--brand-accent)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="rounded-md bg-[var(--brand-accent)] px-3 py-1.5 text-xs font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
           >
             {pendingId === session.id ? 'Booking…' : service.is_free ? 'Book — Free' : `Book — ${formatPrice(service.price_cents, service.currency)}`}
           </button>

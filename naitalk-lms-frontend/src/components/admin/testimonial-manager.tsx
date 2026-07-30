@@ -101,7 +101,7 @@ export function TestimonialManager({ initial }: { initial: Testimonial[] }) {
         <button
           type="submit"
           disabled={pending || !quote.trim() || !author.trim()}
-          className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Adding…' : 'Add testimonial'}
         </button>

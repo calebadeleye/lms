@@ -161,7 +161,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
           <button
             onClick={markComplete}
             disabled={marking}
-            className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
           >
             {marking ? 'Marking…' : 'Mark as Complete'}
           </button>

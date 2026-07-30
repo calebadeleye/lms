@@ -115,7 +115,7 @@ export function QuizPlayer({ lessonId }: { lessonId: number }) {
               setResult(null);
               setAttemptId(null);
             }}
-            className="mt-4 rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90"
+            className="mt-4 rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90"
           >
             Try Again
           </button>
@@ -135,7 +135,7 @@ export function QuizPlayer({ lessonId }: { lessonId: number }) {
         <button
           onClick={startAttempt}
           disabled={!quiz.can_attempt}
-          className="mt-4 rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="mt-4 rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
         >
           {quiz.can_attempt ? 'Start Quiz' : 'No attempts remaining'}
         </button>
@@ -177,7 +177,7 @@ export function QuizPlayer({ lessonId }: { lessonId: number }) {
       ))}
       <button
         onClick={submit}
-        className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+        className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-neutral-900 hover:opacity-90"
       >
         Submit Quiz
       </button>

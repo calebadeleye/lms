@@ -52,7 +52,7 @@ export default async function VerifyEmailPage({
             {status === 'verified' ? (
               <Link
                 href="/dashboard"
-                className="inline-block rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                className="inline-block rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-neutral-900 hover:opacity-90"
               >
                 Go to Dashboard
               </Link>
@@ -61,7 +61,7 @@ export default async function VerifyEmailPage({
             ) : (
               <Link
                 href="/login"
-                className="inline-block rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                className="inline-block rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-neutral-900 hover:opacity-90"
               >
                 Log in
               </Link>

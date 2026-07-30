@@ -91,7 +91,7 @@ export function AssignmentPlayer({ lessonId }: { lessonId: number }) {
         <button
           onClick={submit}
           disabled={pending || !text.trim()}
-          className="mt-3 rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="mt-3 rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Submitting…' : assignment.submission ? 'Resubmit' : 'Submit'}
         </button>

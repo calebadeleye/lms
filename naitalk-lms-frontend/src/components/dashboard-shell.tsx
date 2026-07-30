@@ -27,8 +27,12 @@ export function DashboardShell({
       <aside className="hidden w-64 shrink-0 flex-col bg-[var(--brand-primary)] text-white md:flex">
         <div className="flex items-center px-5 py-5">
           {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt={tenantName} className="h-14 max-w-full object-contain" />
+            // The logo's own linework is teal — on this teal sidebar it
+            // would vanish, so it needs a light backing chip to read at all.
+            <div className="rounded-md bg-white/95 px-3 py-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logoUrl} alt={tenantName} className="h-10 max-w-full object-contain" />
+            </div>
           ) : (
             <div className="flex items-center gap-2">
               <span

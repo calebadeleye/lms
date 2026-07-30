@@ -74,7 +74,7 @@ export function MembershipPlanCard({
         ) : !isAuthenticated ? (
           <button
             onClick={() => router.push('/login?redirect=/membership')}
-            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-neutral-900 hover:opacity-90"
           >
             Log in to Subscribe
           </button>
@@ -84,7 +84,7 @@ export function MembershipPlanCard({
             id={plan.id}
             label="Subscribe"
             pendingLabel="Redirecting to payment…"
-            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
           />
         )}
         {error && <p className="mt-2 text-xs text-red-600">{error}</p>}

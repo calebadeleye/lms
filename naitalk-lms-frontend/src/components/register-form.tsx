@@ -150,7 +150,7 @@ export function RegisterForm() {
           <button
             type="submit"
             disabled={!allAcknowledged}
-            className="w-full rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-40"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-40"
           >
             Continue
           </button>
@@ -227,7 +227,7 @@ export function RegisterForm() {
             </button>
             <button
               type="submit"
-              className="flex-1 rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+              className="flex-1 rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90"
             >
               Continue
             </button>
@@ -287,7 +287,7 @@ export function RegisterForm() {
             <button
               type="submit"
               disabled={pending}
-              className="flex-1 rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+              className="flex-1 rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
             >
               {pending ? 'Submitting…' : 'Submit application'}
             </button>

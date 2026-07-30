@@ -97,7 +97,7 @@ export function AdminCoachProfileForm({ coach }: { coach: AdminCoach }) {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Saving…' : 'Save changes'}
         </button>

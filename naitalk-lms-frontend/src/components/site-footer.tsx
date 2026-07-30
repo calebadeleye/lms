@@ -12,19 +12,22 @@ const SOCIAL_ICONS = {
 
 export function SiteFooter({ tenantName }: { tenantName: string }) {
   const { footer } = HOME_CONTENT;
+  const quickLinks = [...footer.quickLinks, { label: 'Login', href: '/login' }];
 
   return (
-    <footer className="bg-[var(--brand-primary)] text-white">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-4">
-        <div>
-          <p className="text-sm font-bold">{tenantName}</p>
-          <p className="mt-1 text-xs text-white/70">Coaching, learning, and community for Change Agents in the Work of Now.</p>
+    <footer className="border-t-2 border-[#d5a600] bg-[#005456] text-white">
+      <div className="mx-auto grid max-w-[1120px] gap-8 px-4 py-8 sm:px-8 md:grid-cols-[1.25fr_0.75fr_1fr_1.35fr]">
+        <div className="flex items-center md:border-r md:border-dotted md:border-white/30 md:pr-10">
+          <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/branding/logo.png" alt={tenantName} className="h-16 w-auto brightness-0 invert" />
+          </div>
         </div>
 
-        <div>
-          <p className="text-sm font-semibold">Quick Links</p>
-          <ul className="mt-3 space-y-2 text-sm text-white/80">
-            {footer.quickLinks.map((link) => (
+        <div className="md:border-r md:border-dotted md:border-white/30 md:pr-8">
+          <p className="text-sm font-black">Quick Links</p>
+          <ul className="mt-3 space-y-1 text-xs font-medium text-white/90">
+            {quickLinks.map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="hover:text-white">
                   {link.label}
@@ -34,9 +37,9 @@ export function SiteFooter({ tenantName }: { tenantName: string }) {
           </ul>
         </div>
 
-        <div>
-          <p className="text-sm font-semibold">Connect With Us</p>
-          <div className="mt-3 flex gap-3">
+        <div className="md:border-r md:border-dotted md:border-white/30 md:pr-8">
+          <p className="text-sm font-black">Connect With Us</p>
+          <div className="mt-4 flex gap-5">
             {footer.social.map((item) => {
               const Icon = SOCIAL_ICONS[item.platform];
               return (
@@ -44,36 +47,37 @@ export function SiteFooter({ tenantName }: { tenantName: string }) {
                   key={item.platform}
                   href={item.href}
                   aria-label={item.platform}
-                  className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-white/20"
+                  className="text-white/90 hover:text-white"
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-5 w-5" />
                 </a>
               );
             })}
           </div>
-          <p className="mt-4 text-sm text-white/80">{footer.contactEmail}</p>
+          <p className="mt-5 text-xs font-medium text-white/85">{footer.contactEmail}</p>
         </div>
 
         <div>
-          <p className="text-sm font-semibold">Join Our Community</p>
-          <p className="mt-1 text-xs text-white/70">Be the first to know about upcoming programs, events, and resources.</p>
-          <div className="mt-3">
+          <p className="text-sm font-black text-[#ffbd11]">Join Our Community</p>
+          <p className="mt-2 max-w-[330px] text-xs font-medium leading-relaxed text-white/90">Be the first to know about upcoming programs, events, and resources.</p>
+          <div className="mt-4">
             <NewsletterForm />
           </div>
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-white/60 sm:px-6">
+      <div className="border-t border-white/10 bg-[#004749]">
+        <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-white/85 sm:px-8">
           <p>
             &copy; {new Date().getFullYear()} {tenantName}. All rights reserved.
           </p>
-          <div className="flex gap-4">
+          <div className="flex items-center gap-5">
             {footer.legalLinks.map((link) => (
               <Link key={link.href} href={link.href} className="hover:text-white">
                 {link.label}
               </Link>
             ))}
+            <span className="text-white/60">Made by NAI TALK</span>
           </div>
         </div>
       </div>

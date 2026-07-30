@@ -11,6 +11,7 @@ export default async function RegisterPage() {
       logoUrl={config.branding?.logo_url ?? null}
       title="Create your account"
       subtitle={`Join ${config.tenant.name}`}
+      maxWidthClassName="max-w-2xl"
     >
       <RegisterForm />
     </AuthCard>

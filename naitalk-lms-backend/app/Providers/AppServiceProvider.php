@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Domain\Coaching\Models\Booking;
 use App\Domain\Coaching\Models\CoachingService;
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Identity\Models\MembershipApplication;
 use App\Domain\Learning\Models\Course;
 use App\Domain\Learning\Models\Enrolment;
 use App\Domain\Membership\Models\LearnerMembershipPlan;
@@ -65,6 +66,7 @@ class AppServiceProvider extends ServiceProvider
             'learner_subscription' => LearnerSubscription::class,
             'booking' => Booking::class,
             'order' => Order::class,
+            'membership_application' => MembershipApplication::class,
         ]);
     }
 }

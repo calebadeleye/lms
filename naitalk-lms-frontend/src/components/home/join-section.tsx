@@ -6,7 +6,7 @@ export function JoinSection() {
   const { whoShouldJoin, membershipBenefits, memberVoices } = HOME_CONTENT;
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="rounded-xl bg-[var(--brand-primary)]/5 p-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--brand-accent)]">{whoShouldJoin.eyebrow}</p>

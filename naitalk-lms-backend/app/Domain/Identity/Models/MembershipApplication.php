@@ -12,7 +12,7 @@ class MembershipApplication extends Model
         'user_id',
         'ack_impact_beyond_earning', 'ack_growth_mindset', 'ack_interest_in_coaching', 'ack_positive_impact',
         'photo_path', 'motivation',
-        'status', 'reviewed_by', 'reviewed_at', 'review_note',
+        'status', 'payment_status', 'reviewed_by', 'reviewed_at', 'review_note',
     ];
 
     protected $casts = [
@@ -31,5 +31,10 @@ class MembershipApplication extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->payment_status === 'paid';
     }
 }

@@ -4,6 +4,7 @@ namespace App\Domain\Commerce\Services;
 
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\PaymentConfig;
+use App\Domain\Identity\Models\MembershipApplication;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -79,6 +80,58 @@ class CheckoutService
             'reference' => $reference,
             'callback_url' => $callbackUrl,
             'subaccount_code' => $config->subaccount_code,
+        ]);
+
+        $order->update(['provider_reference' => $result['provider_reference']]);
+
+        return ['authorization_url' => $result['authorization_url'], 'order' => $order->fresh('items')];
+    }
+
+    /**
+     * The one-time HR GEMs membership registration fee. Deliberately doesn't
+     * go through the org's own PaymentConfig at all — this always charges
+     * via the platform's own managed Paystack account (see
+     * PaymentProviderFactory::forManagedPaystack()) and its own
+     * pre-configured Transaction Split, regardless of whatever gateway (if
+     * any) the org has configured for its own course/membership sales.
+     */
+    public function checkoutRegistrationFee(User $user, MembershipApplication $application, string $callbackUrl): array
+    {
+        $priceCents = (int) config('services.paystack.registration_fee_cents');
+        $currency = 'NGN';
+
+        $order = DB::transaction(function () use ($user, $application, $priceCents, $currency) {
+            $order = Order::create([
+                'user_id' => $user->id,
+                'status' => 'pending',
+                'currency' => $currency,
+                'subtotal_cents' => $priceCents,
+                'fee_cents' => 0,
+                'total_cents' => $priceCents,
+                'payment_mode' => 'managed',
+                'provider' => 'paystack',
+            ]);
+
+            $order->items()->create([
+                'itemable_type' => $application->getMorphClass(),
+                'itemable_id' => $application->id,
+                'name' => 'HR GEMs membership registration fee',
+                'unit_price_cents' => $priceCents,
+                'quantity' => 1,
+            ]);
+
+            return $order;
+        });
+
+        $reference = "order_{$order->id}_{$order->idempotency_key}";
+
+        $result = $this->providers->forManagedPaystack()->initializePayment([
+            'email' => $user->email,
+            'amount_cents' => $priceCents,
+            'currency' => $currency,
+            'reference' => $reference,
+            'callback_url' => $callbackUrl,
+            'split_code' => config('services.paystack.registration_split_code'),
         ]);
 
         $order->update(['provider_reference' => $result['provider_reference']]);

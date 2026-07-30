@@ -5,23 +5,33 @@ export function WhyItMattersSection() {
   const { whyItMatters } = HOME_CONTENT;
 
   return (
-    <section className="bg-[var(--brand-primary)]/5 py-14">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="px-4 py-16 sm:px-8 sm:py-20">
+      <div className="mx-auto max-w-[1120px] rounded-lg border border-[var(--brand-primary)]/10 bg-[#eefafa] px-4 py-8 shadow-[0_14px_32px_rgba(15,23,42,0.08)] sm:px-6 sm:py-10">
         <div className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--brand-accent)]">{whyItMatters.eyebrow}</p>
-          <h2 className="mt-2 text-2xl font-bold text-[var(--brand-primary)] sm:text-3xl">{whyItMatters.heading}</h2>
+          <p className="text-[11px] font-black uppercase text-[var(--brand-primary)]">{whyItMatters.eyebrow}</p>
+          <h2
+            className="mt-1 text-[26px] font-black leading-tight text-[#082f35] sm:text-[30px]"
+            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+          >
+            {whyItMatters.heading}
+          </h2>
         </div>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 min-[900px]:grid-cols-5">
           {whyItMatters.cards.map((card) => {
             const Icon = WHY_IT_MATTERS_ICONS[card.icon];
             return (
-              <div key={card.title} className="rounded-xl border border-neutral-200 bg-white p-6 text-center">
-                <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]">
-                  <Icon className="h-6 w-6" />
+              <div
+                key={card.title}
+                className="grid min-h-[136px] grid-cols-[44px_1fr] gap-3 rounded-lg bg-white px-5 py-5 shadow-[0_10px_24px_rgba(15,23,42,0.08)]"
+              >
+                <div className="pt-1 text-[var(--brand-primary)]">
+                  <Icon className="h-10 w-10" />
                 </div>
-                <h3 className="text-sm font-semibold text-neutral-900">{card.title}</h3>
-                <p className="mt-1 text-xs text-neutral-500">{card.description}</p>
+                <div>
+                  <h3 className="text-[13px] font-black leading-snug text-[var(--brand-primary)]">{card.title}</h3>
+                  <p className="mt-2 text-[11px] font-medium leading-relaxed text-neutral-900">{card.description}</p>
+                </div>
               </div>
             );
           })}

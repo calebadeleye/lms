@@ -31,6 +31,13 @@ class PaystackPaymentProvider implements PaymentProviderInterface
             $payload['bearer'] = 'account'; // subaccount bears the provider fee by default
         }
 
+        // A pre-configured Paystack Transaction Split (multi-recipient),
+        // distinct from the single-recipient `subaccount` above — the two
+        // are mutually exclusive, a checkout only ever needs one.
+        if (! empty($params['split_code'])) {
+            $payload['split_code'] = $params['split_code'];
+        }
+
         $response = $this->client()->post('/transaction/initialize', $payload)->throw()->json();
 
         return [

@@ -1,9 +1,11 @@
 <?php
 
+use App\Domain\Commerce\Models\Order;
 use App\Domain\Identity\Models\MembershipApplication;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
@@ -81,6 +83,9 @@ it('lets an owner list, view, and approve a pending application', function () {
         ->assertJsonPath('data.motivation', 'Excited to join.')
         ->assertJsonPath('data.ack_growth_mindset', true);
 
+    // Approval requires the registration fee to be paid first.
+    MembershipApplication::find($applicationId)->update(['payment_status' => 'paid']);
+
     $this->postJson("/api/v1/admin/applications/{$applicationId}/approve", ['note' => 'Welcome!'], $headers)
         ->assertOk()
         ->assertJsonPath('data.status', 'approved');
@@ -156,5 +161,84 @@ it('serves the welcome photo only to the owning applicant or an approver', funct
     $owner = makeUserWithRole('owner');
     $ownerToken = $owner->createToken('t')->plainTextToken;
     $this->getJson("/api/v1/members/{$applicant->id}/photo", ['Authorization' => "Bearer {$ownerToken}"])
+        ->assertOk();
+});
+
+// --- Registration fee (₦20,000, platform-managed Paystack + split code) --
+
+it('refuses to approve an application that has not paid the registration fee', function () {
+    registerApplicant()->assertCreated();
+    $applicant = User::where('email', 'jane@example.com')->firstOrFail();
+    $applicationId = MembershipApplication::where('user_id', $applicant->id)->firstOrFail()->id;
+
+    $owner = makeUserWithRole('owner');
+    $headers = ['Authorization' => 'Bearer '.$owner->createToken('t')->plainTextToken];
+
+    $this->postJson("/api/v1/admin/applications/{$applicationId}/approve", ['note' => 'Welcome!'], $headers)
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('payment');
+
+    expect($applicant->fresh()->status)->toBe('pending');
+});
+
+it('lets a pending applicant start the registration-fee checkout via the platform Paystack account, split code included', function () {
+    Http::fake([
+        'api.paystack.co/transaction/initialize' => Http::response(['data' => [
+            'authorization_url' => 'https://checkout.paystack.com/abc123', 'reference' => 'order_1_ref',
+        ]], 200),
+    ]);
+
+    registerApplicant()->assertCreated();
+    $applicant = User::where('email', 'jane@example.com')->firstOrFail();
+    $token = $applicant->createToken('t')->plainTextToken;
+
+    $response = $this->postJson('/api/v1/checkout/registration-fee', [
+        'callback_url' => 'https://app.test/checkout/callback',
+    ], ['Authorization' => "Bearer {$token}"])->assertOk();
+
+    expect($response->json('data.authorization_url'))->toBe('https://checkout.paystack.com/abc123');
+
+    $order = Order::firstOrFail();
+    expect($order->total_cents)->toBe((int) config('services.paystack.registration_fee_cents'));
+    expect($order->items->first()->itemable_type)->toBe('membership_application');
+
+    Http::assertSent(fn ($request) => $request->url() === 'https://api.paystack.co/transaction/initialize'
+        && $request['split_code'] === config('services.paystack.registration_split_code')
+        && $request['amount'] === (int) config('services.paystack.registration_fee_cents'));
+});
+
+it('marks the registration fee paid the moment the applicant polls checkout status, no webhook needed', function () {
+    Http::fake([
+        'api.paystack.co/transaction/initialize' => Http::response(['data' => [
+            'authorization_url' => 'https://checkout.paystack.com/abc123', 'reference' => 'order_1_ref',
+        ]], 200),
+        'api.paystack.co/transaction/verify/*' => Http::response(['data' => [
+            'status' => 'success', 'amount' => config('services.paystack.registration_fee_cents'),
+            'currency' => 'NGN', 'reference' => 'order_1_ref', 'fees' => 0, 'paid_at' => now()->toIso8601String(),
+        ]], 200),
+    ]);
+
+    registerApplicant()->assertCreated();
+    $applicant = User::where('email', 'jane@example.com')->firstOrFail();
+    $token = $applicant->createToken('t')->plainTextToken;
+    $headers = ['Authorization' => "Bearer {$token}"];
+
+    $this->postJson('/api/v1/checkout/registration-fee', ['callback_url' => 'https://app.test/checkout/callback'], $headers)
+        ->assertOk();
+
+    $order = Order::firstOrFail();
+
+    $this->getJson("/api/v1/checkout/orders/{$order->id}", $headers)
+        ->assertOk()
+        ->assertJsonPath('data.status', 'paid');
+
+    expect(MembershipApplication::where('user_id', $applicant->id)->firstOrFail()->payment_status)->toBe('paid');
+
+    // Once paid, the payment guard no longer blocks approval.
+    $this->app->make('auth')->forgetGuards();
+    $owner = makeUserWithRole('owner');
+    $ownerHeaders = ['Authorization' => 'Bearer '.$owner->createToken('t')->plainTextToken];
+    $applicationId = MembershipApplication::where('user_id', $applicant->id)->firstOrFail()->id;
+    $this->postJson("/api/v1/admin/applications/{$applicationId}/approve", ['note' => 'Welcome!'], $ownerHeaders)
         ->assertOk();
 });

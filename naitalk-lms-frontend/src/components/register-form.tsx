@@ -101,7 +101,25 @@ export function RegisterForm() {
         return;
       }
 
-      router.push('/verify-email');
+      // The account and application now exist (status: pending) — the
+      // registration fee is what actually finishes the submission, so we
+      // go straight to Paystack rather than a "you're done" screen.
+      const callback_url = `${window.location.origin}/checkout/callback`;
+      const feeRes = await fetch('/api/v1/checkout/registration-fee', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callback_url }),
+      });
+      const feeBody = await feeRes.json().catch(() => null);
+
+      if (feeRes.ok && feeBody?.data?.authorization_url) {
+        window.location.href = feeBody.data.authorization_url;
+        return;
+      }
+
+      // Account was created either way — let them retry payment from the
+      // pending page rather than stranding them on this form.
+      router.push('/onboarding/pending');
       router.refresh();
     } finally {
       setPending(false);
@@ -159,63 +177,65 @@ export function RegisterForm() {
 
       {step === 'account' && (
         <form onSubmit={goToWelcome} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-neutral-700">
-              Full name
-            </label>
-            <input
-              id="name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
-            />
-            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name[0]}</p>}
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-neutral-700">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
-            />
-            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email[0]}</p>}
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              minLength={10}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
-            />
-            {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password[0]}</p>}
-          </div>
-          <div>
-            <label htmlFor="password_confirmation" className="block text-sm font-medium text-neutral-700">
-              Confirm password
-            </label>
-            <input
-              id="password_confirmation"
-              type="password"
-              required
-              value={passwordConfirmation}
-              onChange={(e) => setPasswordConfirmation(e.target.value)}
-              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
-            />
-            {errors.password_confirmation && (
-              <p className="mt-1 text-xs text-red-600">{errors.password_confirmation[0]}</p>
-            )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-neutral-700">
+                Full name
+              </label>
+              <input
+                id="name"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
+              />
+              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name[0]}</p>}
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-700">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
+              />
+              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email[0]}</p>}
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                minLength={10}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
+              />
+              {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password[0]}</p>}
+            </div>
+            <div>
+              <label htmlFor="password_confirmation" className="block text-sm font-medium text-neutral-700">
+                Confirm password
+              </label>
+              <input
+                id="password_confirmation"
+                type="password"
+                required
+                value={passwordConfirmation}
+                onChange={(e) => setPasswordConfirmation(e.target.value)}
+                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
+              />
+              {errors.password_confirmation && (
+                <p className="mt-1 text-xs text-red-600">{errors.password_confirmation[0]}</p>
+              )}
+            </div>
           </div>
           <div className="flex gap-2">
             <button
@@ -245,8 +265,8 @@ export function RegisterForm() {
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
-            <label className="cursor-pointer">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+            <label className="cursor-pointer shrink-0">
               {photoPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={photoPreview} alt="" className="h-20 w-20 rounded-full object-cover" />
@@ -258,23 +278,29 @@ export function RegisterForm() {
               <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handlePhoto} className="hidden" />
             </label>
             {errors.photo && <p className="text-xs text-red-600">{errors.photo[0]}</p>}
-          </div>
 
-          <div>
-            <label htmlFor="motivation" className="block text-sm font-medium text-neutral-700">
-              Why are you joining? (optional)
-            </label>
-            <textarea
-              id="motivation"
-              rows={3}
-              value={motivation}
-              onChange={(e) => setMotivation(e.target.value)}
-              maxLength={1000}
-              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
-            />
+            <div className="flex-1">
+              <label htmlFor="motivation" className="block text-sm font-medium text-neutral-700">
+                Why are you joining? (optional)
+              </label>
+              <textarea
+                id="motivation"
+                rows={3}
+                value={motivation}
+                onChange={(e) => setMotivation(e.target.value)}
+                maxLength={1000}
+                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
+              />
+            </div>
           </div>
 
           {errors.email && <p className="text-sm text-red-600">{errors.email[0]}</p>}
+
+          <p className="rounded-md bg-[var(--brand-primary)]/5 p-3 text-xs text-neutral-600">
+            A one-time registration fee of <span className="font-semibold">₦20,000</span>{' '}
+            applies. After you submit, you&apos;ll be redirected to Paystack to complete payment before your application is
+            reviewed.
+          </p>
 
           <div className="flex gap-2">
             <button
@@ -289,7 +315,7 @@ export function RegisterForm() {
               disabled={pending}
               className="flex-1 rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
             >
-              {pending ? 'Submitting…' : 'Submit application'}
+              {pending ? 'Redirecting to payment…' : 'Submit & pay ₦20,000'}
             </button>
           </div>
         </form>

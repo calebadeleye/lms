@@ -83,6 +83,17 @@ Route::prefix('auth')->group(function () {
 // course thumbnail.
 Route::middleware('auth:sanctum')->get('/members/{userId}/photo', [MemberPhotoController::class, 'show']);
 
+// Reachable by a still-pending (not yet `approved`) applicant: paying the
+// registration fee, and checking on that payment, are exactly what a
+// pending applicant needs to do before they can ever become approved. Order
+// status is scoped to `$request->user()->id` inside the controller
+// regardless, so this is safe for a pending user to hit for any of their
+// own orders, not just the registration fee.
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/checkout/registration-fee', [CheckoutController::class, 'registrationFee']);
+    Route::get('/checkout/orders/{orderId}', [CheckoutController::class, 'status']);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Learning — public catalogue (no auth required)
@@ -146,7 +157,6 @@ Route::middleware(['auth:sanctum', 'verified', 'approved'])->group(function () {
     Route::post('/checkout/courses/{courseId}', [CheckoutController::class, 'course']);
     Route::post('/checkout/membership-plans/{planId}', [CheckoutController::class, 'membership']);
     Route::post('/checkout/coaching-bookings/{bookingId}', [CheckoutController::class, 'coachingBooking']);
-    Route::get('/checkout/orders/{orderId}', [CheckoutController::class, 'status']);
     Route::get('/my/orders', [OrderController::class, 'mine']);
 
     // Coaching bookings

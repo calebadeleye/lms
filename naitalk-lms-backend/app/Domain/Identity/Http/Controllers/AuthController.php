@@ -99,6 +99,7 @@ class AuthController extends Controller
 
         return response()->json(['data' => $application ? [
             'status' => $application->status,
+            'payment_status' => $application->payment_status,
             'review_note' => $application->review_note,
             'submitted_at' => $application->created_at,
         ] : null]);

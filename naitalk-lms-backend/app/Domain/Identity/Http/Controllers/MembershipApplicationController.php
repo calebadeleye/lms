@@ -61,6 +61,7 @@ class MembershipApplicationController extends Controller
             'id' => $application->id,
             'user' => $application->user->only(['id', 'name', 'email', 'email_verified_at']),
             'status' => $application->status,
+            'payment_status' => $application->payment_status,
             'has_photo' => $application->photo_path !== null,
             'submitted_at' => $application->created_at,
         ];

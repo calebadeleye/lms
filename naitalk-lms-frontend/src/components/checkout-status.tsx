@@ -97,6 +97,7 @@ function itemDestination(order: OrderStatus): string {
   const type = order.items[0]?.itemable_type;
   if (type === 'membership_plan') return '/membership';
   if (type === 'booking') return '/my/bookings';
+  if (type === 'membership_application') return '/onboarding/pending';
   return '/my/courses';
 }
 

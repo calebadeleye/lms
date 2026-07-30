@@ -31,7 +31,7 @@ export const HOME_CONTENT = {
       { icon: 'briefcase', label: 'Professionals Seeking a New Direction' },
     ] as { icon: 'graduate' | 'compass' | 'briefcase'; label: string }[],
     quote: 'Understand yourself. Discover your purpose. Build a career that fits.',
-    photo: { src: '/marketing/hero.jpg', alt: 'HR GEMs coaching session' } as PhotoSlot,
+    photo: { src: '/marketing/hero-career-fit.png', alt: 'Career coaching conversation around a laptop' } as PhotoSlot,
   },
 
   whoWeAre: {
@@ -111,13 +111,25 @@ export const HOME_CONTENT = {
 
   moreStories: {
     heading: 'More Stories. More Impact.',
+    // Real, anonymous participant feedback from the personality assessment
+    // session — quotes only, no attributed names were collected for these.
     testimonials: [
-      { quote: 'HR GEMs has been a game-changer. The tools and community support have helped me become a better leader and coach.', author: 'Chinedu K., HR Manager' },
-      { quote: 'I came for the course, but stayed for the people. This community feels like family.', author: 'Esther I., Aspiring Coach' },
-      { quote: 'The mentorship and practical learning here are simply outstanding.', author: 'David M., Career Changer' },
+      'It was a great overview of who I am',
+      'It made me know there’s so much more i can archive and be with God.',
+      'My overall experience with the personality assessment session was insightful and engaging. It helped me better understand my personality traits, strengths, and areas for improvement. The session also provided practical insights into how I communicate, work with others, and approach challenges. Overall, it was a valuable learning experience that increased my self-awareness and will help me in both my personal and professional development.',
+      'Very insightful and interactive',
+      'It was enlightening.',
+      'My overall experience personality assessment session is ways to find purpose. I found it interesting and loved the purpose behind sharing it',
+      'It was impactful and eye opening',
+      'Awesome and eye opening. It was a positive and insightful experience. The assessment was easy to follow and provided valuable insights into my personality and work style.',
+      'Good',
+      'My overall experience was insightful and engaging. It helped me better understand my personality, strengths, and areas for growth, making the session both enjoyable and valuable.',
+      "Wonderful and it's resonates exactly with my personality",
+      'It was really an eye opener to who i really am.',
+      'It was great, it help me know my self better',
+      'I get to know more about myself and the areas to improve for growth.',
     ],
     photo: { src: '/marketing/more-stories.jpg', alt: 'A member reflecting on their journey' } as PhotoSlot,
-    moreLink: { label: 'View More Testimonials', href: '/testimonials' },
   },
 
   footer: {

@@ -5,7 +5,7 @@ export function CommunityGallerySection() {
   const { communityExperience } = HOME_CONTENT;
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
       <div className="text-center">
         <p className="text-xs font-semibold uppercase tracking-wide text-[var(--brand-accent)]">{communityExperience.eyebrow}</p>
         <h2 className="mt-2 text-2xl font-bold text-[var(--brand-primary)] sm:text-3xl">{communityExperience.heading}</h2>

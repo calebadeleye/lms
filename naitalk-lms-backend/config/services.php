@@ -43,6 +43,12 @@ return [
     'paystack' => [
         'public_key' => env('PAYSTACK_PUBLIC_KEY'),
         'secret_key' => env('PAYSTACK_SECRET_KEY'),
+        // The one-time HR GEMs membership registration fee — always charged
+        // via the platform's own managed Paystack account above (not the
+        // org's own gateway, if it ever configures one), split at Paystack's
+        // level via a pre-configured Transaction Split code.
+        'registration_fee_cents' => (int) env('PAYSTACK_REGISTRATION_FEE_CENTS', 2_000_000),
+        'registration_split_code' => env('PAYSTACK_REGISTRATION_SPLIT_CODE'),
     ],
 
     'flutterwave' => [

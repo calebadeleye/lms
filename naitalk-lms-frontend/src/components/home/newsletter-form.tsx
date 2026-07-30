@@ -15,23 +15,21 @@ export function NewsletterForm() {
     setSubmitted(true);
   }
 
-  if (submitted) {
-    return <p className="text-sm text-white/90">Thanks — we&apos;ll be in touch!</p>;
-  }
+  if (submitted) return <p className="text-xs font-medium text-white/90">Thanks — we&apos;ll be in touch!</p>;
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form onSubmit={handleSubmit} className="flex overflow-hidden rounded-md shadow-[0_8px_18px_rgba(0,0,0,0.18)]">
       <input
         type="email"
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Enter your email"
-        className="min-w-0 flex-1 rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/50 focus:border-[var(--brand-accent)] focus:outline-none"
+        className="min-w-0 flex-1 border-0 bg-white px-4 py-3 text-xs text-neutral-900 placeholder:text-neutral-500 focus:outline-none"
       />
       <button
         type="submit"
-        className="shrink-0 rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90"
+        className="shrink-0 bg-[#ffbd11] px-5 py-3 text-xs font-black text-neutral-950 hover:opacity-90"
       >
         Subscribe
       </button>

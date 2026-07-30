@@ -7,6 +7,7 @@ export interface MembershipApplication {
   id: number;
   user: { id: number; name: string; email: string; email_verified_at: string | null };
   status: 'pending' | 'approved' | 'rejected';
+  payment_status: 'pending' | 'paid';
   has_photo: boolean;
   submitted_at: string;
 }
@@ -121,6 +122,11 @@ export function ApplicationsQueue({ initial }: { initial: MembershipApplication[
                 {!application.has_photo && (
                   <span className="ml-2 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-500">No photo</span>
                 )}
+                {application.payment_status === 'paid' ? (
+                  <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700">Fee paid</span>
+                ) : (
+                  <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-medium text-red-700">Fee unpaid</span>
+                )}
               </p>
             </div>
             <span className="text-xs text-neutral-400">{formatDate(application.submitted_at)}</span>
@@ -171,12 +177,16 @@ export function ApplicationsQueue({ initial }: { initial: MembershipApplication[
                     />
                   </div>
 
+                  {application.payment_status !== 'paid' && (
+                    <p className="text-xs text-red-600">The ₦20,000 registration fee hasn&apos;t been paid yet — this can&apos;t be approved until it is.</p>
+                  )}
+
                   {error && <p className="text-sm text-red-600">{error}</p>}
 
                   <div className="flex gap-2">
                     <button
                       onClick={() => review(application, 'approve')}
-                      disabled={pending}
+                      disabled={pending || application.payment_status !== 'paid'}
                       className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
                     >
                       Approve

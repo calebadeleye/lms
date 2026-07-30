@@ -27,6 +27,17 @@ class PaymentProviderFactory
         return $this->make($config->provider, $secretKey);
     }
 
+    /**
+     * For platform-level charges that aren't the organization's own
+     * commerce (e.g. the registration fee) — always the platform's own
+     * managed Paystack account, regardless of whether this org has since
+     * configured (or switched to) a client-owned gateway of its own.
+     */
+    public function forManagedPaystack(): PaymentProviderInterface
+    {
+        return $this->make('paystack', $this->managedSecretKey('paystack'));
+    }
+
     private function make(string $provider, string $secretKey): PaymentProviderInterface
     {
         return match ($provider) {

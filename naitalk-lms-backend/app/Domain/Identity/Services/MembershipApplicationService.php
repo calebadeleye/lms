@@ -6,6 +6,7 @@ use App\Domain\Identity\Models\MembershipApplication;
 use App\Domain\Identity\Notifications\MembershipApprovedNotification;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /**
  * The only writer of both `membership_applications.status` (the review
@@ -17,6 +18,12 @@ class MembershipApplicationService
 {
     public function approve(MembershipApplication $application, User $reviewer, ?string $note = null): MembershipApplication
     {
+        if (! $application->isPaid()) {
+            throw ValidationException::withMessages([
+                'payment' => ['This applicant has not yet paid the registration fee.'],
+            ]);
+        }
+
         DB::transaction(function () use ($application, $reviewer, $note) {
             $application->update([
                 'status' => 'approved',

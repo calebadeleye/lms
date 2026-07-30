@@ -20,27 +20,6 @@ export function MembershipPlanCard({
   const [error, setError] = useState<string | null>(null);
 
   const isCurrent = mySubscription?.plan.id === plan.id && mySubscription.status === 'active';
-  const isFree = plan.billing_period === 'free' || plan.price_cents === 0;
-
-  async function subscribeFree() {
-    if (!isAuthenticated) {
-      router.push('/login?redirect=/membership');
-      return;
-    }
-    setPending(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/v1/membership-plans/${plan.id}/subscribe`, { method: 'POST' });
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        setError(body?.errors?.plan?.[0] ?? 'Could not subscribe. Please try again.');
-        return;
-      }
-      router.refresh();
-    } finally {
-      setPending(false);
-    }
-  }
 
   async function cancel() {
     if (!mySubscription) return;
@@ -68,7 +47,7 @@ export function MembershipPlanCard({
       <h3 className="text-lg font-bold text-neutral-900">{plan.name}</h3>
       <p className="mt-1 text-2xl font-bold text-neutral-900">
         {formatPrice(plan.price_cents, plan.currency)}
-        {!isFree && <span className="text-sm font-normal text-neutral-500">/{plan.billing_period}</span>}
+        <span className="text-sm font-normal text-neutral-500">/{plan.billing_period}</span>
       </p>
 
       {plan.benefits && plan.benefits.length > 0 && (
@@ -92,14 +71,6 @@ export function MembershipPlanCard({
               Cancel plan
             </button>
           )
-        ) : isFree ? (
-          <button
-            onClick={subscribeFree}
-            disabled={pending}
-            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
-          >
-            {pending ? 'Subscribing…' : 'Subscribe Free'}
-          </button>
         ) : !isAuthenticated ? (
           <button
             onClick={() => router.push('/login?redirect=/membership')}

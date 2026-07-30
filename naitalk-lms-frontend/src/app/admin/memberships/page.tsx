@@ -9,7 +9,7 @@ import { AdminMembershipsManager } from '@/components/admin-memberships-manager'
 interface AdminMembershipPlan {
   id: number;
   name: string;
-  billing_period: 'monthly' | 'annual' | 'free';
+  billing_period: 'monthly' | 'annual';
   price_cents: number;
   currency: string;
   benefits: string[] | null;

@@ -2,48 +2,16 @@
 
 use App\Domain\Learning\Models\Course;
 use App\Domain\Membership\Models\LearnerMembershipPlan;
-use App\Domain\Membership\Models\LearnerSubscription;
 use Database\Seeders\PermissionSeeder;
 
 beforeEach(function () {
     $this->seed(PermissionSeeder::class);
 });
 
-it('lets a student subscribe instantly to a free membership plan', function () {
+it('gates a membership-only course: enrolment fails without membership, succeeds once an active subscription exists', function () {
     $plan = LearnerMembershipPlan::create([
-        'name' => 'Community', 'slug' => 'community', 'billing_period' => 'free',
-        'price_cents' => 0, 'currency' => 'NGN', 'is_active' => true,
-    ]);
-
-    $student = makeUserWithRole('student');
-    $token = $student->createToken('t')->plainTextToken;
-
-    $response = $this->postJson("/api/v1/membership-plans/{$plan->id}/subscribe", [], [
-        'Authorization' => "Bearer {$token}",
-    ])->assertCreated();
-
-    expect($response->json('data.status'))->toBe('active');
-    expect(LearnerSubscription::where('user_id', $student->id)->where('status', 'active')->exists())->toBeTrue();
-});
-
-it('refuses to activate a paid membership plan without going through checkout', function () {
-    $plan = LearnerMembershipPlan::create([
-        'name' => 'Pro', 'slug' => 'pro', 'billing_period' => 'monthly',
+        'name' => 'Community', 'slug' => 'community', 'billing_period' => 'monthly',
         'price_cents' => 500000, 'currency' => 'NGN', 'is_active' => true,
-    ]);
-
-    $student = makeUserWithRole('student');
-    $token = $student->createToken('t')->plainTextToken;
-
-    $this->postJson("/api/v1/membership-plans/{$plan->id}/subscribe", [], [
-        'Authorization' => "Bearer {$token}",
-    ])->assertStatus(422);
-});
-
-it('gates a membership-only course: enrolment fails without membership, succeeds after subscribing', function () {
-    $plan = LearnerMembershipPlan::create([
-        'name' => 'Community', 'slug' => 'community', 'billing_period' => 'free',
-        'price_cents' => 0, 'currency' => 'NGN', 'is_active' => true,
     ]);
     $course = Course::create([
         'title' => 'Members Only Course', 'slug' => 'members-only-course', 'status' => 'published',
@@ -57,9 +25,10 @@ it('gates a membership-only course: enrolment fails without membership, succeeds
         'Authorization' => "Bearer {$token}",
     ])->assertStatus(422);
 
-    $this->postJson("/api/v1/membership-plans/{$plan->id}/subscribe", [], [
-        'Authorization' => "Bearer {$token}",
-    ])->assertCreated();
+    // Every plan is paid now — activation only ever happens as the result of
+    // a completed checkout (OrderFulfillmentService), never a direct
+    // subscribe endpoint, so it's exercised here via the service directly.
+    app(\App\Domain\Membership\Services\MembershipService::class)->activate($student, $plan);
 
     $response = $this->postJson("/api/v1/courses/{$course->id}/enrol", [], [
         'Authorization' => "Bearer {$token}",
@@ -87,8 +56,8 @@ it('revokes lesson access the moment a membership lapses, even after enrolment',
     $token = $student->createToken('t')->plainTextToken;
     $headers = ['Authorization' => "Bearer {$token}"];
 
-    // Activate membership via the service directly (billing_period=monthly
-    // means the subscribe endpoint would reject it as paid) and enrol.
+    // Activate membership via the service directly, the same way a
+    // completed checkout would (see OrderFulfillmentService), then enrol.
     $subscription = app(\App\Domain\Membership\Services\MembershipService::class)->activate($student, $plan);
 
     $this->postJson("/api/v1/courses/{$course->id}/enrol", [], $headers)->assertCreated();

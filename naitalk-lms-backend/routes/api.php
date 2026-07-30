@@ -139,7 +139,6 @@ Route::middleware(['auth:sanctum', 'verified', 'approved'])->group(function () {
     Route::post('/lessons/{lessonId}/assignment/submit', [AssignmentController::class, 'submit']);
 
     // Memberships
-    Route::post('/membership-plans/{planId}/subscribe', [MembershipPlanController::class, 'subscribe']);
     Route::get('/my/membership', [MembershipPlanController::class, 'mySubscription']);
     Route::post('/my/membership/{subscriptionId}/cancel', [MembershipPlanController::class, 'cancel']);
 

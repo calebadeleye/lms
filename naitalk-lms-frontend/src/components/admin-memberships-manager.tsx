@@ -7,7 +7,7 @@ import { formatPrice } from '@/lib/learning-types';
 interface AdminMembershipPlan {
   id: number;
   name: string;
-  billing_period: 'monthly' | 'annual' | 'free';
+  billing_period: 'monthly' | 'annual';
   price_cents: number;
   currency: string;
   benefits: string[] | null;
@@ -17,7 +17,7 @@ interface AdminMembershipPlan {
 
 const emptyForm = {
   name: '',
-  billing_period: 'monthly' as 'monthly' | 'annual' | 'free',
+  billing_period: 'monthly' as 'monthly' | 'annual',
   priceNaira: '0',
   currency: 'NGN',
   benefits: '',
@@ -48,7 +48,7 @@ export function AdminMembershipsManager({ initial }: { initial: AdminMembershipP
         body: JSON.stringify({
           name: form.name,
           billing_period: form.billing_period,
-          price_cents: form.billing_period === 'free' ? 0 : Math.round(Number(form.priceNaira) * 100),
+          price_cents: Math.round(Number(form.priceNaira) * 100),
           currency: form.currency,
           benefits: form.benefits
             .split('\n')
@@ -116,34 +116,31 @@ export function AdminMembershipsManager({ initial }: { initial: AdminMembershipP
                 >
                   <option value="monthly">Monthly</option>
                   <option value="annual">Annual</option>
-                  <option value="free">Free</option>
                 </select>
               </div>
             </div>
 
-            {form.billing_period !== 'free' && (
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="block text-xs font-medium text-neutral-700">Price (₦)</label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={form.priceNaira}
-                    onChange={(e) => setForm((f) => ({ ...f, priceNaira: e.target.value }))}
-                    className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-neutral-700">Currency</label>
-                  <input
-                    value={form.currency}
-                    onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value.toUpperCase() }))}
-                    maxLength={3}
-                    className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
-                  />
-                </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-medium text-neutral-700">Price (₦)</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={form.priceNaira}
+                  onChange={(e) => setForm((f) => ({ ...f, priceNaira: e.target.value }))}
+                  className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
+                />
               </div>
-            )}
+              <div>
+                <label className="block text-xs font-medium text-neutral-700">Currency</label>
+                <input
+                  value={form.currency}
+                  onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value.toUpperCase() }))}
+                  maxLength={3}
+                  className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
+                />
+              </div>
+            </div>
 
             <div>
               <label className="block text-xs font-medium text-neutral-700">Benefits (one per line)</label>
@@ -180,7 +177,7 @@ export function AdminMembershipsManager({ initial }: { initial: AdminMembershipP
                   <p className="text-sm font-medium text-neutral-900">{plan.name}</p>
                   <p className="mt-0.5 text-xs text-neutral-500">
                     {formatPrice(plan.price_cents, plan.currency)}
-                    {plan.billing_period !== 'free' && `/${plan.billing_period}`} &middot; {plan.subscriptions_count} subscriber
+                    /{plan.billing_period} &middot; {plan.subscriptions_count} subscriber
                     {plan.subscriptions_count === 1 ? '' : 's'}
                   </p>
                 </div>

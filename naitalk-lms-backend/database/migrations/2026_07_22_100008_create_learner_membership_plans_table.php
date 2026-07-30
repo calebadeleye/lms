@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug');
-            // monthly|annual|free
+            // monthly|annual
             $table->string('billing_period');
             $table->unsignedBigInteger('price_cents')->default(0);
             $table->string('currency', 3)->default('NGN');

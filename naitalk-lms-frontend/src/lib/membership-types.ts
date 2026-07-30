@@ -2,7 +2,7 @@ export interface MembershipPlan {
   id: number;
   name: string;
   slug: string;
-  billing_period: 'monthly' | 'annual' | 'free';
+  billing_period: 'monthly' | 'annual';
   price_cents: number;
   currency: string;
   benefits: string[] | null;

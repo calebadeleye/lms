@@ -21,9 +21,4 @@ class LearnerMembershipPlan extends Model
     {
         return $this->hasMany(LearnerSubscription::class, 'plan_id');
     }
-
-    public function isFree(): bool
-    {
-        return $this->billing_period === 'free' || $this->price_cents === 0;
-    }
 }

@@ -29,7 +29,7 @@ class CheckoutController extends Controller
 
     public function membership(Request $request, string $planId)
     {
-        $plan = LearnerMembershipPlan::where('is_active', true)->where('billing_period', '!=', 'free')->findOrFail($planId);
+        $plan = LearnerMembershipPlan::where('is_active', true)->findOrFail($planId);
         $data = $request->validate(['callback_url' => ['required', 'url']]);
 
         $result = $this->checkout->checkout(

@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch, ApiError } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
-import { tenantAdminNav } from '@/lib/nav';
+import { adminNav } from '@/lib/nav';
 import { CourseInfoForm } from '@/components/admin/course-info-form';
 import { CourseThumbnailUpload } from '@/components/admin/course-thumbnail-upload';
 import { AddModuleForm } from '@/components/admin/add-module-form';
@@ -14,8 +14,8 @@ import type { AdminCourseDetail, CourseCategory } from '@/lib/admin-course-types
 import type { TenantMember } from '@/lib/admin-coaching-types';
 
 export default async function AdminCourseBuilderPage({ params }: { params: Promise<{ courseId: string }> }) {
-  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
-  if (!config) notFound();
+  const config = BRANDING;
+  const me = await requireUser();
   if (!me.permissions.includes('courses.update')) redirect('/dashboard');
 
   const { courseId } = await params;
@@ -46,7 +46,7 @@ export default async function AdminCourseBuilderPage({ params }: { params: Promi
   const instructorCandidates = tenantMembers.filter((m) => !instructorIds.has(m.id));
 
   return (
-    <DashboardShell tenantName={config.tenant.name} navItems={tenantAdminNav} userName={me.user.name} activeHref="/admin/courses">
+    <DashboardShell tenantName={config.tenant.name} navItems={adminNav} userName={me.user.name} activeHref="/admin/courses">
       <div className="flex items-center justify-between">
         <div>
           <Link href="/admin/courses" className="text-xs font-medium text-neutral-500 hover:underline">

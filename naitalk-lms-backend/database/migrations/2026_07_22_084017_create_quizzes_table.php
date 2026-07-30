@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('quizzes', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('lesson_id')->unique()->constrained('lessons')->cascadeOnDelete();
             $table->unsignedTinyInteger('passing_score_percent')->default(70);
             $table->unsignedInteger('max_attempts')->nullable();

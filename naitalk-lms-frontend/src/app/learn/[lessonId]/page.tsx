@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch, ApiError } from '@/lib/api-server';
 import type { LessonContent } from '@/lib/learning-types';
@@ -9,9 +8,6 @@ import { LessonPlayer } from '@/components/lesson-player';
 import { LogoutButton } from '@/components/logout-button';
 
 export default async function LearnPage({ params }: { params: Promise<{ lessonId: string }> }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
-
   await requireUser();
   const { lessonId } = await params;
 
@@ -39,7 +35,7 @@ export default async function LearnPage({ params }: { params: Promise<{ lessonId
       <div className="flex min-h-full flex-col items-center justify-center gap-3 bg-neutral-50 px-6 text-center">
         <p className="text-lg font-semibold text-neutral-900">Lesson locked</p>
         <p className="max-w-md text-sm text-neutral-600">{lockedMessage}</p>
-        <Link href="/my/courses" className="mt-2 text-sm font-medium text-[var(--tenant-primary)] underline">
+        <Link href="/my/courses" className="mt-2 text-sm font-medium text-[var(--brand-primary)] underline">
           Back to My Courses
         </Link>
       </div>
@@ -49,7 +45,7 @@ export default async function LearnPage({ params }: { params: Promise<{ lessonId
   return (
     <div className="flex min-h-full flex-col bg-neutral-50">
       <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-3 sm:px-6">
-        <Link href={`/courses/${lesson.course_slug}`} className="text-sm font-medium text-neutral-600 hover:text-[var(--tenant-primary)]">
+        <Link href={`/courses/${lesson.course_slug}`} className="text-sm font-medium text-neutral-600 hover:text-[var(--brand-primary)]">
           ← {lesson.course_title}
         </Link>
         <LogoutButton className="text-sm font-medium text-neutral-500 hover:text-neutral-700" />

@@ -1,33 +1,21 @@
 @import "tailwindcss";
 
 /*
- * Tenant-facing and public pages are intentionally light-themed only —
- * every page/component hardcodes bg-white/bg-neutral-50/text-neutral-900
- * rather than adapting to the visitor's OS color scheme, since tenant
- * branding (--tenant-primary etc.) already controls the palette per-tenant.
- * There is deliberately no `prefers-color-scheme: dark` handling: the
- * leftover Next.js starter block that used to live here made `body`'s text
- * color go near-white on a dark-mode system while <input>/<textarea>/
- * <select> elements (which never set their own text/background color
- * anywhere in this codebase) kept a white background — typed text became
- * almost invisible. Form controls get an explicit color below so this
- * can't recur even where a component forgets to set one itself.
- *
- * The platform admin (NAI TALK's own internal tool, see PlatformShell) is
- * the one deliberate exception — it's permanently dark-themed, not
- * OS-driven, using the .platform-bg class below plus explicit dark classes
- * on each element.
+ * Every page/component is intentionally light-themed only — hardcoding
+ * bg-white/bg-neutral-50/text-neutral-900 rather than adapting to the
+ * visitor's OS color scheme, since brand palette (--brand-primary etc.,
+ * see src/lib/branding.ts) already controls the look. There is
+ * deliberately no `prefers-color-scheme: dark` handling: the leftover
+ * Next.js starter block that used to live here made `body`'s text color go
+ * near-white on a dark-mode system while <input>/<textarea>/<select>
+ * elements (which never set their own text/background color anywhere in
+ * this codebase) kept a white background — typed text became almost
+ * invisible. Form controls get an explicit color below so this can't recur
+ * even where a component forgets to set one itself.
  */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  /* NAI TALK's own brand color — used only in the platform admin (never a
-     tenant-facing page, which always uses that tenant's --tenant-* vars
-     instead). Approximated from the brand logo; nudge these if the exact
-     brand hex is ever supplied. */
-  --naitalk-green: #2e8b3d;
-  --naitalk-green-dark: #1f5f2a;
-  --naitalk-gray: #6b7280;
 }
 
 @theme inline {
@@ -48,17 +36,4 @@ textarea,
 select {
   color: var(--foreground);
   background-color: #ffffff;
-}
-
-/* Platform admin's dark aurora backdrop — a fixed set of soft green/teal/
-   violet glows over a near-black navy, echoing the brand green without
-   needing an actual background image asset. */
-.platform-bg {
-  background-color: #060b14;
-  background-image:
-    radial-gradient(circle at 12% 8%, rgba(46, 139, 61, 0.35), transparent 40%),
-    radial-gradient(circle at 88% 15%, rgba(20, 184, 166, 0.18), transparent 38%),
-    radial-gradient(circle at 78% 82%, rgba(147, 51, 234, 0.16), transparent 42%),
-    radial-gradient(circle at 20% 90%, rgba(46, 139, 61, 0.14), transparent 38%);
-  background-attachment: fixed;
 }

@@ -2,8 +2,7 @@
 
 use App\Domain\Identity\Http\Middleware\CheckPermission;
 use App\Domain\Identity\Http\Middleware\EnsureEmailIsVerified;
-use App\Domain\Identity\Http\Middleware\PlatformStaffOnly;
-use App\Domain\Tenancy\Http\Middleware\ResolveTenant;
+use App\Domain\Identity\Http\Middleware\EnsureMemberApproved;
 use App\Support\Api\Http\Middleware\AssignRequestId;
 use App\Support\Api\Http\Middleware\TryAuthenticateSanctum;
 use App\Support\Api\Http\Middleware\VerifyFrontendSecret;
@@ -26,8 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'tenant' => ResolveTenant::class,
-            'platform' => PlatformStaffOnly::class,
             'permission' => CheckPermission::class,
             'optional-auth' => TryAuthenticateSanctum::class,
             // Overrides Laravel's default `verified` alias, which returns a
@@ -36,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // `{"errors": [{"code", "message"}]}`, so this keeps that
             // consistent.
             'verified' => EnsureEmailIsVerified::class,
+            'approved' => EnsureMemberApproved::class,
         ]);
 
         $middleware->throttleApi();

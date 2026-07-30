@@ -1,11 +1,9 @@
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { AuthCard } from '@/components/auth-card';
 import { LoginForm } from '@/components/login-form';
 
 export default async function LoginPage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   return (
     <AuthCard

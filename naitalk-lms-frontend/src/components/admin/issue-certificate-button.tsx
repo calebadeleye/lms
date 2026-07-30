@@ -35,7 +35,7 @@ export function IssueCertificateButton({ enrolmentId }: { enrolmentId: number })
 
   return (
     <div>
-      <button onClick={issue} disabled={pending} className="text-xs font-medium text-[var(--tenant-primary)] hover:underline">
+      <button onClick={issue} disabled={pending} className="text-xs font-medium text-[var(--brand-primary)] hover:underline">
         {pending ? 'Issuing…' : 'Issue certificate'}
       </button>
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}

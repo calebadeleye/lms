@@ -1,5 +1,4 @@
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
@@ -17,8 +16,7 @@ export default async function CheckoutCallbackPage({
 }: {
   searchParams: Promise<{ reference?: string; trxref?: string; tx_ref?: string }>;
 }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const user = await getOptionalUser();
   const params = await searchParams;

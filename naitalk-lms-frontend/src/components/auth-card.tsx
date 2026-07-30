@@ -21,7 +21,7 @@ export function AuthCard({
           ) : (
             <span
               aria-hidden
-              className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-md bg-[var(--tenant-primary)] text-lg font-bold text-[var(--tenant-accent)]"
+              className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-md bg-[var(--brand-primary)] text-lg font-bold text-[var(--brand-accent)]"
             >
               {tenantName.charAt(0)}
             </span>

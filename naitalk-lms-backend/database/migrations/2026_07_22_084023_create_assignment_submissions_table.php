@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('assignment_submissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('assignment_id')->constrained('assignments')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('enrolment_id')->constrained('enrolments')->cascadeOnDelete();
@@ -24,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['assignment_id', 'user_id']);
-            $table->index(['tenant_id', 'assignment_id']);
+            $table->index('assignment_id');
         });
     }
 

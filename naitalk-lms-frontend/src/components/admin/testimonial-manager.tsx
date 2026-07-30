@@ -24,7 +24,7 @@ export function TestimonialManager({ initial }: { initial: Testimonial[] }) {
     setError(null);
 
     try {
-      const res = await fetch('/api/v1/tenant/testimonials', {
+      const res = await fetch('/api/v1/admin/testimonials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quote, author }),
@@ -47,7 +47,7 @@ export function TestimonialManager({ initial }: { initial: Testimonial[] }) {
 
   async function remove(testimonial: Testimonial) {
     if (!window.confirm(`Delete this testimonial from ${testimonial.author}?`)) return;
-    await fetch(`/api/v1/tenant/testimonials/${testimonial.id}`, { method: 'DELETE' });
+    await fetch(`/api/v1/admin/testimonials/${testimonial.id}`, { method: 'DELETE' });
     setTestimonials((prev) => prev.filter((t) => t.id !== testimonial.id));
     router.refresh();
   }
@@ -82,7 +82,7 @@ export function TestimonialManager({ initial }: { initial: Testimonial[] }) {
             value={quote}
             onChange={(e) => setQuote(e.target.value)}
             rows={3}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <div>
@@ -94,14 +94,14 @@ export function TestimonialManager({ initial }: { initial: Testimonial[] }) {
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
             placeholder="Funke A., HR Manager"
-            className="mt-1 w-full max-w-sm rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full max-w-sm rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"
           disabled={pending || !quote.trim() || !author.trim()}
-          className="rounded-md bg-[var(--tenant-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Adding…' : 'Add testimonial'}
         </button>

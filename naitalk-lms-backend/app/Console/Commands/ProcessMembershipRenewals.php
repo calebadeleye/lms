@@ -25,12 +25,11 @@ class ProcessMembershipRenewals extends Command
     {
         $graceDays = (int) $this->option('grace-days');
 
-        $expiring = LearnerSubscription::withoutTenancy(fn () => LearnerSubscription::query()
+        $expiring = LearnerSubscription::query()
             ->where('status', 'active')
             ->whereNotNull('current_period_end')
             ->where('current_period_end', '<', now())
-            ->get()
-        );
+            ->get();
 
         foreach ($expiring as $subscription) {
             if ($subscription->cancel_at_period_end) {
@@ -42,11 +41,10 @@ class ProcessMembershipRenewals extends Command
             }
         }
 
-        $overdue = LearnerSubscription::withoutTenancy(fn () => LearnerSubscription::query()
+        $overdue = LearnerSubscription::query()
             ->where('status', 'past_due')
             ->where('current_period_end', '<', now()->subDays($graceDays))
-            ->get()
-        );
+            ->get();
 
         foreach ($overdue as $subscription) {
             $subscription->update(['status' => 'expired']);

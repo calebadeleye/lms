@@ -3,16 +3,11 @@
 namespace App\Domain\Identity\Http\Middleware;
 
 use App\Domain\Identity\Services\PermissionService;
-use App\Domain\Tenancy\Services\TenantContext;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Route middleware: `->middleware('permission:courses.publish')`.
- * Must run after `auth:sanctum` and after either `tenant` (ResolveTenant) or
- * `platform` (PlatformStaffOnly) so it knows which scope to check.
- */
+/** Route middleware: `->middleware('permission:courses.publish')`. Must run after `auth:sanctum`. */
 class CheckPermission
 {
     public function __construct(private PermissionService $permissions) {}
@@ -27,13 +22,7 @@ class CheckPermission
             ], 401);
         }
 
-        $isPlatformRoute = $request->attributes->get('platform_staff') !== null;
-
-        $allowed = $isPlatformRoute
-            ? $this->permissions->userHasPlatformPermission($user, $key)
-            : $this->permissions->userHasTenantPermission($user, app(TenantContext::class)->id() ?? '', $key);
-
-        if (! $allowed) {
+        if (! $this->permissions->userHasPermission($user, $key)) {
             return response()->json([
                 'errors' => [['code' => 'forbidden', 'message' => "Missing required permission: {$key}."]],
             ], 403);

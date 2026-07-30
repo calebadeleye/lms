@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('enrolments', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             // active|completed|cancelled
@@ -21,8 +20,8 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['tenant_id', 'course_id', 'user_id']);
-            $table->index(['tenant_id', 'user_id', 'status']);
+            $table->unique(['course_id', 'user_id']);
+            $table->index(['user_id', 'status']);
         });
     }
 

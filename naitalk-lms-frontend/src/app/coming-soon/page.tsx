@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
-import { notFound } from 'next/navigation';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 
@@ -15,8 +14,7 @@ export default async function ComingSoonPage({
 }: {
   searchParams: Promise<{ feature?: string }>;
 }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const user = await getOptionalUser();
   const { feature } = await searchParams;
@@ -29,7 +27,7 @@ export default async function ComingSoonPage({
         <p className="max-w-md text-neutral-600">
           {config.tenant.name} is being built out in phases. This part of the platform isn&apos;t live yet.
         </p>
-        <Link href="/" className="mt-2 text-sm font-medium text-[var(--tenant-primary)] underline">
+        <Link href="/" className="mt-2 text-sm font-medium text-[var(--brand-primary)] underline">
           Back to homepage
         </Link>
       </main>

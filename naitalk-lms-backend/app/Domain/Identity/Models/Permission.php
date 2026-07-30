@@ -9,7 +9,7 @@ class Permission extends Model
 {
     public $timestamps = true;
 
-    protected $fillable = ['key', 'label', 'scope'];
+    protected $fillable = ['key', 'label'];
 
     public function roles(): BelongsToMany
     {

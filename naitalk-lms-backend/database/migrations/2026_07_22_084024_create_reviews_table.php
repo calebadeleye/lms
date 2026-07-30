@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->unsignedTinyInteger('rating');
@@ -18,7 +17,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['course_id', 'user_id']);
-            $table->index(['tenant_id', 'course_id']);
+            $table->index('course_id');
         });
     }
 

@@ -147,7 +147,7 @@ export function AdminUsersManager({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="colleague@example.com"
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <div>
@@ -155,7 +155,7 @@ export function AdminUsersManager({
           <select
             value={roleId}
             onChange={(e) => setRoleId(e.target.value)}
-            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             {roles.map((r) => (
               <option key={r.id} value={r.id}>
@@ -168,7 +168,7 @@ export function AdminUsersManager({
           <button
             type="submit"
             disabled={pending || !email}
-            className="w-full rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
           >
             {pending ? 'Sending…' : 'Invite'}
           </button>
@@ -229,7 +229,7 @@ export function AdminUsersManager({
                     <select
                       value={member.role_id}
                       onChange={(e) => changeRole(member.id, e.target.value)}
-                      className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs focus:border-[var(--tenant-primary)] focus:outline-none"
+                      className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs focus:border-[var(--brand-primary)] focus:outline-none"
                     >
                       {roles.map((r) => (
                         <option key={r.id} value={r.id}>

@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { SiteHeader } from '@/components/site-header';
@@ -12,8 +11,7 @@ export default async function CourseCataloguePage({
 }: {
   searchParams: Promise<{ category_id?: string; search?: string }>;
 }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const user = await getOptionalUser();
   const { category_id, search } = await searchParams;
@@ -45,7 +43,7 @@ export default async function CourseCataloguePage({
                 name="search"
                 defaultValue={search}
                 placeholder="Search courses…"
-                className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+                className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
               />
             </form>
             <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Categories</h2>
@@ -53,7 +51,7 @@ export default async function CourseCataloguePage({
               <li>
                 <Link
                   href="/courses"
-                  className={`block rounded-md px-2 py-1.5 ${!category_id ? 'bg-[var(--tenant-primary)]/10 font-medium text-[var(--tenant-primary)]' : 'text-neutral-600 hover:bg-neutral-50'}`}
+                  className={`block rounded-md px-2 py-1.5 ${!category_id ? 'bg-[var(--brand-primary)]/10 font-medium text-[var(--brand-primary)]' : 'text-neutral-600 hover:bg-neutral-50'}`}
                 >
                   All Categories
                 </Link>
@@ -62,7 +60,7 @@ export default async function CourseCataloguePage({
                 <li key={cat.id}>
                   <Link
                     href={`/courses?category_id=${cat.id}`}
-                    className={`block rounded-md px-2 py-1.5 ${category_id === String(cat.id) ? 'bg-[var(--tenant-primary)]/10 font-medium text-[var(--tenant-primary)]' : 'text-neutral-600 hover:bg-neutral-50'}`}
+                    className={`block rounded-md px-2 py-1.5 ${category_id === String(cat.id) ? 'bg-[var(--brand-primary)]/10 font-medium text-[var(--brand-primary)]' : 'text-neutral-600 hover:bg-neutral-50'}`}
                   >
                     {cat.name}
                   </Link>
@@ -82,10 +80,10 @@ export default async function CourseCataloguePage({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={course.thumbnail_url} alt="" className="aspect-video w-full object-cover" />
                 ) : (
-                  <div className="aspect-video bg-linear-to-br from-[var(--tenant-primary)] to-[var(--tenant-secondary)]/60" />
+                  <div className="aspect-video bg-linear-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)]/60" />
                 )}
                 <div className="flex flex-1 flex-col p-4">
-                  <p className="text-xs font-medium text-[var(--tenant-primary)]">{course.category?.name}</p>
+                  <p className="text-xs font-medium text-[var(--brand-primary)]">{course.category?.name}</p>
                   <h3 className="mt-1 font-semibold text-neutral-900 group-hover:underline">{course.title}</h3>
                   <p className="mt-1 text-xs capitalize text-neutral-500">{course.difficulty_level}</p>
                   <div className="mt-auto flex items-center justify-between pt-4">

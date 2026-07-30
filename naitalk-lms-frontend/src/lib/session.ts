@@ -7,23 +7,10 @@ export interface SessionData {
   publicId?: string;
   name?: string;
   email?: string;
-  tenantId?: string;
-  /** Set only by platform-login/route.ts. tenantId is NOT a reliable way to
-   * tell tenant and platform-staff sessions apart — neither login nor
-   * register (tenant-side) ever sets it — so anything that needs to branch
-   * on session type (e.g. logout/route.ts picking which backend logout
-   * endpoint to call) must check this flag instead. */
-  isPlatformStaff?: boolean;
   /** Sanctum bearer token — never sent to the browser, only ever read
    * server-side to attach `Authorization: Bearer` on outgoing API calls. */
   token?: string;
   expiresAt?: string;
-  /** Set while a platform support agent is impersonating this session. */
-  impersonation?: {
-    staffId: number;
-    reason: string;
-    expiresAt: string;
-  };
 }
 
 const sessionOptions: SessionOptions = {

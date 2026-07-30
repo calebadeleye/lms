@@ -119,7 +119,7 @@ function StatusCard({
       {action && (
         <Link
           href={action.href}
-          className="mt-6 inline-block rounded-md bg-[var(--tenant-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90"
+          className="mt-6 inline-block rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90"
         >
           {action.label}
         </Link>

@@ -8,32 +8,26 @@ use App\Support\Identity\PermissionCatalog;
 use Illuminate\Database\Seeder;
 
 /**
- * Seeds the global permission catalog and the four platform-scoped roles.
- * Tenant-scoped roles are NOT seeded here — each tenant gets its own copies,
- * created by TenantProvisioningService when the tenant is created.
+ * Seeds the global permission catalog and the fixed set of roles.
  */
 class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (PermissionCatalog::TENANT_PERMISSIONS as $key => $label) {
-            Permission::updateOrCreate(['key' => $key], ['label' => $label, 'scope' => 'tenant']);
+        foreach (PermissionCatalog::PERMISSIONS as $key => $label) {
+            Permission::updateOrCreate(['key' => $key], ['label' => $label]);
         }
 
-        foreach (PermissionCatalog::PLATFORM_PERMISSIONS as $key => $label) {
-            Permission::updateOrCreate(['key' => $key], ['label' => $label, 'scope' => 'platform']);
-        }
+        $allPermissionIds = Permission::pluck('id');
 
-        $allPlatformPermissionIds = Permission::where('scope', 'platform')->pluck('id');
-
-        foreach (PermissionCatalog::PLATFORM_ROLE_DEFAULTS as $slug => $keys) {
+        foreach (PermissionCatalog::ROLE_DEFAULTS as $slug => $keys) {
             $role = Role::updateOrCreate(
-                ['tenant_id' => null, 'slug' => $slug],
-                ['name' => PermissionCatalog::PLATFORM_ROLE_LABELS[$slug], 'is_system' => true]
+                ['slug' => $slug],
+                ['name' => PermissionCatalog::ROLE_LABELS[$slug], 'is_system' => true]
             );
 
             $permissionIds = in_array('*', $keys, true)
-                ? $allPlatformPermissionIds
+                ? $allPermissionIds
                 : Permission::whereIn('key', $keys)->pluck('id');
 
             $role->permissions()->sync($permissionIds);

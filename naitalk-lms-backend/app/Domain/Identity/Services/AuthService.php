@@ -8,8 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * Shared login/token machinery for both tenant-domain auth (AuthController)
- * and platform-staff auth (PlatformAuthController). The Next.js BFF is the
+ * Shared login/token machinery for AuthController. The Next.js BFF is the
  * only intended caller: it exchanges credentials here for a Sanctum bearer
  * token, then keeps that token server-side inside an encrypted HttpOnly
  * cookie (see ARCHITECTURE.md §2) — this endpoint itself does not set
@@ -31,7 +30,7 @@ class AuthService
     /**
      * @return array{token: string, expires_at: \Illuminate\Support\Carbon}
      */
-    public function issueToken(User $user, Request $request, ?string $tenantId = null): array
+    public function issueToken(User $user, Request $request): array
     {
         $expiresAt = now()->addHours(2);
 
@@ -44,7 +43,6 @@ class AuthService
         UserSession::create([
             'user_id' => $user->id,
             'personal_access_token_id' => $token->accessToken->id,
-            'tenant_id' => $tenantId,
             'device_label' => $request->input('device_label'),
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),

@@ -1,16 +1,16 @@
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { redirect } from 'next/navigation';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
-import { tenantAdminNav } from '@/lib/nav';
+import { adminNav } from '@/lib/nav';
 import { AdminAddCoachForm } from '@/components/admin-add-coach-form';
 import type { AdminCoach, TenantMember } from '@/lib/admin-coaching-types';
 
 export default async function AdminCoachingPage() {
-  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
-  if (!config) notFound();
+  const config = BRANDING;
+  const me = await requireUser();
   if (!me.permissions.includes('coaching.manage')) redirect('/dashboard');
 
   const [coaches, members] = await Promise.all([
@@ -22,7 +22,7 @@ export default async function AdminCoachingPage() {
   const candidates = members.data.filter((m) => !coachUserIds.has(m.id));
 
   return (
-    <DashboardShell tenantName={config.tenant.name} navItems={tenantAdminNav} userName={me.user.name} activeHref="/admin/coaching">
+    <DashboardShell tenantName={config.tenant.name} navItems={adminNav} userName={me.user.name} activeHref="/admin/coaching">
       <h1 className="text-xl font-bold text-neutral-900">Coaching</h1>
       <p className="mt-1 text-sm text-neutral-500">Manage coaches, their availability, and coaching sessions.</p>
 

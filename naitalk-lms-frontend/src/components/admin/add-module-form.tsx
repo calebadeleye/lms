@@ -30,12 +30,12 @@ export function AddModuleForm({ courseId }: { courseId: number }) {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="New module title"
-        className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+        className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
       />
       <button
         type="submit"
         disabled={pending || !title}
-        className="rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
       >
         + Add module
       </button>

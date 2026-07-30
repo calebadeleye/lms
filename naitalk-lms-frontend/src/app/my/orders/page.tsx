@@ -1,5 +1,4 @@
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -25,8 +24,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function MyOrdersPage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const me = await requireUser();
   const orders = await apiFetch<{ data: OrderRecord[] }>('/api/v1/my/orders');

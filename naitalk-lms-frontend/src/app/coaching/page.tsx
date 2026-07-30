@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { SiteHeader } from '@/components/site-header';
@@ -11,8 +10,7 @@ import { formatPrice } from '@/lib/learning-types';
 import type { CoachSummary } from '@/lib/coaching-types';
 
 export default async function CoachingCataloguePage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const user = await getOptionalUser();
   const coaches = await apiFetch<{ data: CoachSummary[] }>('/api/v1/coaches');
@@ -66,7 +64,7 @@ function CoachCard({ coach }: { coach: CoachSummary }) {
       <div className="flex items-center gap-3">
         <span
           aria-hidden
-          className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[var(--tenant-primary)] text-lg font-bold text-[var(--tenant-accent)]"
+          className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[var(--brand-primary)] text-lg font-bold text-[var(--brand-accent)]"
         >
           {coach.name.charAt(0)}
         </span>

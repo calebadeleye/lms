@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('quiz_questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('quiz_id')->constrained('quizzes')->cascadeOnDelete();
             // multiple_choice|multiple_answer|true_false|free_text
             $table->string('type');
@@ -19,7 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
 
-            $table->index(['tenant_id', 'quiz_id', 'sort_order']);
+            $table->index(['quiz_id', 'sort_order']);
         });
     }
 

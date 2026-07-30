@@ -20,9 +20,19 @@ return new class extends Migration
             $table->string('password');
             $table->string('mfa_secret')->nullable();
             $table->timestamp('mfa_enabled_at')->nullable();
+            // FK to `roles` added by a later migration (roles doesn't exist
+            // yet at this point in migration order).
+            $table->unsignedBigInteger('role_id')->nullable();
+            // active|inactive
+            $table->string('status')->default('active');
+            $table->timestamp('joined_at')->nullable();
+            $table->foreignId('invited_by')->nullable()->constrained('users')->nullOnDelete();
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->index('role_id');
+            $table->index('status');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

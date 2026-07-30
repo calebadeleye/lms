@@ -2,14 +2,12 @@
 
 namespace App\Domain\Learning\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Quiz extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = [
         'lesson_id', 'passing_score_percent', 'max_attempts', 'time_limit_minutes', 'randomize_questions',

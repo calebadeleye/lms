@@ -67,7 +67,7 @@ export function AdminAvailabilityManager({ coachId, initial }: { coachId: number
           <select
             value={dayOfWeek}
             onChange={(e) => setDayOfWeek(e.target.value)}
-            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             {DAY_NAMES.map((day, i) => (
               <option key={day} value={i}>
@@ -82,7 +82,7 @@ export function AdminAvailabilityManager({ coachId, initial }: { coachId: number
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <div>
@@ -91,13 +91,13 @@ export function AdminAvailabilityManager({ coachId, initial }: { coachId: number
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
           Add
         </button>

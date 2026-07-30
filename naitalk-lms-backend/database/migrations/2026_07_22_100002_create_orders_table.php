@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             // pending|paid|failed|refunded|partially_refunded|cancelled
             $table->string('status')->default('pending');
@@ -28,7 +27,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['provider', 'provider_reference']);
-            $table->index(['tenant_id', 'user_id', 'status']);
+            $table->index(['user_id', 'status']);
         });
     }
 

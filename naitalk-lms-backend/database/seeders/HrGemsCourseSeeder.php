@@ -3,49 +3,39 @@
 namespace Database\Seeders;
 
 use App\Domain\Identity\Models\Role;
-use App\Domain\Identity\Models\TenantUser;
 use App\Domain\Learning\Models\Course;
 use App\Domain\Learning\Models\CourseCategory;
-use App\Domain\Tenancy\Models\Tenant;
-use App\Domain\Tenancy\Services\TenantContext;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 /**
- * Course catalogue for the HR GEMS demo tenant, matching the attached
- * mockup's course cards (titles, levels, ratings, prices, instructor). One
- * additional free course is seeded beyond the mockup so the Phase 2
- * enrol/learn/quiz flow has something real to demonstrate end-to-end —
- * Phase 2 only supports free-course enrolment, real checkout is Phase 3.
+ * Course catalogue, matching the attached mockup's course cards (titles,
+ * levels, ratings, prices, instructor). One additional free course is
+ * seeded beyond the mockup so the enrol/learn/quiz flow has something real
+ * to demonstrate end-to-end.
  */
 class HrGemsCourseSeeder extends Seeder
 {
     public function run(): void
     {
-        $tenant = Tenant::where('slug', 'hrgems')->first();
-
-        if (! $tenant) {
-            $this->command?->line('HR GEMS tenant not found, run HrGemsTenantSeeder first — skipping.');
-
-            return;
-        }
-
-        app(TenantContext::class)->set($tenant);
+        $instructorRole = Role::where('slug', 'instructor')->firstOrFail();
 
         // email_verified_at isn't in User::$fillable (deliberately — nothing
         // should mass-assign it from request input), so passing it into
         // firstOrCreate()'s attributes silently drops it. forceFill after.
         $instructor = User::firstOrCreate(
             ['email' => 'lara.yeku@hrgems.test'],
-            ['name' => 'Lara Yeku', 'password' => 'password']
+            [
+                'name' => 'Lara Yeku',
+                'password' => 'password',
+                'role_id' => $instructorRole->id,
+                'status' => 'active',
+                'joined_at' => now(),
+            ]
         );
         if (! $instructor->email_verified_at) {
             $instructor->forceFill(['email_verified_at' => now()])->save();
-        }
-        $instructorRole = Role::forTenant($tenant->id)->where('slug', 'instructor')->first();
-        if ($instructorRole && ! TenantUser::where('tenant_id', $tenant->id)->where('user_id', $instructor->id)->exists()) {
-            TenantUser::create(['user_id' => $instructor->id, 'role_id' => $instructorRole->id, 'status' => 'active', 'joined_at' => now()]);
         }
 
         $categories = collect([
@@ -87,9 +77,7 @@ class HrGemsCourseSeeder extends Seeder
                 'published_at' => now(),
             ]);
 
-            // attach() bypasses Eloquent events (raw pivot insert), so
-            // BelongsToTenant never auto-fills tenant_id here — pass it explicitly.
-            $course->instructors()->attach($instructor->id, ['role' => 'primary', 'tenant_id' => $tenant->id]);
+            $course->instructors()->attach($instructor->id, ['role' => 'primary']);
 
             if ($entry['full_curriculum'] ?? false) {
                 $this->seedFullCurriculum($course);
@@ -105,8 +93,12 @@ class HrGemsCourseSeeder extends Seeder
 
         $this->seedFreeDemoCourse($categories['HR Fundamentals']);
 
-        app(TenantContext::class)->clear();
-        $this->command?->line('HR GEMS course catalogue seeded.');
+        \App\Domain\Site\Models\Testimonial::firstOrCreate(
+            ['author' => 'Funke A., HR Manager'],
+            ['quote' => 'The coaching I received from HR Gems transformed the way I lead my team. Highly recommended!']
+        );
+
+        $this->command?->line('Course catalogue seeded.');
     }
 
     private function seedFullCurriculum(Course $course): void

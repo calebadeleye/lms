@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { redirect } from 'next/navigation';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -14,8 +14,7 @@ interface EnrolmentSummary {
 }
 
 export default async function DashboardPage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const me = await requireUser();
   // Mirrors /admin's own `permissions.length === 0 -> /dashboard` redirect
@@ -69,13 +68,13 @@ export default async function DashboardPage() {
                 className="h-16 w-24 shrink-0 rounded-md object-cover"
               />
             ) : (
-              <div className="h-16 w-24 shrink-0 rounded-md bg-linear-to-br from-[var(--tenant-primary)] to-[var(--tenant-secondary)]/60" />
+              <div className="h-16 w-24 shrink-0 rounded-md bg-linear-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)]/60" />
             )}
             <div className="flex-1">
               <p className="font-medium text-neutral-900">{continueLearning.course.title}</p>
               <div className="mt-2 h-1.5 w-full max-w-xs rounded-full bg-neutral-100">
                 <div
-                  className="h-1.5 rounded-full bg-[var(--tenant-accent)]"
+                  className="h-1.5 rounded-full bg-[var(--brand-accent)]"
                   style={{ width: `${continueLearning.completion_percent}%` }}
                 />
               </div>
@@ -87,7 +86,7 @@ export default async function DashboardPage() {
         <div className="mt-6 rounded-xl border border-dashed border-neutral-300 bg-white p-8 text-center">
           <p className="text-sm text-neutral-500">
             You&apos;re not enrolled in any courses yet.{' '}
-            <Link href="/courses" className="font-medium text-[var(--tenant-primary)] underline">
+            <Link href="/courses" className="font-medium text-[var(--brand-primary)] underline">
               Browse the catalogue
             </Link>
             .

@@ -10,9 +10,6 @@ return new class extends Migration
     {
         Schema::create('webhook_events', function (Blueprint $table) {
             $table->id();
-            // Nullable: a malformed/unroutable webhook may arrive before a
-            // tenant can be resolved at all.
-            $table->foreignUuid('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->string('provider');
             $table->string('event_type')->nullable();
             $table->string('provider_event_id');

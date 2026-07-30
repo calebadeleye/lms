@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('availability_rules', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('coach_id')->constrained('coaches')->cascadeOnDelete();
             // 0 (Sunday) - 6 (Saturday)
             $table->unsignedTinyInteger('day_of_week');
@@ -19,7 +18,7 @@ return new class extends Migration
             $table->string('timezone')->default('UTC');
             $table->timestamps();
 
-            $table->index(['tenant_id', 'coach_id', 'day_of_week']);
+            $table->index(['coach_id', 'day_of_week']);
         });
     }
 

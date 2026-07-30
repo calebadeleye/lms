@@ -152,7 +152,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
       onClick={onClick}
       className={`px-4 py-2 text-sm font-medium ${
         active
-          ? 'border-b-2 border-[var(--tenant-primary)] text-[var(--tenant-primary)]'
+          ? 'border-b-2 border-[var(--brand-primary)] text-[var(--brand-primary)]'
           : 'text-neutral-500 hover:text-neutral-700'
       }`}
     >
@@ -223,7 +223,7 @@ function ClientOwnedForm({ current, onSaved }: { current: PaymentConfig | null; 
           <select
             value={form.provider}
             onChange={(e) => setForm((f) => ({ ...f, provider: e.target.value }))}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             <option value="paystack">Paystack</option>
             <option value="flutterwave">Flutterwave</option>
@@ -233,7 +233,7 @@ function ClientOwnedForm({ current, onSaved }: { current: PaymentConfig | null; 
           <select
             value={form.environment}
             onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             <option value="test">Test</option>
             <option value="live">Live</option>
@@ -246,7 +246,7 @@ function ClientOwnedForm({ current, onSaved }: { current: PaymentConfig | null; 
           value={form.public_key}
           onChange={(e) => setForm((f) => ({ ...f, public_key: e.target.value }))}
           required
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
       </Field>
 
@@ -257,7 +257,7 @@ function ClientOwnedForm({ current, onSaved }: { current: PaymentConfig | null; 
           onChange={(e) => setForm((f) => ({ ...f, secret_key: e.target.value }))}
           required
           autoComplete="off"
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
       </Field>
 
@@ -268,7 +268,7 @@ function ClientOwnedForm({ current, onSaved }: { current: PaymentConfig | null; 
           onChange={(e) => setForm((f) => ({ ...f, webhook_secret: e.target.value }))}
           required
           autoComplete="off"
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
         <p className="mt-1 text-xs text-neutral-400">
           Flutterwave: the dashboard-configured secret hash. Paystack: re-enter your secret key — it signs webhooks too.
@@ -279,7 +279,7 @@ function ClientOwnedForm({ current, onSaved }: { current: PaymentConfig | null; 
         <select
           value={form.fee_bearer}
           onChange={(e) => setForm((f) => ({ ...f, fee_bearer: e.target.value }))}
-          className="mt-1 w-full max-w-xs rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full max-w-xs rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         >
           <option value="tenant">You (deducted from your payout)</option>
           <option value="learner">The learner (added at checkout)</option>
@@ -292,7 +292,7 @@ function ClientOwnedForm({ current, onSaved }: { current: PaymentConfig | null; 
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-[var(--tenant-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
       >
         {pending ? 'Saving…' : 'Save credentials'}
       </button>
@@ -358,7 +358,7 @@ function ManagedForm({ current, onSaved }: { current: PaymentConfig | null; onSa
         <select
           value={form.provider}
           onChange={(e) => setForm((f) => ({ ...f, provider: e.target.value }))}
-          className="mt-1 w-full max-w-xs rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full max-w-xs rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         >
           <option value="paystack">Paystack</option>
           <option value="flutterwave">Flutterwave</option>
@@ -370,7 +370,7 @@ function ManagedForm({ current, onSaved }: { current: PaymentConfig | null; onSa
           value={form.business_name}
           onChange={(e) => setForm((f) => ({ ...f, business_name: e.target.value }))}
           required
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
       </Field>
 
@@ -380,7 +380,7 @@ function ManagedForm({ current, onSaved }: { current: PaymentConfig | null; onSa
             value={form.settlement_bank_code}
             onChange={(e) => setForm((f) => ({ ...f, settlement_bank_code: e.target.value }))}
             required
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </Field>
         <Field label="Account number">
@@ -388,7 +388,7 @@ function ManagedForm({ current, onSaved }: { current: PaymentConfig | null; onSa
             value={form.account_number}
             onChange={(e) => setForm((f) => ({ ...f, account_number: e.target.value }))}
             required
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </Field>
       </div>
@@ -397,7 +397,7 @@ function ManagedForm({ current, onSaved }: { current: PaymentConfig | null; onSa
         <select
           value={form.fee_bearer}
           onChange={(e) => setForm((f) => ({ ...f, fee_bearer: e.target.value }))}
-          className="mt-1 w-full max-w-xs rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full max-w-xs rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         >
           <option value="tenant">You (deducted from your payout)</option>
           <option value="learner">The learner (added at checkout)</option>
@@ -410,7 +410,7 @@ function ManagedForm({ current, onSaved }: { current: PaymentConfig | null; onSa
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-[var(--tenant-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
       >
         {pending ? 'Activating…' : 'Activate managed payments'}
       </button>

@@ -40,7 +40,7 @@ export function ReconcileButton({ orderId }: { orderId: number }) {
       <button
         onClick={checkStatus}
         disabled={pending}
-        className="text-xs font-medium text-[var(--tenant-primary)] hover:underline disabled:opacity-60"
+        className="text-xs font-medium text-[var(--brand-primary)] hover:underline disabled:opacity-60"
       >
         {pending ? 'Checking…' : 'Check payment status'}
       </button>

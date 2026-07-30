@@ -79,7 +79,7 @@ export function InstructorManager({
           <select
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
-            className="rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             {candidates.map((c) => (
               <option key={c.id} value={c.id}>
@@ -90,7 +90,7 @@ export function InstructorManager({
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as 'primary' | 'co_instructor')}
-            className="rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             <option value="co_instructor">Co-instructor</option>
             <option value="primary">Primary</option>
@@ -98,7 +98,7 @@ export function InstructorManager({
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-[var(--tenant-accent)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="rounded-md bg-[var(--brand-accent)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
           >
             {pending ? 'Adding…' : 'Add'}
           </button>

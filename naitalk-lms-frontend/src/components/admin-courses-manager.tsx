@@ -170,7 +170,7 @@ export function AdminCoursesManager({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Onboarding Essentials"
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <div>
@@ -178,7 +178,7 @@ export function AdminCoursesManager({
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             <option value="">Uncategorized</option>
             {categories.map((c) => (
@@ -193,7 +193,7 @@ export function AdminCoursesManager({
           <select
             value={pricingType}
             onChange={(e) => setPricingType(e.target.value as 'free' | 'paid')}
-            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             <option value="free">Free</option>
             <option value="paid">Paid</option>
@@ -207,7 +207,7 @@ export function AdminCoursesManager({
               min="0"
               value={priceNaira}
               onChange={(e) => setPriceNaira(e.target.value)}
-              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
             />
           </div>
         )}
@@ -216,7 +216,7 @@ export function AdminCoursesManager({
           <button
             type="submit"
             disabled={pending || !title}
-            className="rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
           >
             {pending ? 'Creating…' : 'Create course & start editing'}
           </button>
@@ -227,7 +227,7 @@ export function AdminCoursesManager({
       </form>
 
       {selectedIds.size > 0 && (
-        <div className="flex items-center justify-between rounded-xl border border-[var(--tenant-primary)]/30 bg-[var(--tenant-primary)]/5 px-4 py-2.5">
+        <div className="flex items-center justify-between rounded-xl border border-[var(--brand-primary)]/30 bg-[var(--brand-primary)]/5 px-4 py-2.5">
           <span className="text-sm font-medium text-neutral-700">{selectedIds.size} selected</span>
           <div className="flex items-center gap-3">
             <button
@@ -274,7 +274,7 @@ export function AdminCoursesManager({
           </thead>
           <tbody className="divide-y divide-neutral-100">
             {courses.map((course) => (
-              <tr key={course.id} className={selectedIds.has(course.id) ? 'bg-[var(--tenant-primary)]/5' : undefined}>
+              <tr key={course.id} className={selectedIds.has(course.id) ? 'bg-[var(--brand-primary)]/5' : undefined}>
                 <td className="px-4 py-3">
                   <input
                     type="checkbox"
@@ -288,7 +288,7 @@ export function AdminCoursesManager({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={course.thumbnail_url} alt="" className="h-8 w-14 rounded object-cover" />
                   ) : (
-                    <div className="h-8 w-14 rounded bg-linear-to-br from-[var(--tenant-primary)] to-[var(--tenant-secondary)]/60" />
+                    <div className="h-8 w-14 rounded bg-linear-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)]/60" />
                   )}
                 </td>
                 <td className="px-4 py-3 font-medium text-neutral-900">
@@ -309,7 +309,7 @@ export function AdminCoursesManager({
                 </td>
                 <td className="px-4 py-3 text-neutral-600">{course.enrolments_count}</td>
                 <td className="px-4 py-3 text-right text-xs font-medium whitespace-nowrap">
-                  <Link href={`/admin/courses/${course.id}`} className="mr-3 font-semibold text-[var(--tenant-primary)] hover:underline">
+                  <Link href={`/admin/courses/${course.id}`} className="mr-3 font-semibold text-[var(--brand-primary)] hover:underline">
                     Edit
                   </Link>
                   <button

@@ -1,6 +1,6 @@
 import QRCode from 'qrcode';
 import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { apiFetch, ApiError } from '@/lib/api-server';
 import { SiteHeader } from '@/components/site-header';
@@ -22,8 +22,7 @@ export default async function CertificateVerifyPage({
 }: {
   params: Promise<{ code: string }>;
 }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const user = await getOptionalUser();
   const { code } = await params;
@@ -51,10 +50,10 @@ export default async function CertificateVerifyPage({
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:px-6">
         <div
           className={`rounded-2xl border-4 p-10 text-center print:border-0 ${
-            certificate.valid ? 'border-[var(--tenant-accent)]' : 'border-neutral-300 opacity-75'
+            certificate.valid ? 'border-[var(--brand-accent)]' : 'border-neutral-300 opacity-75'
           }`}
         >
-          <p className="text-xs font-semibold uppercase tracking-widest text-[var(--tenant-primary)]">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[var(--brand-primary)]">
             {certificate.tenant_name}
           </p>
           <h1 className="mt-4 text-lg text-neutral-500">Certificate of Completion</h1>

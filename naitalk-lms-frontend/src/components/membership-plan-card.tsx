@@ -57,11 +57,11 @@ export function MembershipPlanCard({
   return (
     <div
       className={`flex flex-col rounded-xl border bg-white p-6 ${
-        isCurrent ? 'border-[var(--tenant-accent)] ring-1 ring-[var(--tenant-accent)]' : 'border-neutral-200'
+        isCurrent ? 'border-[var(--brand-accent)] ring-1 ring-[var(--brand-accent)]' : 'border-neutral-200'
       }`}
     >
       {isCurrent && (
-        <span className="mb-3 inline-block w-fit rounded-full bg-[var(--tenant-accent)]/15 px-2.5 py-0.5 text-xs font-semibold text-[var(--tenant-accent)]">
+        <span className="mb-3 inline-block w-fit rounded-full bg-[var(--brand-accent)]/15 px-2.5 py-0.5 text-xs font-semibold text-[var(--brand-accent)]">
           Current Plan
         </span>
       )}
@@ -96,14 +96,14 @@ export function MembershipPlanCard({
           <button
             onClick={subscribeFree}
             disabled={pending}
-            className="w-full rounded-md bg-[var(--tenant-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
           >
             {pending ? 'Subscribing…' : 'Subscribe Free'}
           </button>
         ) : !isAuthenticated ? (
           <button
             onClick={() => router.push('/login?redirect=/membership')}
-            className="w-full rounded-md bg-[var(--tenant-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
           >
             Log in to Subscribe
           </button>
@@ -113,7 +113,7 @@ export function MembershipPlanCard({
             id={plan.id}
             label="Subscribe"
             pendingLabel="Redirecting to payment…"
-            className="w-full rounded-md bg-[var(--tenant-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
           />
         )}
         {error && <p className="mt-2 text-xs text-red-600">{error}</p>}

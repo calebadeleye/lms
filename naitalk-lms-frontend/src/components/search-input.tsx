@@ -31,7 +31,7 @@ export function SearchInput({
       placeholder={placeholder}
       className={
         className ??
-        'w-full max-w-xs rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none'
+        'w-full max-w-xs rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none'
       }
     />
   );

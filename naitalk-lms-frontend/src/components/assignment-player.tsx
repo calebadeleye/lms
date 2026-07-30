@@ -81,7 +81,7 @@ export function AssignmentPlayer({ lessonId }: { lessonId: number }) {
           rows={6}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
         {assignment.submission && (
           <p className="mt-1 text-xs text-neutral-500">
@@ -91,7 +91,7 @@ export function AssignmentPlayer({ lessonId }: { lessonId: number }) {
         <button
           onClick={submit}
           disabled={pending || !text.trim()}
-          className="mt-3 rounded-md bg-[var(--tenant-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="mt-3 rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Submitting…' : assignment.submission ? 'Resubmit' : 'Submit'}
         </button>

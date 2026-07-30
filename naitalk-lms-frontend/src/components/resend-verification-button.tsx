@@ -26,7 +26,7 @@ export function ResendVerificationButton({ className }: { className?: string }) 
       disabled={pending}
       className={
         className ??
-        'rounded-md bg-[var(--tenant-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60'
+        'rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60'
       }
     >
       {pending ? 'Sending…' : 'Resend verification email'}

@@ -2,14 +2,12 @@
 
 namespace App\Domain\Learning\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AssignmentSubmission extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = [
         'assignment_id', 'user_id', 'enrolment_id', 'content_text', 'file_path', 'submitted_at',

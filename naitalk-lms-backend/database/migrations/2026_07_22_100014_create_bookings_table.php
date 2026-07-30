@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('coaching_session_id')->constrained('coaching_sessions')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             // pending|confirmed|cancelled|completed|no_show
@@ -21,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['coaching_session_id', 'user_id']);
-            $table->index(['tenant_id', 'user_id']);
+            $table->index('user_id');
         });
     }
 

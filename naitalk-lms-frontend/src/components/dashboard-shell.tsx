@@ -1,33 +1,30 @@
 import Link from 'next/link';
 import { LogoutButton } from '@/components/logout-button';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 
 export interface NavItem {
   href: string;
   label: string;
 }
 
-export async function DashboardShell({
+export function DashboardShell({
   tenantName,
   navItems,
   userName,
   activeHref,
   children,
-  impersonationBanner,
 }: {
   tenantName: string;
   navItems: NavItem[];
   userName: string;
   activeHref: string;
   children: React.ReactNode;
-  impersonationBanner?: React.ReactNode;
 }) {
-  const config = await getTenantConfig();
-  const logoUrl = config?.branding?.logo_url ?? null;
+  const logoUrl = BRANDING.branding.logo_url;
 
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden w-64 shrink-0 flex-col bg-[var(--tenant-primary)] text-white md:flex">
+      <aside className="hidden w-64 shrink-0 flex-col bg-[var(--brand-primary)] text-white md:flex">
         <div className="flex items-center px-5 py-5">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -36,7 +33,7 @@ export async function DashboardShell({
             <div className="flex items-center gap-2">
               <span
                 aria-hidden
-                className="grid h-8 w-8 place-items-center rounded-md bg-white/10 text-sm font-bold text-[var(--tenant-accent)]"
+                className="grid h-8 w-8 place-items-center rounded-md bg-white/10 text-sm font-bold text-[var(--brand-accent)]"
               >
                 {tenantName.charAt(0)}
               </span>
@@ -66,7 +63,6 @@ export async function DashboardShell({
       </aside>
 
       <div className="flex min-h-full flex-1 flex-col">
-        {impersonationBanner}
         <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-3 sm:px-6">
           <p className="text-sm font-medium text-neutral-500 md:hidden">{tenantName}</p>
           <div className="ml-auto flex items-center gap-2">

@@ -65,7 +65,7 @@ export function CategoryManager({ initial }: { initial: CourseCategory[] }) {
             <input
               defaultValue={category.name}
               onBlur={(e) => rename(category, e.target.value)}
-              className="w-full rounded-md border border-neutral-300 px-2 py-1 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+              className="w-full rounded-md border border-neutral-300 px-2 py-1 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
             />
             <button onClick={() => remove(category)} className="text-xs font-medium text-red-600 hover:underline">
               Delete
@@ -80,12 +80,12 @@ export function CategoryManager({ initial }: { initial: CourseCategory[] }) {
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder="New category name"
-          className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
         <button
           type="submit"
           disabled={pending || !newName.trim()}
-          className="whitespace-nowrap rounded-md bg-[var(--tenant-accent)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="whitespace-nowrap rounded-md bg-[var(--brand-accent)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Adding…' : 'Add'}
         </button>

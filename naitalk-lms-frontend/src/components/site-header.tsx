@@ -43,11 +43,11 @@ export function SiteHeader({
             <>
               <span
                 aria-hidden
-                className="grid h-9 w-9 place-items-center rounded-md bg-[var(--tenant-primary)] text-[var(--tenant-accent)] font-bold"
+                className="grid h-9 w-9 place-items-center rounded-md bg-[var(--brand-primary)] text-[var(--brand-accent)] font-bold"
               >
                 {tenantName.charAt(0)}
               </span>
-              <span className="text-sm font-bold leading-tight text-[var(--tenant-primary)]">
+              <span className="text-sm font-bold leading-tight text-[var(--brand-primary)]">
                 {tenantName}
                 <span className="block text-[10px] font-medium tracking-wide text-neutral-500">ONLINE ACADEMY</span>
               </span>
@@ -57,7 +57,7 @@ export function SiteHeader({
 
         <nav className="hidden items-center gap-6 text-sm font-medium text-neutral-700 md:flex">
           {navItems.map((item) => (
-            <Link key={item.label} href={item.href} className="hover:text-[var(--tenant-primary)]">
+            <Link key={item.label} href={item.href} className="hover:text-[var(--brand-primary)]">
               {item.label}
             </Link>
           ))}
@@ -66,19 +66,19 @@ export function SiteHeader({
         <div className="hidden items-center gap-3 md:flex">
           {isAuthenticated ? (
             <>
-              <Link href="/dashboard" className="text-sm font-medium text-neutral-700 hover:text-[var(--tenant-primary)]">
+              <Link href="/dashboard" className="text-sm font-medium text-neutral-700 hover:text-[var(--brand-primary)]">
                 Dashboard
               </Link>
               <LogoutButton className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-50" />
             </>
           ) : (
             <>
-              <Link href="/login" className="text-sm font-medium text-neutral-700 hover:text-[var(--tenant-primary)]">
+              <Link href="/login" className="text-sm font-medium text-neutral-700 hover:text-[var(--brand-primary)]">
                 Login
               </Link>
               <Link
                 href="/register"
-                className="rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90"
+                className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90"
               >
                 Sign Up
               </Link>
@@ -117,7 +117,7 @@ export function SiteHeader({
                   >
                     Dashboard
                   </Link>
-                  <LogoutButton className="flex-1 rounded-md bg-[var(--tenant-accent)] px-3 py-2 text-center font-semibold text-white" />
+                  <LogoutButton className="flex-1 rounded-md bg-[var(--brand-accent)] px-3 py-2 text-center font-semibold text-white" />
                 </>
               ) : (
                 <>
@@ -126,7 +126,7 @@ export function SiteHeader({
                   </Link>
                   <Link
                     href="/register"
-                    className="flex-1 rounded-md bg-[var(--tenant-accent)] px-3 py-2 text-center font-semibold text-white"
+                    className="flex-1 rounded-md bg-[var(--brand-accent)] px-3 py-2 text-center font-semibold text-white"
                   >
                     Sign Up
                   </Link>

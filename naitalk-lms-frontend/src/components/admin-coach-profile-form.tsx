@@ -49,7 +49,7 @@ export function AdminCoachProfileForm({ coach }: { coach: AdminCoach }) {
           <input
             value={form.title}
             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <div>
@@ -57,7 +57,7 @@ export function AdminCoachProfileForm({ coach }: { coach: AdminCoach }) {
           <input
             value={form.timezone}
             onChange={(e) => setForm((f) => ({ ...f, timezone: e.target.value }))}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
       </div>
@@ -68,7 +68,7 @@ export function AdminCoachProfileForm({ coach }: { coach: AdminCoach }) {
           value={form.bio}
           onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
           rows={3}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
       </div>
 
@@ -80,7 +80,7 @@ export function AdminCoachProfileForm({ coach }: { coach: AdminCoach }) {
             min={0}
             value={form.years_experience}
             onChange={(e) => setForm((f) => ({ ...f, years_experience: e.target.value }))}
-            className="mt-1 w-32 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-32 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <label className="flex items-center gap-2 pb-2 text-sm text-neutral-700">
@@ -97,7 +97,7 @@ export function AdminCoachProfileForm({ coach }: { coach: AdminCoach }) {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-[var(--tenant-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Saving…' : 'Save changes'}
         </button>

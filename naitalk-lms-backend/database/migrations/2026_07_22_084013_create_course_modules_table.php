@@ -10,13 +10,12 @@ return new class extends Migration
     {
         Schema::create('course_modules', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete();
             $table->string('title');
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
 
-            $table->index(['tenant_id', 'course_id', 'sort_order']);
+            $table->index(['course_id', 'sort_order']);
         });
     }
 

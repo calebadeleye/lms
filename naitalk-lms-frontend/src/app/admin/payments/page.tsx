@@ -1,15 +1,15 @@
-import { notFound, redirect } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { redirect } from 'next/navigation';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
-import { tenantAdminNav } from '@/lib/nav';
+import { adminNav } from '@/lib/nav';
 import { PaymentConfigForm } from '@/components/payment-config-form';
 import type { PaymentConfig } from '@/lib/commerce-types';
 
 export default async function PaymentSettingsPage() {
-  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
-  if (!config) notFound();
+  const config = BRANDING;
+  const me = await requireUser();
   if (!me.permissions.includes('payment_gateway.manage')) redirect('/dashboard');
 
   const paymentConfig = await apiFetch<{ data: PaymentConfig | null }>('/api/v1/admin/payment-config');
@@ -17,7 +17,7 @@ export default async function PaymentSettingsPage() {
   return (
     <DashboardShell
       tenantName={config.tenant.name}
-      navItems={tenantAdminNav}
+      navItems={adminNav}
       userName={me.user.name}
       activeHref="/admin/payments"
     >

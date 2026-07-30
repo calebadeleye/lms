@@ -1,5 +1,4 @@
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { SiteHeader } from '@/components/site-header';
@@ -10,8 +9,7 @@ import { MembershipPlanCard } from '@/components/membership-plan-card';
 import type { MembershipPlan, MySubscription } from '@/lib/membership-types';
 
 export default async function MembershipPage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const user = await getOptionalUser();
   const plans = await apiFetch<{ data: MembershipPlan[] }>('/api/v1/membership-plans');

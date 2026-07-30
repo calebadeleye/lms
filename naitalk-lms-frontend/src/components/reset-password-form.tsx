@@ -46,7 +46,7 @@ export function ResetPasswordForm({ token, email }: { token: string; email: stri
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
         {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password[0]}</p>}
       </div>
@@ -60,7 +60,7 @@ export function ResetPasswordForm({ token, email }: { token: string; email: stri
           required
           value={passwordConfirmation}
           onChange={(e) => setPasswordConfirmation(e.target.value)}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
         {errors.password_confirmation && (
           <p className="mt-1 text-xs text-red-600">{errors.password_confirmation[0]}</p>
@@ -70,7 +70,7 @@ export function ResetPasswordForm({ token, email }: { token: string; email: stri
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="w-full rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
       >
         {pending ? 'Resetting…' : 'Reset password'}
       </button>

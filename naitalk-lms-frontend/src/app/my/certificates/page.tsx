@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -8,8 +7,7 @@ import { studentNav } from '@/lib/nav';
 import type { CertificateSummary } from '@/lib/certificate-types';
 
 export default async function MyCertificatesPage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const me = await requireUser();
   const certificates = await apiFetch<{ data: CertificateSummary[] }>('/api/v1/my/certificates');
@@ -30,7 +28,7 @@ export default async function MyCertificatesPage() {
             href={`/certificates/${certificate.verification_code}`}
             target="_blank"
             className={`rounded-xl border bg-white p-5 hover:shadow-sm ${
-              certificate.revoked_at ? 'border-neutral-200 opacity-60' : 'border-[var(--tenant-accent)]/40'
+              certificate.revoked_at ? 'border-neutral-200 opacity-60' : 'border-[var(--brand-accent)]/40'
             }`}
           >
             <p className="text-3xl">🎓</p>

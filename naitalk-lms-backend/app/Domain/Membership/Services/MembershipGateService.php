@@ -7,10 +7,9 @@ use App\Models\User;
 
 /**
  * The single call site for "does this user's membership unlock this
- * content." A course with pricing_type = membership_only, or a
- * member-only community channel, is unlocked by ANY active membership in
- * the tenant — not tied to a specific plan tier. See ARCHITECTURE.md §11
- * for why per-plan restriction isn't implemented.
+ * content." A course with pricing_type = membership_only is unlocked by
+ * ANY active membership — not tied to a specific plan tier. See
+ * ARCHITECTURE.md §9 for why per-plan restriction isn't implemented.
  */
 class MembershipGateService
 {

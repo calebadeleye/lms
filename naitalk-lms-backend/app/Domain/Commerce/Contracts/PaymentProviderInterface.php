@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
  * One interface, two real implementations (Paystack, Flutterwave). No
  * controller or service ever branches on provider name — callers resolve a
  * concrete instance via App\Domain\Commerce\Services\PaymentProviderFactory,
- * which knows how to pick the right credentials for a given tenant + mode.
+ * which knows how to pick the right credentials for the configured mode.
  */
 interface PaymentProviderInterface
 {
@@ -45,8 +45,8 @@ interface PaymentProviderInterface
      */
     public function refundPayment(string $reference, ?int $amountCents = null): array;
 
-    /** Verifies the raw request signature against the tenant's configured
-     * webhook secret — must run before the payload is trusted at all. */
+    /** Verifies the raw request signature against the configured webhook
+     * secret — must run before the payload is trusted at all. */
     public function verifyWebhook(Request $request, string $secret): bool;
 
     /**
@@ -56,8 +56,8 @@ interface PaymentProviderInterface
     public function fetchTransaction(string $reference): array;
 
     /**
-     * Settlement reporting (when funds actually land in the tenant's bank
-     * account) is provider- and country-specific in ways that go well
+     * Settlement reporting (when funds actually land in the organization's
+     * bank account) is provider- and country-specific in ways that go well
      * beyond Phase 3's acceptance criteria (commission *calculation*, not
      * settlement *reconciliation*). The interface shape is real; both
      * implementations document this as a deliberate gap rather than
@@ -69,6 +69,6 @@ interface PaymentProviderInterface
 
     /** Lightweight authenticated call used to confirm a secret key is valid
      * and reachable — never verifies more than "the provider accepted our
-     * credentials," used by the "test connection" action in tenant settings. */
+     * credentials," used by the "test connection" action in payment settings. */
     public function testConnection(): bool;
 }

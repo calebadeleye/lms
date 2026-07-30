@@ -47,7 +47,7 @@ export function CourseThumbnailUpload({ courseId, currentUrl }: { courseId: numb
           // eslint-disable-next-line @next/next/no-img-element
           <img src={currentUrl} alt="" className="aspect-video w-full rounded-lg object-cover" />
         ) : (
-          <div className="grid aspect-video w-full place-items-center rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 text-sm text-neutral-400 hover:border-[var(--tenant-primary)] hover:text-[var(--tenant-primary)]">
+          <div className="grid aspect-video w-full place-items-center rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 text-sm text-neutral-400 hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]">
             {pending ? `Uploading… ${progress}%` : 'Click to upload an image'}
           </div>
         )}
@@ -56,12 +56,12 @@ export function CourseThumbnailUpload({ courseId, currentUrl }: { courseId: numb
 
       {pending && (
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100">
-          <div className="h-full rounded-full bg-[var(--tenant-accent)] transition-all" style={{ width: `${progress}%` }} />
+          <div className="h-full rounded-full bg-[var(--brand-accent)] transition-all" style={{ width: `${progress}%` }} />
         </div>
       )}
 
       {currentUrl && !pending && (
-        <label className="mt-2 inline-block cursor-pointer text-xs font-medium text-[var(--tenant-primary)] hover:underline">
+        <label className="mt-2 inline-block cursor-pointer text-xs font-medium text-[var(--brand-primary)] hover:underline">
           Replace image
           <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleFile} disabled={pending} className="hidden" />
         </label>

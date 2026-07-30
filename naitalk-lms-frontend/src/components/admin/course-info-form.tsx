@@ -43,7 +43,7 @@ export function CourseInfoForm({ course, categories }: { course: AdminCourseDeta
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
       </div>
       <div>
@@ -51,7 +51,7 @@ export function CourseInfoForm({ course, categories }: { course: AdminCourseDeta
         <input
           value={excerpt}
           onChange={(e) => setExcerpt(e.target.value)}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
       </div>
       <div>
@@ -59,7 +59,7 @@ export function CourseInfoForm({ course, categories }: { course: AdminCourseDeta
         <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
-          className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         >
           <option value="">Uncategorized</option>
           {categories.map((c) => (
@@ -75,14 +75,14 @@ export function CourseInfoForm({ course, categories }: { course: AdminCourseDeta
           rows={4}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
       </div>
       <div className="flex items-center gap-3">
         <button
           type="submit"
           disabled={saving}
-          className="rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
           {saving ? 'Saving…' : 'Save course details'}
         </button>

@@ -54,7 +54,7 @@ export function CheckoutButton({
         disabled={pending}
         className={
           className ??
-          'w-full rounded-md bg-[var(--tenant-accent)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60'
+          'w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60'
         }
       >
         {pending ? (pendingLabel ?? 'Redirecting…') : label}

@@ -7,7 +7,7 @@ use App\Domain\Commerce\Contracts\PaymentProviderInterface;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\Payment;
 use App\Domain\Commerce\Models\PaymentAllocation;
-use App\Domain\Commerce\Models\TenantPaymentConfig;
+use App\Domain\Commerce\Models\PaymentConfig;
 use App\Domain\Learning\Models\Course;
 use App\Domain\Learning\Services\EnrolmentService;
 use App\Domain\Membership\Models\LearnerMembershipPlan;
@@ -41,7 +41,7 @@ class OrderFulfillmentService
      */
     public function reconcileWithProvider(
         Order $order,
-        TenantPaymentConfig $config,
+        PaymentConfig $config,
         PaymentProviderInterface $provider,
         CommissionService $commission,
     ): string {
@@ -70,7 +70,7 @@ class OrderFulfillmentService
             'currency' => $verified['currency'],
             'provider_fee_cents' => $verified['provider_fee_cents'],
             'platform_commission_cents' => $split['commission_cents'],
-            'tenant_net_cents' => $split['tenant_net_cents'],
+            'org_net_cents' => $split['org_net_cents'],
             'fee_bearer' => $config->fee_bearer,
             'paid_at' => now(),
             'raw_response' => $this->stripSecrets($verified['raw']),

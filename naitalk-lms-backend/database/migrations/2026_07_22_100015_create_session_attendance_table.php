@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('session_attendance', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('coaching_session_id')->constrained('coaching_sessions')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->boolean('attended')->default(false);

@@ -2,14 +2,12 @@
 
 namespace App\Domain\Commerce\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Refund extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = [
         'payment_id', 'amount_cents', 'reason', 'status', 'provider_reference',

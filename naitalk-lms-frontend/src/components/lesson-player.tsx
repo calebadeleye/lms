@@ -112,7 +112,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
         <div className="rounded-xl border border-neutral-200 bg-white p-6">
           <p className="text-sm text-neutral-600">Downloadable resource for this lesson.</p>
           {lesson.video_path && (
-            <a href={lesson.video_path} className="mt-2 inline-block text-sm font-medium text-[var(--tenant-primary)] underline">
+            <a href={lesson.video_path} className="mt-2 inline-block text-sm font-medium text-[var(--brand-primary)] underline">
               Download file
             </a>
           )}
@@ -127,7 +127,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
               href={lesson.content.url as string}
               target="_blank"
               rel="noreferrer"
-              className="mt-2 inline-block text-sm font-medium text-[var(--tenant-primary)] underline"
+              className="mt-2 inline-block text-sm font-medium text-[var(--brand-primary)] underline"
             >
               Open resource ↗
             </a>
@@ -143,7 +143,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
               href={lesson.content.meeting_url as string}
               target="_blank"
               rel="noreferrer"
-              className="mt-2 inline-block text-sm font-medium text-[var(--tenant-primary)] underline"
+              className="mt-2 inline-block text-sm font-medium text-[var(--brand-primary)] underline"
             >
               Join session ↗
             </a>
@@ -161,7 +161,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
           <button
             onClick={markComplete}
             disabled={marking}
-            className="rounded-md bg-[var(--tenant-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="rounded-md bg-[var(--brand-accent)] px-5 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
           >
             {marking ? 'Marking…' : 'Mark as Complete'}
           </button>

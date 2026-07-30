@@ -2,7 +2,6 @@
 
 namespace App\Domain\Coaching\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CoachingService extends Model
 {
-    use BelongsToTenant, SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'coach_id', 'title', 'description', 'session_type', 'duration_minutes',

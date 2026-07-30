@@ -2,14 +2,12 @@
 
 namespace App\Domain\Learning\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CourseModule extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = ['course_id', 'title', 'sort_order'];
 

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { AuthCard } from '@/components/auth-card';
 import { ResetPasswordForm } from '@/components/reset-password-form';
 
@@ -8,8 +8,7 @@ export default async function ResetPasswordPage({
 }: {
   searchParams: Promise<{ token?: string; email?: string }>;
 }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const { token, email } = await searchParams;
   if (!token || !email) notFound();

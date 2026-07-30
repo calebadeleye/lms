@@ -51,7 +51,7 @@ export function CourseCurriculum({ modules, isEnrolled }: { modules: CourseModul
                       <span aria-hidden>{typeIcon[lesson.type] ?? '•'}</span>
                       {lesson.title}
                       {lesson.is_preview && (
-                        <span className="rounded-full bg-[var(--tenant-accent)]/15 px-2 py-0.5 text-[10px] font-semibold text-[var(--tenant-accent)]">
+                        <span className="rounded-full bg-[var(--brand-accent)]/15 px-2 py-0.5 text-[10px] font-semibold text-[var(--brand-accent)]">
                           Preview
                         </span>
                       )}

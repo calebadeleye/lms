@@ -2,13 +2,11 @@
 
 namespace App\Domain\Identity\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Invitation extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = ['email', 'role_id', 'token', 'invited_by', 'status', 'expires_at', 'accepted_at'];
 
@@ -31,6 +29,8 @@ class Invitation extends Model
 
     public function acceptUrl(): string
     {
-        return $this->tenant->frontendUrl()."/invitations/{$this->token}";
+        $frontendUrl = rtrim((string) config('services.frontend.url'), '/');
+
+        return "{$frontendUrl}/invitations/{$this->token}";
     }
 }

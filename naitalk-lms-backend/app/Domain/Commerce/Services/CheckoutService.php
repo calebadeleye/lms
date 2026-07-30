@@ -3,7 +3,7 @@
 namespace App\Domain\Commerce\Services;
 
 use App\Domain\Commerce\Models\Order;
-use App\Domain\Commerce\Models\TenantPaymentConfig;
+use App\Domain\Commerce\Models\PaymentConfig;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +32,7 @@ class CheckoutService
         string $currency,
         string $callbackUrl,
     ): array {
-        $config = TenantPaymentConfig::where('status', 'active')->first();
+        $config = PaymentConfig::where('status', 'active')->first();
 
         if (! $config) {
             throw ValidationException::withMessages([
@@ -41,7 +41,7 @@ class CheckoutService
         }
 
         $estimatedFeeCents = $config->fee_bearer === 'learner'
-            ? (int) round($priceCents * (config('services.platform_billing.estimated_provider_fee_percent', 1.5) / 100))
+            ? (int) round($priceCents * (config('services.managed_payments.estimated_provider_fee_percent', 1.5) / 100))
             : 0;
         $totalCents = $priceCents + $estimatedFeeCents;
 
@@ -70,7 +70,7 @@ class CheckoutService
 
         $reference = "order_{$order->id}_{$order->idempotency_key}";
 
-        $provider = $this->providers->forTenantConfig($config);
+        $provider = $this->providers->forConfig($config);
 
         $result = $provider->initializePayment([
             'email' => $user->email,

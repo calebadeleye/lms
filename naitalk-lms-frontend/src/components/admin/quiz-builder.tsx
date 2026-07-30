@@ -138,7 +138,7 @@ export function QuizBuilder({
                 </div>
               ))}
               {question.type !== 'true_false' && (
-                <button onClick={() => addOption(qIndex)} className="text-xs font-medium text-[var(--tenant-primary)]">
+                <button onClick={() => addOption(qIndex)} className="text-xs font-medium text-[var(--brand-primary)]">
                   + Add option
                 </button>
               )}
@@ -148,13 +148,13 @@ export function QuizBuilder({
       ))}
 
       <div className="flex gap-3">
-        <button onClick={addQuestion} className="text-xs font-medium text-[var(--tenant-primary)]">
+        <button onClick={addQuestion} className="text-xs font-medium text-[var(--brand-primary)]">
           + Add question
         </button>
         <button
           onClick={save}
           disabled={saving}
-          className="rounded-md bg-[var(--tenant-accent)] px-4 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-4 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
           {saving ? 'Saving…' : 'Save quiz'}
         </button>

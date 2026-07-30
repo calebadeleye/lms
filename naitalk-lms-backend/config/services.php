@@ -38,7 +38,6 @@ return [
     'frontend' => [
         'url' => env('FRONTEND_URL', 'http://localhost:3000'),
         'internal_secret' => env('FRONTEND_INTERNAL_SECRET'),
-        'neutral_platform_domain' => env('NEUTRAL_PLATFORM_DOMAIN', 'localhost'),
     ],
 
     'paystack' => [
@@ -55,8 +54,10 @@ return [
         'webhook_secret' => env('FLUTTERWAVE_WEBHOOK_SECRET'),
     ],
 
-    'platform_billing' => [
-        'provider' => env('PLATFORM_PAYMENT_PROVIDER', 'paystack'),
+    // Managed-payments mode: NAI TALK collects on the organization's behalf
+    // via its own gateway credentials and remits net of a commission.
+    'managed_payments' => [
+        'provider' => env('MANAGED_PAYMENT_PROVIDER', 'paystack'),
         'default_commission_percent' => (float) env('DEFAULT_MANAGED_COMMISSION_PERCENT', 1.0),
         // Used only to estimate the up-front charge when fee_bearer =
         // "learner" — the real fee is always re-read from the provider's

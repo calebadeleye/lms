@@ -4,13 +4,11 @@ namespace App\Domain\Commerce\Jobs;
 
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\Payment;
-use App\Domain\Commerce\Models\TenantPaymentConfig;
+use App\Domain\Commerce\Models\PaymentConfig;
 use App\Domain\Commerce\Models\WebhookEvent;
 use App\Domain\Commerce\Services\CommissionService;
 use App\Domain\Commerce\Services\OrderFulfillmentService;
 use App\Domain\Commerce\Services\PaymentProviderFactory;
-use App\Domain\Tenancy\Concerns\TenantAwareJob;
-use App\Domain\Tenancy\Models\Tenant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,10 +25,9 @@ use Illuminate\Queue\SerializesModels;
  */
 class ProcessPaymentWebhookJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, TenantAwareJob;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        public string $tenantId,
         public int $webhookEventId,
     ) {}
 
@@ -39,10 +36,8 @@ class ProcessPaymentWebhookJob implements ShouldQueue
         CommissionService $commission,
         OrderFulfillmentService $fulfillment,
     ): void {
-        $this->establishTenantContext();
-
         $event = WebhookEvent::findOrFail($this->webhookEventId);
-        $config = TenantPaymentConfig::where('tenant_id', $this->tenantId)->firstOrFail();
+        $config = PaymentConfig::where('provider', $event->provider)->firstOrFail();
 
         try {
             $providerReference = $this->extractReference($event);
@@ -53,11 +48,9 @@ class ProcessPaymentWebhookJob implements ShouldQueue
                 return;
             }
 
-            $provider = $providers->forTenantConfig($config);
+            $provider = $providers->forConfig($config);
             $verified = $provider->verifyPayment($providerReference);
 
-            // Tenant context is already established above, so the normal
-            // tenant-scoped query is correctly and automatically filtered.
             $order = Order::where('provider_reference', $providerReference)->first();
 
             if (! $order) {
@@ -92,7 +85,7 @@ class ProcessPaymentWebhookJob implements ShouldQueue
                 'currency' => $verified['currency'],
                 'provider_fee_cents' => $verified['provider_fee_cents'],
                 'platform_commission_cents' => $split['commission_cents'],
-                'tenant_net_cents' => $split['tenant_net_cents'],
+                'org_net_cents' => $split['org_net_cents'],
                 'fee_bearer' => $config->fee_bearer,
                 'paid_at' => now(),
                 'raw_response' => $this->stripSecrets($verified['raw']),

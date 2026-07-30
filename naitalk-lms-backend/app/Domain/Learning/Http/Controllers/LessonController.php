@@ -2,7 +2,6 @@
 
 namespace App\Domain\Learning\Http\Controllers;
 
-use App\Domain\Billing\Services\TenantUsageService;
 use App\Domain\Learning\Models\CourseModule;
 use App\Domain\Learning\Models\Enrolment;
 use App\Domain\Learning\Models\Lesson;
@@ -14,7 +13,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class LessonController extends Controller
 {
@@ -101,26 +99,24 @@ class LessonController extends Controller
 
         $materialPath = $lesson->content['material_path'] ?? null;
 
-        if (! $materialPath || ! Storage::disk('tenants')->exists($materialPath)) {
+        if (! $materialPath || ! Storage::disk('uploads')->exists($materialPath)) {
             abort(404);
         }
 
         $filename = $lesson->content['material_filename'] ?? basename($materialPath);
 
-        return Storage::disk('tenants')->download($materialPath, $filename);
+        return Storage::disk('uploads')->download($materialPath, $filename);
     }
 
     /**
      * Admin upload for a 'file'-type lesson's material (PDF/PPT/etc). Stored
-     * on the private `tenants` disk — downloadMaterial() above is the only
+     * on the private `uploads` disk — downloadMaterial() above is the only
      * way to read it back, so access stays gated by real enrolment rather
      * than a guessable public URL. `video_path` is set to that protected
-     * route (relative, proxied through the frontend's own origin — see the
-     * branding logo/favicon fix for why an absolute backend URL would be
-     * wrong here) so the existing student-facing lesson player needs no
-     * changes at all.
+     * route (relative, proxied through the frontend's own origin) so the
+     * existing student-facing lesson player needs no changes at all.
      */
-    public function uploadMaterial(Request $request, string $lessonId, TenantUsageService $usage)
+    public function uploadMaterial(Request $request, string $lessonId)
     {
         $lesson = Lesson::findOrFail($lessonId);
 
@@ -129,18 +125,10 @@ class LessonController extends Controller
         ]);
 
         $file = $request->file('file');
-        $tenant = $lesson->tenant;
-
-        if (! $usage->hasCapacity($tenant, 'storage_gb', $file->getSize() / 1_073_741_824)) {
-            throw ValidationException::withMessages([
-                'file' => ["Your plan's storage limit has been reached. Upgrade your plan for more space."],
-            ]);
-        }
-
-        $directory = "{$lesson->tenant_id}/course-materials/{$lesson->id}";
+        $directory = "course-materials/{$lesson->id}";
         $storedName = Str::uuid().'.'.$file->extension();
 
-        $file->storeAs($directory, $storedName, ['disk' => 'tenants']);
+        $file->storeAs($directory, $storedName, ['disk' => 'uploads']);
 
         $lesson->update([
             'video_path' => "/api/v1/lessons/{$lesson->id}/material",
@@ -150,8 +138,6 @@ class LessonController extends Controller
                 'material_filename' => $file->getClientOriginalName(),
             ],
         ]);
-
-        $usage->forget($tenant, 'storage_gb');
 
         return response()->json(['data' => $lesson->fresh()]);
     }

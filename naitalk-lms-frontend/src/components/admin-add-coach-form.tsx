@@ -48,7 +48,7 @@ export function AdminAddCoachForm({ candidates }: { candidates: TenantMember[] }
     return (
       <button
         onClick={() => setShowForm(true)}
-        className="rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+        className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
       >
         Add coach
       </button>
@@ -63,7 +63,7 @@ export function AdminAddCoachForm({ candidates }: { candidates: TenantMember[] }
           <select
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             {candidates.map((c) => (
               <option key={c.id} value={c.id}>
@@ -78,7 +78,7 @@ export function AdminAddCoachForm({ candidates }: { candidates: TenantMember[] }
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Career Coach"
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <div>
@@ -87,7 +87,7 @@ export function AdminAddCoachForm({ candidates }: { candidates: TenantMember[] }
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
             placeholder="Africa/Lagos"
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
       </div>
@@ -96,7 +96,7 @@ export function AdminAddCoachForm({ candidates }: { candidates: TenantMember[] }
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Adding…' : 'Add coach'}
         </button>

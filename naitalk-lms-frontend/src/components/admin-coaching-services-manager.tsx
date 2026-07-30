@@ -75,7 +75,7 @@ export function AdminCoachingServicesManager({ coachId, initial }: { coachId: nu
     <div className="rounded-xl border border-neutral-200 bg-white p-5">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-neutral-900">Coaching Sessions Offered</h2>
-        <button onClick={() => setShowAddForm((v) => !v)} className="text-xs font-semibold text-[var(--tenant-primary)] hover:underline">
+        <button onClick={() => setShowAddForm((v) => !v)} className="text-xs font-semibold text-[var(--brand-primary)] hover:underline">
           {showAddForm ? 'Cancel' : '+ Add session type'}
         </button>
       </div>
@@ -89,7 +89,7 @@ export function AdminCoachingServicesManager({ coachId, initial }: { coachId: nu
                 required
                 value={form.title}
                 onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
               />
             </div>
             <div>
@@ -97,7 +97,7 @@ export function AdminCoachingServicesManager({ coachId, initial }: { coachId: nu
               <select
                 value={form.session_type}
                 onChange={(e) => setForm((f) => ({ ...f, session_type: e.target.value as 'one_to_one' | 'group' }))}
-                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
               >
                 <option value="one_to_one">1:1</option>
                 <option value="group">Group</option>
@@ -110,7 +110,7 @@ export function AdminCoachingServicesManager({ coachId, initial }: { coachId: nu
             <input
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
             />
           </div>
 
@@ -122,7 +122,7 @@ export function AdminCoachingServicesManager({ coachId, initial }: { coachId: nu
                 min={5}
                 value={form.duration_minutes}
                 onChange={(e) => setForm((f) => ({ ...f, duration_minutes: e.target.value }))}
-                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+                className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
               />
             </div>
             {form.session_type === 'group' && (
@@ -133,7 +133,7 @@ export function AdminCoachingServicesManager({ coachId, initial }: { coachId: nu
                   min={1}
                   value={form.max_participants}
                   onChange={(e) => setForm((f) => ({ ...f, max_participants: e.target.value }))}
-                  className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+                  className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
                 />
               </div>
             )}
@@ -158,7 +158,7 @@ export function AdminCoachingServicesManager({ coachId, initial }: { coachId: nu
                   min={0}
                   value={form.price_cents}
                   onChange={(e) => setForm((f) => ({ ...f, price_cents: e.target.value }))}
-                  className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+                  className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
                 />
               </div>
               <div>
@@ -167,7 +167,7 @@ export function AdminCoachingServicesManager({ coachId, initial }: { coachId: nu
                   value={form.currency}
                   onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value.toUpperCase() }))}
                   maxLength={3}
-                  className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+                  className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
                 />
               </div>
             </div>
@@ -178,7 +178,7 @@ export function AdminCoachingServicesManager({ coachId, initial }: { coachId: nu
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
           >
             {pending ? 'Creating…' : 'Create'}
           </button>
@@ -223,7 +223,7 @@ function ServiceCard({ service, onDeactivate }: { service: AdminCoachingService;
             {service.is_active ? 'Active' : 'Inactive'}
           </span>
           {service.session_type === 'group' && (
-            <button onClick={() => setExpanded((v) => !v)} className="text-xs font-semibold text-[var(--tenant-primary)] hover:underline">
+            <button onClick={() => setExpanded((v) => !v)} className="text-xs font-semibold text-[var(--brand-primary)] hover:underline">
               {expanded ? 'Hide sessions' : 'Manage sessions'}
             </button>
           )}
@@ -308,7 +308,7 @@ function GroupSessionScheduler({ serviceId }: { serviceId: number }) {
             min={localDatetimeNow()}
             value={scheduledStart}
             onChange={(e) => setScheduledStart(e.target.value)}
-            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <div>
@@ -317,13 +317,13 @@ function GroupSessionScheduler({ serviceId }: { serviceId: number }) {
             value={meetingUrl}
             onChange={(e) => setMeetingUrl(e.target.value)}
             placeholder="https://..."
-            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
         >
           Schedule
         </button>

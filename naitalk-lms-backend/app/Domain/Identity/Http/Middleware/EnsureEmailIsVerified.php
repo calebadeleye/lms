@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Route middleware: `->middleware('verified')`. Blocks every tenant-scoped
- * student action for a self-registered account that hasn't clicked its
+ * Route middleware: `->middleware('verified')`. Blocks every member action
+ * for a self-registered account that hasn't clicked its
  * verification link yet — matching JSON error shape used elsewhere
  * (CheckPermission) rather than Laravel's default `{"message": "..."}`
  * body, so the frontend's error handling stays consistent. Deliberately

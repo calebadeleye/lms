@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { HOME_CONTENT } from '@/lib/home-content';
 import { PhotoSlotImage } from '@/components/home/photo-slot';
+import { HERO_AUDIENCE_ICONS, JoinIcon } from '@/components/home/home-icons';
 
 export function HeroSection() {
   const { hero } = HOME_CONTENT;
@@ -21,21 +22,25 @@ export function HeroSection() {
           </Link>
           <Link
             href={hero.ctaSecondary.href}
-            className="rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 shadow-sm hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 shadow-sm hover:opacity-90"
           >
+            <JoinIcon className="h-4 w-4" />
             {hero.ctaSecondary.label} &rarr;
           </Link>
         </div>
 
         <ul className="mt-8 flex flex-wrap gap-6 text-xs font-medium text-neutral-600">
-          {hero.audiences.map((audience) => (
-            <li key={audience} className="flex items-center gap-2">
-              <span aria-hidden className="grid h-6 w-6 place-items-center rounded-full bg-[var(--brand-accent)]/15 text-[var(--brand-primary)]">
-                ✦
-              </span>
-              {audience}
-            </li>
-          ))}
+          {hero.audiences.map((audience) => {
+            const Icon = HERO_AUDIENCE_ICONS[audience.icon];
+            return (
+              <li key={audience.label} className="flex items-center gap-2">
+                <span aria-hidden className="grid h-6 w-6 place-items-center rounded-full bg-[var(--brand-accent)]/15 text-[var(--brand-primary)]">
+                  <Icon className="h-3.5 w-3.5" />
+                </span>
+                {audience.label}
+              </li>
+            );
+          })}
         </ul>
       </div>
 

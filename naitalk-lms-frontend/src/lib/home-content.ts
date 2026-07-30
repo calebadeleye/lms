@@ -25,7 +25,11 @@ export const HOME_CONTENT = {
       'themselves, identify suitable career paths, and make informed, purpose-driven career decisions.',
     ctaPrimary: { label: 'Explore the Course', href: '/courses' },
     ctaSecondary: { label: 'Join HR GEMs', href: '/register' },
-    audiences: ['Recent Graduates', 'Career Explorers', 'Professionals Seeking a New Direction'],
+    audiences: [
+      { icon: 'graduate', label: 'Recent Graduates' },
+      { icon: 'compass', label: 'Career Explorers' },
+      { icon: 'briefcase', label: 'Professionals Seeking a New Direction' },
+    ] as { icon: 'graduate' | 'compass' | 'briefcase'; label: string }[],
     quote: 'Understand yourself. Discover your purpose. Build a career that fits.',
     photo: { src: '/marketing/hero.jpg', alt: 'HR GEMs coaching session' } as PhotoSlot,
   },

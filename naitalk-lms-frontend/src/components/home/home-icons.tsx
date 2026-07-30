@@ -107,6 +107,51 @@ export function TagIcon({ className }: IconProps) {
   );
 }
 
+export function GraduateIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M2 9.5 12 5l10 4.5-10 4.5-10-4.5Z" />
+      <path d="M6 11.5v4.3c0 1.5 2.7 3.2 6 3.2s6-1.7 6-3.2v-4.3" />
+      <path d="M21 9.5v5.5" />
+    </svg>
+  );
+}
+
+export function CompassIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m14.8 9.2-1.8 4.4-4.4 1.8 1.8-4.4 4.4-1.8Z" />
+    </svg>
+  );
+}
+
+export function BriefcaseIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="2.5" y="7" width="19" height="13" rx="2" />
+      <path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7" />
+      <path d="M2.5 13h19" />
+    </svg>
+  );
+}
+
+export function JoinIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" />
+      <path d="M18 8v5M20.5 10.5h-5" />
+    </svg>
+  );
+}
+
+export const HERO_AUDIENCE_ICONS = {
+  graduate: GraduateIcon,
+  compass: CompassIcon,
+  briefcase: BriefcaseIcon,
+} as const;
+
 export const WHY_IT_MATTERS_ICONS = {
   strength: StrengthIcon,
   personality: PersonalityIcon,

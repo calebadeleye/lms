@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 /**
- * One-off dev script (not run by the app at runtime): searches Pexels for a
- * fitting stock photo per homepage placeholder slot, downloads it into
- * public/marketing/, and writes a small credits manifest. Re-run any time to
- * refresh a slot — API responses are cached on disk for PEXELS_CACHE_TTL
- * seconds so repeated runs during iteration don't burn API quota.
+ * One-off dev script (not run by the app at runtime): searches Pexels for
+ * candidate stock photos per homepage placeholder slot and downloads them
+ * into .pexels-candidates/<slot>/ for visual review, since Pexels' keyword
+ * search doesn't reliably guarantee the subjects match a specific
+ * demographic — each slot needs a human pick, not just "take the first
+ * result". Once a candidate is chosen, copy it into public/marketing/ by
+ * hand and record it in CREDITS.md.
  *
  * Usage: node scripts/fetch-marketing-images.mjs
  * Requires PEXELS_API_KEY (and optionally PEXELS_CACHE_TTL, seconds) in
@@ -17,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const ENV_PATH = path.join(ROOT, '.env.local');
 const CACHE_DIR = path.join(ROOT, '.pexels-cache');
-const OUTPUT_DIR = path.join(ROOT, 'public', 'marketing');
+const CANDIDATES_DIR = path.join(ROOT, '.pexels-candidates');
 
 async function loadEnv() {
   const content = await fs.readFile(ENV_PATH, 'utf8');
@@ -29,41 +31,41 @@ async function loadEnv() {
   return env;
 }
 
-// One search query + one output filename per placeholder slot in
-// src/lib/home-content.ts. Query wording aims for genuine, non-staged-looking
-// professional/coaching imagery matching each slot's actual caption/alt text.
+// One search query + output slot per placeholder in src/lib/home-content.ts.
+// Every query is scoped to Black students/young professionals per the
+// client's brief (Black-skinned subjects, mostly undergraduate-age).
 const SLOTS = [
-  { file: 'hero.jpg', query: 'coaching session office conversation', orientation: 'landscape' },
-  { file: 'who-we-are.jpg', query: 'hands together teamwork unity', orientation: 'landscape' },
-  { file: 'community-1.jpg', query: 'group coaching discussion meeting', orientation: 'landscape' },
-  { file: 'community-2.jpg', query: 'colleagues peer learning laptop', orientation: 'landscape' },
-  { file: 'community-3.jpg', query: 'mentor mentee conversation office', orientation: 'landscape' },
-  { file: 'community-4.jpg', query: 'professional networking event handshake', orientation: 'landscape' },
-  { file: 'community-5.jpg', query: 'workshop training seminar whiteboard', orientation: 'landscape' },
-  { file: 'community-6.jpg', query: 'career growth professional development', orientation: 'landscape' },
-  { file: 'more-stories.jpg', query: 'person achievement mountain success', orientation: 'square' },
+  { slot: 'hero', query: 'black college students studying together laptop', orientation: 'landscape' },
+  { slot: 'who-we-are', query: 'black students hands together teamwork', orientation: 'landscape' },
+  { slot: 'community-1', query: 'black students group discussion campus', orientation: 'landscape' },
+  { slot: 'community-2', query: 'black student studying laptop library', orientation: 'landscape' },
+  { slot: 'community-3', query: 'black mentor student conversation', orientation: 'landscape' },
+  { slot: 'community-4', query: 'black students networking event smiling', orientation: 'landscape' },
+  { slot: 'community-5', query: 'black students workshop classroom', orientation: 'landscape' },
+  { slot: 'community-6', query: 'black graduate student career', orientation: 'landscape' },
+  { slot: 'more-stories', query: 'black student portrait thinking', orientation: 'square' },
 ];
 
-async function cachedSearch(env, slot) {
+async function cachedSearch(env, query, orientation) {
   await fs.mkdir(CACHE_DIR, { recursive: true });
-  const cacheKey = slot.query.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+  const cacheKey = query.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
   const cachePath = path.join(CACHE_DIR, `${cacheKey}.json`);
   const ttlSeconds = Number(env.PEXELS_CACHE_TTL || '86400');
 
   try {
     const cached = JSON.parse(await fs.readFile(cachePath, 'utf8'));
     if (Date.now() - cached.fetchedAt < ttlSeconds * 1000) {
-      console.log(`  cache hit (${slot.query})`);
+      console.log(`  cache hit (${query})`);
       return cached.body;
     }
   } catch {
     // no cache yet, fall through to a real fetch
   }
 
-  const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(slot.query)}&per_page=3&orientation=${slot.orientation}`;
+  const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=8&orientation=${orientation}`;
   const response = await fetch(url, { headers: { Authorization: env.PEXELS_API_KEY } });
   if (!response.ok) {
-    throw new Error(`Pexels search failed for "${slot.query}": ${response.status} ${await response.text()}`);
+    throw new Error(`Pexels search failed for "${query}": ${response.status} ${await response.text()}`);
   }
   const body = await response.json();
   await fs.writeFile(cachePath, JSON.stringify({ fetchedAt: Date.now(), body }, null, 2));
@@ -71,7 +73,7 @@ async function cachedSearch(env, slot) {
 }
 
 async function downloadPhoto(photo, destPath) {
-  const response = await fetch(photo.src.large2x ?? photo.src.large);
+  const response = await fetch(photo.src.large ?? photo.src.large2x);
   if (!response.ok) throw new Error(`Download failed for ${destPath}: ${response.status}`);
   const buffer = Buffer.from(await response.arrayBuffer());
   await fs.writeFile(destPath, buffer);
@@ -84,33 +86,31 @@ async function main() {
     process.exit(1);
   }
 
-  await fs.mkdir(OUTPUT_DIR, { recursive: true });
-  const credits = [];
+  await fs.mkdir(CANDIDATES_DIR, { recursive: true });
+  const manifest = [];
 
-  for (const slot of SLOTS) {
-    console.log(`Searching: ${slot.query}`);
-    const body = await cachedSearch(env, slot);
-    const photo = body.photos?.[0];
-    if (!photo) {
-      console.warn(`  no result for "${slot.query}" — skipping ${slot.file}`);
+  for (const { slot, query, orientation } of SLOTS) {
+    console.log(`Searching: ${query}`);
+    const body = await cachedSearch(env, query, orientation);
+    const photos = body.photos ?? [];
+    if (!photos.length) {
+      console.warn(`  no results for "${query}"`);
       continue;
     }
 
-    const destPath = path.join(OUTPUT_DIR, slot.file);
-    await downloadPhoto(photo, destPath);
-    console.log(`  saved ${slot.file} (photo by ${photo.photographer})`);
-    credits.push({ file: slot.file, photographer: photo.photographer, photographerUrl: photo.photographer_url, pexelsUrl: photo.url });
+    const slotDir = path.join(CANDIDATES_DIR, slot);
+    await fs.mkdir(slotDir, { recursive: true });
+
+    for (const [i, photo] of photos.entries()) {
+      const destPath = path.join(slotDir, `${i}.jpg`);
+      await downloadPhoto(photo, destPath);
+      manifest.push({ slot, index: i, id: photo.id, photographer: photo.photographer, photographerUrl: photo.photographer_url, pexelsUrl: photo.url });
+    }
+    console.log(`  saved ${photos.length} candidates to .pexels-candidates/${slot}/`);
   }
 
-  const creditsPath = path.join(OUTPUT_DIR, 'CREDITS.md');
-  const creditsBody =
-    '# Photo credits\n\n' +
-    'Sourced from [Pexels](https://www.pexels.com) — free to use, attribution not required but recorded here for traceability.\n\n' +
-    credits.map((c) => `- \`${c.file}\` — [${c.photographer}](${c.photographerUrl}) ([source](${c.pexelsUrl}))`).join('\n') +
-    '\n';
-  await fs.writeFile(creditsPath, creditsBody);
-
-  console.log(`\nDone. ${credits.length}/${SLOTS.length} images saved to public/marketing/.`);
+  await fs.writeFile(path.join(CANDIDATES_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
+  console.log(`\nDone. Review .pexels-candidates/<slot>/*.jpg and pick one per slot.`);
 }
 
 main().catch((error) => {

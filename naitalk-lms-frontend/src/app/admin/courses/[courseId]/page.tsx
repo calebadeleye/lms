@@ -37,7 +37,7 @@ export default async function AdminCourseBuilderPage({ params }: { params: Promi
   // empty candidate list rather than failing the whole page.
   let tenantMembers: TenantMember[] = [];
   try {
-    const members = await apiFetch<{ data: TenantMember[] }>('/api/v1/admin/tenant-users');
+    const members = await apiFetch<{ data: TenantMember[] }>('/api/v1/admin/members');
     tenantMembers = members.data;
   } catch (error) {
     if (!(error instanceof ApiError && error.status === 403)) throw error;

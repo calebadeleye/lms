@@ -15,7 +15,7 @@ export default async function AdminUsersPage() {
 
   const [members, invitations, roles] = await Promise.all([
     apiFetch<{ data: TenantMemberDetail[]; meta?: { pagination: PaginationMeta } }>(
-      '/api/v1/admin/tenant-users?page=1&per_page=20'
+      '/api/v1/admin/members?page=1&per_page=20'
     ),
     apiFetch<{ data: PendingInvitation[] }>('/api/v1/admin/invitations'),
     apiFetch<{ data: TenantRole[] }>('/api/v1/admin/roles'),

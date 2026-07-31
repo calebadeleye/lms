@@ -15,7 +15,7 @@ export default async function AdminCoachingPage() {
 
   const [coaches, members] = await Promise.all([
     apiFetch<{ data: AdminCoach[] }>('/api/v1/admin/coaches'),
-    apiFetch<{ data: TenantMember[] }>('/api/v1/admin/tenant-users'),
+    apiFetch<{ data: TenantMember[] }>('/api/v1/admin/members'),
   ]);
 
   const coachUserIds = new Set(coaches.data.map((c) => c.user_id));

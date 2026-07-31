@@ -17,16 +17,16 @@ export function WhyItMattersSection() {
           </h2>
         </div>
 
-        <div className="mt-5 grid gap-5 sm:grid-cols-2 min-[900px]:grid-cols-5">
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {whyItMatters.cards.map((card) => {
             const Icon = WHY_IT_MATTERS_ICONS[card.icon];
             return (
               <div
                 key={card.title}
-                className="grid min-h-[136px] grid-cols-[44px_1fr] gap-3 rounded-lg bg-white px-5 py-5 shadow-[0_10px_24px_rgba(15,23,42,0.08)]"
+                className="flex min-h-[168px] flex-col items-center gap-3 rounded-lg bg-white px-4 py-6 text-center shadow-[0_10px_24px_rgba(15,23,42,0.08)]"
               >
-                <div className="pt-1 text-[var(--brand-primary)]">
-                  <Icon className="h-10 w-10" />
+                <div className="text-[var(--brand-primary)]">
+                  <Icon className="h-9 w-9" />
                 </div>
                 <div>
                   <h3 className="text-[13px] font-black leading-snug text-[var(--brand-primary)]">{card.title}</h3>

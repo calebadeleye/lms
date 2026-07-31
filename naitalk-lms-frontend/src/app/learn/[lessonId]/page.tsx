@@ -32,7 +32,7 @@ export default async function LearnPage({ params }: { params: Promise<{ lessonId
 
   if (lockedMessage) {
     return (
-      <div className="flex min-h-full flex-col items-center justify-center gap-3 bg-neutral-50 px-6 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-neutral-50 px-6 text-center">
         <p className="text-lg font-semibold text-neutral-900">Lesson locked</p>
         <p className="max-w-md text-sm text-neutral-600">{lockedMessage}</p>
         <Link href="/my/courses" className="mt-2 text-sm font-medium text-[var(--brand-primary)] underline">
@@ -43,7 +43,7 @@ export default async function LearnPage({ params }: { params: Promise<{ lessonId
   }
 
   return (
-    <div className="flex min-h-full flex-col bg-neutral-50">
+    <div className="flex min-h-screen flex-col bg-neutral-50">
       <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-3 sm:px-6">
         <Link href={`/courses/${lesson.course_slug}`} className="text-sm font-medium text-neutral-600 hover:text-[var(--brand-primary)]">
           ← {lesson.course_title}

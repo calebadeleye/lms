@@ -3,6 +3,7 @@
 use App\Domain\Learning\Models\Course;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
@@ -87,4 +88,71 @@ it('rejects a disallowed file type for the thumbnail upload', function () {
 
 it('404s the public course-asset route for a nonexistent file', function () {
     $this->get("/api/v1/course-assets/{$this->course->id}/thumbnail.jpg")->assertStatus(404);
+});
+
+// --- Pexels fallback thumbnail, filled in at publish time ---------------
+
+it('fills in a Pexels stock photo when a course is published with no thumbnail of its own', function () {
+    config(['services.pexels.key' => 'test_key']);
+    Http::fake([
+        'api.pexels.co/*' => Http::response([], 404), // safety net: never match by accident
+        'api.pexels.com/v1/search*' => Http::response([
+            'photos' => [['src' => ['medium' => 'https://images.pexels.com/photos/1/pic.jpeg']]],
+        ], 200),
+        'images.pexels.com/*' => Http::response('fake-jpeg-bytes', 200, ['Content-Type' => 'image/jpeg']),
+    ]);
+
+    $draft = Course::create(['title' => 'HR Analytics for Data-Driven Decisions', 'slug' => 'hra-draft', 'status' => 'draft']);
+
+    $this->postJson("/api/v1/admin/courses/{$draft->id}/publish", [], ['Authorization' => "Bearer {$this->adminToken}"])
+        ->assertOk();
+
+    $draft->refresh();
+    expect($draft->thumbnail_path)->toBe("courses/{$draft->id}/thumbnail.jpg");
+    Storage::disk('uploads')->assertExists($draft->thumbnail_path);
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), 'api.pexels.com/v1/search')
+        && $request['query'] === 'HR Analytics for Data-Driven Decisions');
+});
+
+it('leaves an existing thumbnail alone when publishing, even with Pexels configured', function () {
+    config(['services.pexels.key' => 'test_key']);
+    Http::fake(); // if this fires at all, Http::assertNotSent below catches it
+
+    $draft = Course::create([
+        'title' => 'Already Has A Thumbnail', 'slug' => 'already-thumb', 'status' => 'draft',
+        'thumbnail_path' => 'courses/999/thumbnail.jpg',
+    ]);
+
+    $this->postJson("/api/v1/admin/courses/{$draft->id}/publish", [], ['Authorization' => "Bearer {$this->adminToken}"])
+        ->assertOk();
+
+    expect($draft->fresh()->thumbnail_path)->toBe('courses/999/thumbnail.jpg');
+    Http::assertNothingSent();
+});
+
+it('publishes successfully even when Pexels is unreachable', function () {
+    config(['services.pexels.key' => 'test_key']);
+    Http::fake(['api.pexels.com/*' => fn () => throw new \Illuminate\Http\Client\ConnectionException('down')]);
+
+    $draft = Course::create(['title' => 'Unreachable Pexels Course', 'slug' => 'unreachable-pexels', 'status' => 'draft']);
+
+    $this->postJson("/api/v1/admin/courses/{$draft->id}/publish", [], ['Authorization' => "Bearer {$this->adminToken}"])
+        ->assertOk();
+
+    expect($draft->fresh()->status)->toBe('published');
+    expect($draft->fresh()->thumbnail_path)->toBeNull();
+});
+
+it('does not call Pexels at all when no key is configured', function () {
+    config(['services.pexels.key' => null]);
+    Http::fake();
+
+    $draft = Course::create(['title' => 'No Pexels Key Course', 'slug' => 'no-pexels-key', 'status' => 'draft']);
+
+    $this->postJson("/api/v1/admin/courses/{$draft->id}/publish", [], ['Authorization' => "Bearer {$this->adminToken}"])
+        ->assertOk();
+
+    Http::assertNothingSent();
+    expect($draft->fresh()->thumbnail_path)->toBeNull();
 });

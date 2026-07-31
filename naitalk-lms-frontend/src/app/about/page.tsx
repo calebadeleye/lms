@@ -12,7 +12,7 @@ export default async function AboutPage() {
   const { whoWeAre } = HOME_CONTENT;
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding.logo_url} isAuthenticated={user !== null} />
 
       <main className="flex-1">

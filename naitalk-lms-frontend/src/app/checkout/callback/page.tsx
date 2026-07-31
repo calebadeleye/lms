@@ -24,7 +24,7 @@ export default async function CheckoutCallbackPage({
   const orderId = parseOrderId(reference);
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding?.logo_url ?? null} isAuthenticated={user !== null} />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-16 sm:px-6">
         <CheckoutStatus orderId={orderId} reference={reference} isAuthenticated={user !== null} />

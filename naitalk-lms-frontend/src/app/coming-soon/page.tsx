@@ -20,7 +20,7 @@ export default async function ComingSoonPage({
   const { feature } = await searchParams;
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding?.logo_url ?? null} isAuthenticated={user !== null} />
       <main className="flex flex-1 flex-col items-center justify-center gap-3 px-6 py-24 text-center">
         <h1 className="text-2xl font-semibold text-neutral-900">{feature ?? 'This feature'} is coming soon</h1>

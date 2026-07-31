@@ -31,7 +31,7 @@ export default async function VerifyEmailPage({
         : { icon: '📧', title: 'Check your email', message: "We've sent a confirmation link to your email address." };
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding?.logo_url ?? null} isAuthenticated={user !== null} />
 
       <main className="flex flex-1 items-center justify-center px-4 py-20">

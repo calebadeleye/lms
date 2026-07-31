@@ -4,6 +4,7 @@ namespace App\Domain\Learning\Http\Controllers;
 
 use App\Domain\Learning\Models\Course;
 use App\Domain\Learning\Models\Enrolment;
+use App\Domain\Learning\Services\CourseThumbnailFallbackService;
 use App\Domain\Learning\Services\EnrolmentService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,7 +14,10 @@ use Illuminate\Validation\ValidationException;
 
 class CourseController extends Controller
 {
-    public function __construct(private EnrolmentService $enrolments) {}
+    public function __construct(
+        private EnrolmentService $enrolments,
+        private CourseThumbnailFallbackService $thumbnailFallback,
+    ) {}
 
     /** Public catalogue — published courses only. */
     public function index(Request $request)
@@ -153,6 +157,7 @@ class CourseController extends Controller
     public function publish(string $courseId)
     {
         $course = Course::findOrFail($courseId);
+        $this->thumbnailFallback->fillMissing($course);
         $course->update(['status' => 'published', 'published_at' => $course->published_at ?? now()]);
 
         return response()->json(['data' => $course->fresh()]);

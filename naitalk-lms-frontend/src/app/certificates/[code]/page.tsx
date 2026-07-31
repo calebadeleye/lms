@@ -42,7 +42,7 @@ export default async function CertificateVerifyPage({
   const qrSvg = await QRCode.toString(verifyUrl, { type: 'svg', margin: 1, width: 140 });
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <div className="print:hidden">
         <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding?.logo_url ?? null} isAuthenticated={user !== null} />
       </div>

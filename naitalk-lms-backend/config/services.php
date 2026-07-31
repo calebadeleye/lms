@@ -18,6 +18,13 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
+    // Used only to auto-fill a course thumbnail with a fitting stock photo
+    // when an admin publishes a course without uploading one of their own —
+    // see CourseThumbnailFallbackService.
+    'pexels' => [
+        'key' => env('PEXELS_API_KEY'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

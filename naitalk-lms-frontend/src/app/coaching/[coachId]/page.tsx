@@ -26,7 +26,7 @@ export default async function CoachProfilePage({ params }: { params: Promise<{ c
   const availabilityByDay = [...coach.availability_rules].sort((a, b) => a.day_of_week - b.day_of_week);
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding?.logo_url ?? null} isAuthenticated={user !== null} />
 
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-12 sm:px-6">

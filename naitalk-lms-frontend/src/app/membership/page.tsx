@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
@@ -7,6 +8,13 @@ import { DashboardShell } from '@/components/dashboard-shell';
 import { studentNav } from '@/lib/nav';
 import { MembershipPlanCard } from '@/components/membership-plan-card';
 import type { MembershipPlan, MySubscription } from '@/lib/membership-types';
+
+export const metadata: Metadata = {
+  title: 'Membership',
+  description:
+    'Join HR GEMs Coach Network as a member for free access to a learning community, pro bono ' +
+    'coaching opportunities, coaching mentorship, team coaching sessions, and partner discounts.',
+};
 
 export default async function MembershipPage() {
   const config = BRANDING;

@@ -1,20 +1,40 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { BRANDING } from '@/lib/branding';
-import { HOME_CONTENT } from '@/lib/home-content';
+import { DEFAULT_DESCRIPTION, DEFAULT_KEYWORDS, DEFAULT_TITLE, SITE_NAME, SITE_URL, THEME_COLOR } from '@/lib/seo';
 import { QueryProvider } from '@/components/query-provider';
 import './globals.css';
 
 const inter = Inter({ variable: '--font-inter', subsets: ['latin'] });
 
+export const viewport: Viewport = {
+  themeColor: THEME_COLOR,
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const config = BRANDING;
 
   return {
-    title: config.tenant.name,
-    description: HOME_CONTENT.hero.subheading,
+    metadataBase: new URL(SITE_URL),
+    title: { default: DEFAULT_TITLE, template: `%s | ${SITE_NAME}` },
+    description: DEFAULT_DESCRIPTION,
+    keywords: DEFAULT_KEYWORDS,
     icons: config.branding.favicon_url ? [{ url: config.branding.favicon_url }] : undefined,
     manifest: '/manifest.webmanifest',
+    robots: { index: true, follow: true },
+    openGraph: {
+      type: 'website',
+      url: SITE_URL,
+      siteName: SITE_NAME,
+      title: DEFAULT_TITLE,
+      description: DEFAULT_DESCRIPTION,
+      locale: 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: DEFAULT_TITLE,
+      description: DEFAULT_DESCRIPTION,
+    },
   };
 }
 

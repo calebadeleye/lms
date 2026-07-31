@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
@@ -5,6 +6,13 @@ import { apiFetch } from '@/lib/api-server';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { formatPrice, type CourseCategory, type CourseSummary } from '@/lib/learning-types';
+
+export const metadata: Metadata = {
+  title: 'Courses',
+  description:
+    'Browse HR GEMs Coach Network courses, including Find Your Career Fit — a practical guide to ' +
+    'discovering your strengths, personality, values, and purpose for confident career decisions.',
+};
 
 export default async function CourseCataloguePage({
   searchParams,

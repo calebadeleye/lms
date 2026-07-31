@@ -1,6 +1,12 @@
+import type { Metadata } from 'next';
 import { BRANDING } from '@/lib/branding';
 import { AuthCard } from '@/components/auth-card';
 import { LoginForm } from '@/components/login-form';
+
+export const metadata: Metadata = {
+  title: 'Sign In',
+  robots: { index: false, follow: true },
+};
 
 export default async function LoginPage() {
   const config = BRANDING;

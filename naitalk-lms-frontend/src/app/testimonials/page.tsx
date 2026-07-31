@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
@@ -9,6 +10,13 @@ interface Testimonial {
   quote: string;
   author: string;
 }
+
+export const metadata: Metadata = {
+  title: 'Testimonials',
+  description:
+    'Read real stories from HR GEMs Coach Network members about discovering their career fit, ' +
+    'building coaching skills, and finding a supportive community for transformational growth.',
+};
 
 /** The real destination for the homepage's "Read more stories"/"View More
  * Testimonials" CTAs — lists every testimonial an admin has added via

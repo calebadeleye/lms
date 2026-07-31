@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BRANDING } from '@/lib/branding';
 import { HOME_CONTENT } from '@/lib/home-content';
@@ -5,6 +6,13 @@ import { getOptionalUser } from '@/lib/auth-server';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { PhotoSlotImage } from '@/components/home/photo-slot';
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description:
+    'HR GEMs means Great.Excellent.Minds. Learn how HR GEMs Coach Network transforms HR ' +
+    'professionals into change agents through coaching, NLP, and CBT-based transformational skills.',
+};
 
 export default async function AboutPage() {
   const config = BRANDING;

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
@@ -8,6 +9,13 @@ import { DashboardShell } from '@/components/dashboard-shell';
 import { studentNav } from '@/lib/nav';
 import { formatPrice } from '@/lib/learning-types';
 import type { CoachSummary } from '@/lib/coaching-types';
+
+export const metadata: Metadata = {
+  title: 'Coaching',
+  description:
+    'Book a session with an HR GEMs Coach Network coach — professional coaching to help you grow, ' +
+    'transform, and make confident career and life decisions.',
+};
 
 export default async function CoachingCataloguePage() {
   const config = BRANDING;

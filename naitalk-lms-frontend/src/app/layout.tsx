@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Manrope } from 'next/font/google';
 import { BRANDING } from '@/lib/branding';
 import { DEFAULT_DESCRIPTION, DEFAULT_KEYWORDS, DEFAULT_TITLE, SITE_NAME, SITE_URL, THEME_COLOR } from '@/lib/seo';
 import { QueryProvider } from '@/components/query-provider';
 import './globals.css';
 
 const inter = Inter({ variable: '--font-inter', subsets: ['latin'] });
+const manrope = Manrope({ variable: '--font-manrope', subsets: ['latin'] });
 
 export const viewport: Viewport = {
   themeColor: THEME_COLOR,
@@ -49,7 +50,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   } as React.CSSProperties;
 
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`} style={themeVars}>
+    <html lang="en" className={`${inter.variable} ${manrope.variable} h-full antialiased`} style={themeVars}>
       <body className="min-h-full flex flex-col" style={{ fontFamily: 'var(--brand-font)' }}>
         <QueryProvider>{children}</QueryProvider>
       </body>

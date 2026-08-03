@@ -1,61 +1,53 @@
 import { HOME_CONTENT } from '@/lib/home-content';
-import { PhotoSlotImage } from '@/components/home/photo-slot';
+import { BrandIcon } from '@/components/home/brand-icon';
+
+const valueColours = {
+  teal: 'text-[#006c70] bg-[#e7f5f3]',
+  red: 'text-[#ee564f] bg-[#fff0ee]',
+  gold: 'text-[#edae18] bg-[#fff7df]',
+  green: 'text-[#36a875] bg-[#eaf8f0]',
+} as const;
 
 export function WhoWeAreSection() {
   const { whoWeAre } = HOME_CONTENT;
 
   return (
-    <section className="mx-auto grid max-w-[1120px] items-center gap-8 px-4 py-16 sm:px-8 sm:py-20 md:grid-cols-[40%_37%_18%]">
-      <PhotoSlotImage photo={whoWeAre.photo} className="aspect-[1.65/1] w-full rounded-lg shadow-[0_12px_28px_rgba(15,23,42,0.12)]" />
+    <section id="about" className="px-5 py-16 sm:px-7 sm:py-20 lg:px-8">
+      <div className="mx-auto grid max-w-[1060px] items-center gap-10 lg:grid-cols-[1.08fr_1fr] lg:gap-14">
+        <div className="relative pb-8">
+          <div className="h-[390px] overflow-hidden rounded-2xl sm:h-[430px]">
+            {whoWeAre.photo.src && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={whoWeAre.photo.src} alt={whoWeAre.photo.alt} className="h-full w-full object-cover" />
+            )}
+          </div>
+          <div className="absolute bottom-0 left-0 max-w-[260px] rounded-2xl bg-[#f7f6f0]/95 p-5 shadow-[0_12px_28px_rgba(7,61,64,0.08)] sm:-left-5">
+            <span className="text-3xl font-extrabold leading-none text-[#006c70]">“</span>
+            <p className="-mt-2 text-[14px] font-bold leading-6 text-[#344244]">{whoWeAre.quote}</p>
+            <span className="mt-3 block h-0.5 w-20 bg-[#f4b728]" />
+          </div>
+        </div>
 
-      <div className="self-start md:pt-1">
-        <p className="text-[11px] font-black uppercase text-[var(--brand-primary)]">{whoWeAre.eyebrow}</p>
-        <h2
-          className="mt-1 max-w-[420px] text-[30px] font-black leading-[0.98] text-[#082f35]"
-          style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-        >
-          {whoWeAre.heading}
-        </h2>
-        <div className="mt-3 h-1 w-10 bg-[#ffbd11]" />
-        <p className="mt-3 text-[12px] font-semibold leading-relaxed text-neutral-800">
-          HR GEMs means <span className="text-[var(--brand-primary)]">Great.Excellent.Minds.</span>
-        </p>
-        <div className="mt-2 space-y-3 text-[12px] font-medium leading-relaxed text-neutral-900">
-          {whoWeAre.paragraphs.map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
-          ))}
+        <div>
+          <p className="text-[13px] font-extrabold uppercase tracking-[0.06em] text-[#006c70]">{whoWeAre.eyebrow}</p>
+          <h2 className="mt-2 text-3xl font-extrabold tracking-[-0.035em] text-[#092d32] sm:text-[36px]">{whoWeAre.heading.slice(0, -1)}<span className="text-[#f4b728]">.</span></h2>
+          <div className="mt-5 space-y-4 text-[15px] leading-7 text-[#536063]">
+            {whoWeAre.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          </div>
+
+          <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4 lg:gap-2">
+            {whoWeAre.values.map((value) => (
+              <div key={value.title} className="text-center sm:text-left">
+                <span className={`mx-auto grid h-10 w-10 place-items-center rounded-full sm:mx-0 ${valueColours[value.color as keyof typeof valueColours]}`}>
+                  <BrandIcon name={value.icon} className="h-6 w-6" />
+                </span>
+                <h3 className="mt-3 text-sm font-extrabold text-[#172326]">{value.title}</h3>
+                <p className="mt-1 text-[11px] leading-[1.55] text-[#606b6d]">{value.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-
-      <div className="hidden self-stretch md:block">
-        <GrowthIllustration />
-      </div>
     </section>
-  );
-}
-
-function GrowthIllustration() {
-  return (
-    <div className="relative h-full min-h-[220px] text-[var(--brand-primary)]">
-      <div className="absolute left-0 top-8 grid grid-cols-7 gap-1 opacity-25" aria-hidden>
-        {Array.from({ length: 28 }).map((_, index) => (
-          <span key={index} className="h-1 w-1 rounded-full bg-[#ffbd11]" />
-        ))}
-      </div>
-      <span aria-hidden className="absolute right-16 top-16 h-10 w-10 rounded-full bg-[#ffcf42]" />
-      <svg viewBox="0 0 230 220" fill="none" className="absolute inset-x-0 bottom-0 h-full w-full" aria-hidden="true">
-        <path d="M32 178C64 151 84 124 113 117C145 109 169 91 197 58" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-        <path d="M72 172C103 171 131 163 157 146" stroke="currentColor" strokeWidth="2" strokeDasharray="4 6" strokeLinecap="round" />
-        <path d="M162 33h40v25h-40z" stroke="currentColor" strokeWidth="3" />
-        <path d="m202 33-16 8 16 8" stroke="#ffcf42" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M162 33v110" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-        <circle cx="60" cy="141" r="7" stroke="currentColor" strokeWidth="3" />
-        <path d="M60 148v26M49 160h22M45 174h30" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-        <circle cx="105" cy="109" r="8" stroke="currentColor" strokeWidth="3" />
-        <path d="M105 117v34M91 132h28M85 151h40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-        <circle cx="153" cy="74" r="9" stroke="currentColor" strokeWidth="3" />
-        <path d="M153 83v50M136 101h34M128 133h54" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-      </svg>
-    </div>
   );
 }

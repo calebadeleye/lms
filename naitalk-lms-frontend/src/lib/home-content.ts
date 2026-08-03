@@ -17,35 +17,86 @@ export interface PhotoSlot {
 
 export const HOME_CONTENT = {
   hero: {
-    heading: 'Find Your Career Fit',
-    subheading: 'A practical guide to discovering your strengths, personality, values, and purpose.',
+    eyebrow: 'Career Clarity. Coaching. Transformation.',
+    heading: 'Discover Who You Are. Build What Comes Next.',
+    subheading: 'Discover who you are and build what comes next.',
     description:
-      'Too many people choose careers based on trends, pressure, family expectations, or what appears ' +
-      'financially attractive. The Find Your Career Fit course helps participants understand ' +
-      'themselves, identify suitable career paths, and make informed, purpose-driven career decisions.',
-    ctaPrimary: { label: 'Explore the Course', href: '/courses' },
-    ctaSecondary: { label: 'Join HR GEMs', href: '/register' },
+      'HR GEMs helps professionals, graduates and aspiring coaches gain clarity, build transformational skills and create meaningful impact in their careers and communities.',
+    ctaPrimary: { label: 'Explore Courses', href: '/courses' },
+    ctaSecondary: { label: 'Join Our Community', href: '/register' },
     audiences: [
       { icon: 'graduate', label: 'Recent Graduates' },
       { icon: 'compass', label: 'Career Explorers' },
       { icon: 'briefcase', label: 'Professionals Seeking a New Direction' },
     ] as { icon: 'graduate' | 'compass' | 'briefcase'; label: string }[],
-    quote: 'Understand yourself. Discover your purpose. Build a career that fits.',
-    photo: { src: '/marketing/hero-career-fit.png', alt: 'Career coaching conversation around a laptop' } as PhotoSlot,
+    quote: 'Join 2,000+ purpose-driven minds transforming their lives',
+    photo: { src: '/marketing/community-2.jpg', alt: 'A confident professional woman working at her laptop in an office' } as PhotoSlot,
+    featureCards: [
+      { icon: 'compass', title: 'Career Clarity', description: 'Discover your strengths, values and direction.' },
+      { icon: 'people', title: 'Coaching Skills', description: 'Learn practical coaching and people skills.' },
+      { icon: 'leaf', title: 'Personal Growth', description: 'Build confidence, purpose and self-awareness.' },
+      { icon: 'heart', title: 'Community', description: 'Connect, collaborate and create real impact.' },
+    ],
+  },
+
+  impact: [
+    { icon: 'people', value: '5+', label: 'Years of Impact' },
+    { icon: 'community', value: '2,000+', label: 'Members Supported' },
+    { icon: 'calendar', value: '1,200+', label: 'Coaching Sessions' },
+    { icon: 'award', value: '80+', label: 'Courses Delivered' },
+  ],
+
+  programmes: {
+    eyebrow: 'Our Courses',
+    heading: 'Pathways to Your Next Level',
+    description: 'Choose the path that meets you where you are and helps you become who you are meant to be.',
+    items: [
+      {
+        title: 'Find Your Career Fit',
+        description: 'Understand your personality, strengths and values to discover career paths that align with who you are.',
+        action: 'Explore Course',
+        href: '/courses',
+        image: '/marketing/community-2.jpg',
+        imageAlt: 'A professional exploring her career path',
+        icon: 'compass',
+      },
+      {
+        title: 'Transformational Coach Development',
+        description: 'Build coaching skills, gain mentorship and learn to help others unlock their potential.',
+        action: 'Explore Coaching',
+        href: '/coaching',
+        image: '/marketing/community-4.jpg',
+        imageAlt: 'A mentoring session in a library',
+        icon: 'people',
+      },
+      {
+        title: 'HR GEMs Membership',
+        description: 'Join a thriving community of professionals who learn, grow and support each other to create greater impact.',
+        action: 'Become a Member',
+        href: '/membership',
+        image: '/marketing/community-5.jpg',
+        imageAlt: 'Professionals connecting at a learning event',
+        icon: 'community',
+      },
+    ],
   },
 
   whoWeAre: {
-    eyebrow: 'Who We Are',
-    heading: 'Transforming Professionals into Change Agents',
+    eyebrow: 'About HR GEMs',
+    heading: 'Great. Excellent. Minds.',
     meaning: 'HR GEMs means Great.Excellent.Minds.',
     paragraphs: [
-      'HR GEMs Coach Network is a community of professionals, primarily within Human Resources, who ' +
-        'are learning transformational skills that prepare them to become change agents in the Work of Now.',
-      'Members begin by transforming themselves and then use tools such as coaching, Neuro-Linguistic ' +
-        'Programming, Cognitive Behavioural Therapy, and other transformational techniques to positively ' +
-        'influence individuals, organisations, and society.',
+      'HR GEMs is a transformational learning and coaching community committed to developing purpose-driven professionals and coaches who create impact in their workplaces and communities.',
+      'We believe in the power of people, the beauty of collaboration and the impact of intentional growth.',
     ],
-    photo: { src: '/marketing/who-we-are.jpg', alt: 'A group of hands joined together' } as PhotoSlot,
+    quote: 'When great minds connect with purpose, transformation becomes inevitable.',
+    photo: { src: '/marketing/hero.jpg', alt: 'Two women learning and growing together' } as PhotoSlot,
+    values: [
+      { title: 'Collaboration', description: 'We grow together and achieve more.', icon: 'people', color: 'teal' },
+      { title: 'Love', description: 'We care deeply about people.', icon: 'heart', color: 'red' },
+      { title: 'Impact', description: 'We create change that matters.', icon: 'star', color: 'gold' },
+      { title: 'Purpose', description: 'We live and lead with meaning.', icon: 'target', color: 'green' },
+    ],
   },
 
   whyItMatters: {
@@ -86,12 +137,12 @@ export const HOME_CONTENT = {
   },
 
   memberVoices: {
-    eyebrow: 'What Our Members Say',
-    heading: 'Voices of Transformation',
+    eyebrow: 'What Our Community Says',
+    heading: 'Real Stories. Real Impact.',
     testimonials: [
-      { quote: 'HR GEMs helped me discover my true calling and build the confidence to pursue a career I love.', author: 'Aisha O., HR Professional' },
-      { quote: "The coaching skills I've gained are transforming not only my career but also the lives of others I support.", author: 'Tunde B., Coach in Training' },
-      { quote: 'A supportive community that challenges me to grow, learn, and make a real difference in the world.', author: 'Funmi A., Career Explorer' },
+      { quote: 'HR GEMs helped me understand my strengths and transition into a career I truly love.', author: 'Favour O.', role: 'Project Manager', photo: '/marketing/community-6.jpg' },
+      { quote: 'The coaching skills I learned have transformed the way I lead and support my team.', author: 'Samuel A.', role: 'Team Lead', photo: '/marketing/community-1.jpg' },
+      { quote: "The community is so supportive. I've built friendships and grown beyond my expectations.", author: 'Blessing N.', role: 'HR Professional', photo: '/marketing/community-5.jpg' },
     ],
   },
 
@@ -99,12 +150,12 @@ export const HOME_CONTENT = {
     eyebrow: 'Our Community Experience',
     heading: 'Learn. Connect. Grow. Create Impact.',
     items: [
-      { caption: 'Group Coaching Sessions', photo: { src: '/marketing/community-1.jpg', alt: 'Group coaching session' } as PhotoSlot },
-      { caption: 'Peer Learning', photo: { src: '/marketing/community-2.jpg', alt: 'Peer learning session' } as PhotoSlot },
+      { caption: 'Group Coaching Sessions', photo: { src: '/marketing/hero-career-fit.png', alt: 'Professionals taking part in group coaching' } as PhotoSlot },
+      { caption: 'Peer Learning', photo: { src: '/marketing/hero.jpg', alt: 'Two peers learning together' } as PhotoSlot },
       { caption: 'Mentorship', photo: { src: '/marketing/community-3.jpg', alt: 'Mentorship conversation' } as PhotoSlot },
       { caption: 'Professional Networking', photo: { src: '/marketing/community-4.jpg', alt: 'Professional networking event' } as PhotoSlot },
-      { caption: 'Transformational Workshops', photo: { src: '/marketing/community-5.jpg', alt: 'Transformational workshop' } as PhotoSlot },
-      { caption: 'Personal & Career Development', photo: { src: '/marketing/community-6.jpg', alt: 'Personal and career development session' } as PhotoSlot },
+      { caption: 'Transformational Workshops', photo: { src: '/marketing/community-1.jpg', alt: 'Collaborative learning workshop' } as PhotoSlot },
+      { caption: 'Personal & Career Development', photo: { src: '/marketing/community-2.jpg', alt: 'A professional focused on personal growth' } as PhotoSlot },
     ],
   },
 

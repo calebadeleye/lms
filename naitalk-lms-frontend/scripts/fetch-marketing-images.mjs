@@ -38,7 +38,7 @@ const SLOTS = [
   { slot: 'hero', query: 'black college students studying together laptop', orientation: 'landscape' },
   { slot: 'who-we-are', query: 'black students hands together teamwork', orientation: 'landscape' },
   { slot: 'community-1', query: 'black students group discussion campus', orientation: 'landscape' },
-  { slot: 'community-2', query: 'black student studying laptop library', orientation: 'landscape' },
+  { slot: 'community-2', query: 'black businesswoman office laptop professional', orientation: 'landscape' },
   { slot: 'community-3', query: 'black mentor student conversation', orientation: 'landscape' },
   { slot: 'community-4', query: 'black students networking event smiling', orientation: 'landscape' },
   { slot: 'community-5', query: 'black students workshop classroom', orientation: 'landscape' },

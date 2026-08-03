@@ -38,9 +38,9 @@ export const BRANDING: BrandingConfig = {
     // marketing copy (hero/etc.) lives in src/lib/home-content.ts, not here.
     logo_url: '/branding/logo.png',
     favicon_url: '/branding/favicon.png',
-    primary_color: '#008080',
-    secondary_color: '#F9E86B',
-    accent_color: '#F5D908',
+    primary_color: '#006C70',
+    secondary_color: '#0B7C80',
+    accent_color: '#F4B728',
     font_family: 'var(--font-inter), system-ui, sans-serif',
     email_sender_name: 'HR GEMs Coach Network',
     pwa: { name: 'HR GEMs Coach Network', theme_color: '#008080', icon_url: '/branding/favicon.png' },

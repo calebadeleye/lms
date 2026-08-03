@@ -3,9 +3,8 @@ import { getOptionalUser } from '@/lib/auth-server';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { HeroSection } from '@/components/home/hero-section';
+import { ProgrammesSection } from '@/components/home/programmes-section';
 import { WhoWeAreSection } from '@/components/home/who-we-are-section';
-import { WhyItMattersSection } from '@/components/home/why-it-matters-section';
-import { JoinSection } from '@/components/home/join-section';
 import { CommunityGallerySection } from '@/components/home/community-gallery-section';
 import { TestimonialCarouselSection } from '@/components/home/testimonial-carousel-section';
 
@@ -19,9 +18,8 @@ export default async function HomePage() {
 
       <main className="flex-1">
         <HeroSection />
+        <ProgrammesSection />
         <WhoWeAreSection />
-        <WhyItMattersSection />
-        <JoinSection />
         <CommunityGallerySection />
         <TestimonialCarouselSection />
       </main>

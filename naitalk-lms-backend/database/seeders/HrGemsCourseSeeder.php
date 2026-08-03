@@ -25,10 +25,10 @@ class HrGemsCourseSeeder extends Seeder
         // should mass-assign it from request input), so passing it into
         // firstOrCreate()'s attributes silently drops it. forceFill after.
         $instructor = User::firstOrCreate(
-            ['email' => 'lara.yeku@hrgems.test'],
+            ['email' => env('OWNER_SEED_EMAIL', 'lara.yeku@hrgems.test')],
             [
-                'name' => 'Lara Yeku',
-                'password' => 'password',
+                'name' => env('OWNER_SEED_NAME', 'Lara Yeku'),
+                'password' => env('OWNER_SEED_PASSWORD', 'password'),
                 'role_id' => $instructorRole->id,
                 'status' => 'active',
                 'joined_at' => now(),

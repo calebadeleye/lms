@@ -1,108 +1,124 @@
 import Link from 'next/link';
 import { HOME_CONTENT } from '@/lib/home-content';
-import { HERO_AUDIENCE_ICONS, JoinIcon } from '@/components/home/home-icons';
+import { BrandIcon } from '@/components/home/brand-icon';
 
 export function HeroSection() {
-  const { hero } = HOME_CONTENT;
-  const quoteLines = hero.quote.split('. ').map((line, index, lines) => `${line}${index < lines.length - 1 ? '.' : ''}`);
+  const { hero, impact } = HOME_CONTENT;
 
   return (
-    <section className="relative isolate overflow-hidden border-b border-neutral-200 bg-white">
-      <div className="absolute inset-y-0 right-0 hidden w-[62.5%] md:block">
-        {hero.photo.src ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={hero.photo.src} alt={hero.photo.alt} className="h-[76%] w-full object-cover object-center" />
-        ) : null}
-        <div
-          className="absolute inset-y-0 left-0 w-32 md:w-36 lg:w-40"
-          style={{
-            background:
-              'linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.75) 30%, rgba(255,255,255,0.25) 65%, rgba(255,255,255,0) 100%)',
-          }}
-        />
-      </div>
-
-      <div
-        aria-hidden
-        className="absolute bottom-0 right-0 hidden h-[43%] w-[63%] bg-[var(--brand-primary)] md:block"
-        style={{ clipPath: 'polygon(17% 78%, 100% 0, 100% 100%, 0 100%)' }}
-      />
-
-      <div className="relative mx-auto grid max-w-[1120px] gap-8 px-4 py-10 sm:px-8 md:min-h-[340px] md:grid-cols-[41%_59%] md:px-12 md:py-9">
-        <div className="max-w-[365px] self-start">
-          <h1
-            className="text-[42px] font-black leading-[0.95] text-[#082f35] sm:text-[54px]"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-          >
-            <span className="block">Find Your</span>
-            <span className="block text-[var(--brand-primary)]">Career Fit</span>
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_58%_20%,rgba(244,183,40,0.08),transparent_26%),linear-gradient(180deg,#fff_0%,#fff_88%,#f7f6f0_100%)]">
+      <div className="mx-auto grid max-w-[1240px] items-center gap-10 px-5 pb-14 pt-12 sm:px-7 sm:pt-16 lg:min-h-[610px] lg:grid-cols-[44%_56%] lg:gap-0 lg:px-8 lg:pb-24 lg:pt-10">
+        <div className="home-rise relative z-20 max-w-[560px]">
+          <p className="text-[13px] font-extrabold uppercase tracking-[0.08em] text-[#006c70] sm:text-sm">{hero.eyebrow}</p>
+          <h1 className="mt-4 text-[42px] font-extrabold leading-[1.03] tracking-[-0.045em] text-[#092d32] sm:text-[58px] lg:text-[62px]">
+            Discover Who<br />You Are<span className="text-[#f4b728]">.</span><br />
+            <span className="text-[#006c70]">Build What<br />Comes Next</span><span className="text-[#f4b728]">.</span>
           </h1>
-          <p className="mt-3 text-[15px] font-semibold leading-snug text-neutral-800">{hero.subheading}</p>
-          <p className="mt-3 max-w-[340px] text-[12.5px] font-medium leading-relaxed text-neutral-900">{hero.description}</p>
+          <p className="mt-5 max-w-[530px] text-base leading-7 text-[#485456] sm:text-[17px]">{hero.description}</p>
 
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link
-              href={hero.ctaPrimary.href}
-              className="inline-flex items-center rounded-md bg-[var(--brand-primary)] px-5 py-3 text-[13px] font-bold text-white shadow-sm hover:opacity-90"
-            >
-              {hero.ctaPrimary.label} &rarr;
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <Link href={hero.ctaPrimary.href} className="group inline-flex min-h-12 items-center justify-center gap-5 rounded-lg bg-[#006c70] px-6 text-[15px] font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#075d61]">
+              {hero.ctaPrimary.label}<span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
             </Link>
-            <Link
-              href={hero.ctaSecondary.href}
-              className="inline-flex items-center gap-2 rounded-md bg-[#ffbd11] px-5 py-3 text-[13px] font-bold text-neutral-950 shadow-sm hover:opacity-90"
-            >
-              <JoinIcon className="h-4 w-4" />
-              {hero.ctaSecondary.label} &rarr;
+            <Link href={hero.ctaSecondary.href} className="inline-flex min-h-12 items-center justify-center gap-4 rounded-lg border border-[#006c70] bg-white px-6 text-[15px] font-bold text-[#073d40] transition hover:bg-[#006c70]/5">
+              {hero.ctaSecondary.label}<BrandIcon name="people" className="h-5 w-5" />
             </Link>
           </div>
 
-          <ul className="mt-6 grid grid-cols-3 gap-4 text-[10px] font-bold leading-tight text-neutral-800">
-            {hero.audiences.map((audience) => {
-              const Icon = HERO_AUDIENCE_ICONS[audience.icon];
-              return (
-                <li key={audience.label} className="flex items-center gap-2">
-                  <span aria-hidden className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#dff2ee] text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary)]/15">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  {audience.label}
-                </li>
-              );
-            })}
-          </ul>
+          <div className="mt-7 grid grid-cols-[120px_1fr] items-center gap-3">
+            <div className="flex w-[120px] -space-x-2" aria-hidden>
+              {['/marketing/community-2.jpg', '/marketing/community-5.jpg', '/marketing/community-6.jpg', '/marketing/hero.jpg'].map((src) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={src} src={src} alt="" className="h-9 w-9 rounded-full border-2 border-white object-cover" />
+              ))}
+            </div>
+            <p className="min-w-0 max-w-[250px] text-[13px] font-semibold leading-5 text-[#3f4c4e]">{hero.quote}</p>
+          </div>
         </div>
 
-        <div className="relative min-h-[235px] overflow-hidden rounded-none md:min-h-0">
-          <div className="absolute inset-0 md:hidden">
-            {hero.photo.src ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={hero.photo.src} alt={hero.photo.alt} className="h-full w-full object-cover object-center" />
-            ) : null}
-            <div
-              className="absolute inset-y-0 left-0 w-24"
-              style={{
-                background:
-                  'linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 35%, rgba(255,255,255,0.2) 70%, rgba(255,255,255,0) 100%)',
-              }}
-            />
-          </div>
-          <div
-            className="absolute bottom-0 right-0 flex h-32 w-full items-end justify-end bg-[var(--brand-primary)] px-6 py-7 text-white md:h-[43%] md:w-[106%] md:px-9"
-            style={{ clipPath: 'polygon(17% 78%, 100% 0, 100% 100%, 0 100%)' }}
+        <div className="hero-media-curve relative min-h-[500px] sm:min-h-[570px] lg:-mt-10 lg:min-h-[650px]">
+          <svg
+            viewBox="0 0 1000 650"
+            preserveAspectRatio="none"
+            className="absolute inset-0 h-full w-full overflow-visible"
+            role="img"
+            aria-label={hero.photo.alt}
           >
-            <p className="relative max-w-[205px] pr-8 text-[11px] font-bold leading-relaxed">
-              <span aria-hidden className="absolute -left-8 -top-1 text-4xl leading-none text-white/35">
-                &ldquo;
-              </span>
-              {quoteLines.map((line) => (
-                <span key={line} className="block">
-                  {line}
+            <defs>
+              <clipPath id="hero-photo-curve">
+                <path d="M180 0H930L1000 70V360C970 395 930 455 840 500C720 560 570 570 420 535C290 505 210 445 0 425C90 380 110 330 90 270L180 0Z" />
+              </clipPath>
+              <linearGradient id="hero-photo-fade" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor="white" stopOpacity="1" />
+                <stop offset="0.35" stopColor="white" stopOpacity="0.72" />
+                <stop offset="1" stopColor="white" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="hero-teal-sweep" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stopColor="#0b7c80" />
+                <stop offset="1" stopColor="#005b60" />
+              </linearGradient>
+            </defs>
+
+            <path
+              d="M1000 360C970 395 930 455 840 500C720 560 570 570 420 535C290 505 210 445 0 425V650H1000V360Z"
+              fill="url(#hero-teal-sweep)"
+            />
+            {hero.photo.src && (
+              <image
+                href={hero.photo.src}
+                width="1000"
+                height="650"
+                preserveAspectRatio="xMidYMid slice"
+                clipPath="url(#hero-photo-curve)"
+              />
+            )}
+            <rect width="390" height="650" fill="url(#hero-photo-fade)" clipPath="url(#hero-photo-curve)" />
+            <path
+              d="M1000 360C970 395 930 455 840 500C720 560 570 570 420 535C290 505 210 445 0 425"
+              fill="none"
+              stroke="#f4b728"
+              strokeWidth="3"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path d="M180 0L135 68" fill="none" stroke="#f4b728" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+            <path d="M930 0L1000 70" fill="none" stroke="#f4b728" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+          </svg>
+
+          <div className="absolute left-0 top-[49%] z-10 hidden w-[235px] -translate-y-1/2 space-y-4 sm:block lg:-left-5">
+            {hero.featureCards.map((card) => (
+              <div key={card.title} className="flex items-start gap-3 rounded-xl border border-white/80 bg-white/95 p-4 shadow-[0_10px_25px_rgba(7,61,64,0.11)] backdrop-bl">
+                <span className="mt-0.5 text-[#006c70]"><BrandIcon name={card.icon} className="h-6 w-6" /></span>
+                <span>
+                  <strong className="block text-[13px] font-extrabold text-[#172326]">{card.title}</strong>
+                  <span className="mt-1 block text-[11px] leading-[1.55] text-[#5b6668]">{card.description}</span>
                 </span>
-              ))}
-              <span aria-hidden className="absolute -right-1 bottom-0 text-4xl leading-none text-white/35">
-                &rdquo;
-              </span>
-            </p>
+              </div>
+            ))}
           </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:hidden">
+          {hero.featureCards.map((card) => (
+            <div key={card.title} className="rounded-xl border border-[#e7ecea] bg-white p-4 shadow-[0_8px_22px_rgba(7,61,64,0.06)]">
+              <BrandIcon name={card.icon} className="h-6 w-6 text-[#006c70]" />
+              <h2 className="mt-3 text-sm font-extrabold text-[#172326]">{card.title}</h2>
+              <p className="mt-1 text-xs leading-5 text-[#5b6668]">{card.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative z-30 mx-auto -mt-4 max-w-[1240px] px-5 pb-12 sm:px-7 lg:-mt-14 lg:px-8">
+        <div className="grid grid-cols-2 rounded-[20px] bg-[#064c50] px-3 py-5 text-white shadow-[0_18px_38px_rgba(7,61,64,0.14)] sm:px-6 lg:grid-cols-4 lg:py-7">
+          {impact.map((item, index) => (
+            <div key={item.label} className={`flex items-center gap-3 px-2 py-4 sm:justify-center lg:px-5 lg:py-0 ${index % 2 ? 'border-l border-white/20' : ''} ${index > 1 ? 'border-t border-white/15 lg:border-t-0' : ''} ${index > 0 ? 'lg:border-l lg:border-white/25' : ''}`}>
+              <span className="text-[#f4b728]"><BrandIcon name={item.icon} className="h-7 w-7 lg:h-9 lg:w-9" /></span>
+              <span>
+                <strong className="block text-xl font-extrabold leading-none sm:text-2xl">{item.value}</strong>
+                <span className="mt-1.5 block text-[11px] leading-4 text-white/90 sm:text-xs">{item.label}</span>
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </section>

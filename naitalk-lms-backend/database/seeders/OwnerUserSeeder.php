@@ -17,10 +17,10 @@ class OwnerUserSeeder extends Seeder
         $ownerRole = Role::where('slug', 'owner')->firstOrFail();
 
         $owner = User::firstOrCreate(
-            ['email' => 'admin@hrgems.test'],
+            ['email' => env('OWNER_SEED_EMAIL', 'admin@hrgems.test')],
             [
-                'name' => 'Titi Adeola',
-                'password' => 'password',
+                'name' => env('OWNER_SEED_NAME', 'Titi Adeola'),
+                'password' => env('OWNER_SEED_PASSWORD', 'password'),
                 'role_id' => $ownerRole->id,
                 'status' => 'active',
                 'joined_at' => now(),

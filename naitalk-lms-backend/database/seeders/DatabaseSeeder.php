@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             OwnerUserSeeder::class,
             HrGemsCourseSeeder::class,
+            MembershipAndCoachingSeeder::class,
         ]);
     }
 }

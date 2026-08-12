@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { HOME_CONTENT } from '@/lib/home-content';
-import { FacebookIcon, LinkedInIcon, InstagramIcon, YoutubeIcon } from '@/components/social-icons';
+import { FacebookIcon, XIcon, LinkedInIcon, InstagramIcon, YoutubeIcon } from '@/components/social-icons';
 
-const SOCIAL_ICONS = { facebook: FacebookIcon, linkedin: LinkedInIcon, instagram: InstagramIcon, youtube: YoutubeIcon } as const;
+const SOCIAL_ICONS = { facebook: FacebookIcon, twitter: XIcon, linkedin: LinkedInIcon, instagram: InstagramIcon, youtube: YoutubeIcon } as const;
 
 const quickLinks = [
   { label: 'About Us', href: '/about' },
@@ -41,7 +41,7 @@ export function SiteFooter({ tenantName }: { tenantName: string }) {
           <div className="mt-5 flex gap-2">
             {footer.social.map((item) => {
               const Icon = SOCIAL_ICONS[item.platform];
-              return <a key={item.platform} href={item.href} aria-label={item.platform} className="grid h-8 w-8 place-items-center rounded-full bg-white/8 text-white/85 transition hover:bg-[#006c70]"><Icon className="h-4 w-4" /></a>;
+              return <a key={item.platform} href={item.href} target="_blank" rel="noopener noreferrer" aria-label={item.platform} className="grid h-8 w-8 place-items-center rounded-full bg-white/8 text-white/85 transition hover:bg-[#006c70]"><Icon className="h-4 w-4" /></a>;
             })}
           </div>
         </div>

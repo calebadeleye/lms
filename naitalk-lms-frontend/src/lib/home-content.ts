@@ -189,14 +189,13 @@ export const HOME_CONTENT = {
       { label: 'Coaching', href: '/coaching' },
       { label: 'About', href: '/about' },
     ],
-    // Placeholder hrefs — real profile URLs weren't supplied yet, and a
-    // guessed URL is worse than an inert link. Fill these in once known.
     social: [
-      { platform: 'facebook', href: '#' },
-      { platform: 'linkedin', href: '#' },
-      { platform: 'instagram', href: '#' },
-      { platform: 'youtube', href: '#' },
-    ] as { platform: 'facebook' | 'linkedin' | 'instagram' | 'youtube'; href: string }[],
+      { platform: 'facebook', href: 'https://www.facebook.com/HR-GEMs-Coaches-Network-102910981613316/' },
+      { platform: 'twitter', href: 'https://twitter.com/hrgemscoaches' },
+      { platform: 'linkedin', href: 'https://www.linkedin.com/company/hr-g-e-ms-coach-network' },
+      { platform: 'instagram', href: 'https://instagram.com/hrgemscoaches' },
+      { platform: 'youtube', href: 'https://www.youtube.com/channel/UCngn418q588vUVd9G4DSbzw' },
+    ] as { platform: 'facebook' | 'twitter' | 'linkedin' | 'instagram' | 'youtube'; href: string }[],
     contactEmail: 'info@hrgemscoachnetwork.com',
     legalLinks: [
       { label: 'Privacy Policy', href: '/coming-soon?feature=Privacy%20Policy' },

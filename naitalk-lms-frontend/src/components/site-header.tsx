@@ -11,6 +11,7 @@ const navItems = [
   { href: '/courses', label: 'Courses', expandable: true },
   { href: '/membership', label: 'Membership' },
   { href: '/coaching', label: 'Coaching' },
+  { href: '/events', label: 'Events' },
 ];
 
 export function SiteHeader({

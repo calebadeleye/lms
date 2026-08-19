@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { HOME_CONTENT } from '@/lib/home-content';
 import { BrandIcon } from '@/components/home/brand-icon';
+import { AnimatedCounter } from '@/components/home/animated-counter';
 
 export function HeroSection() {
   const { hero, impact } = HOME_CONTENT;
@@ -36,10 +37,10 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div className="hero-media-curve relative min-h-[500px] sm:min-h-[570px] lg:-mt-10 lg:min-h-[650px]">
+        <div className="hero-media-curve relative aspect-[1000/650] sm:aspect-auto sm:min-h-[570px] lg:-mt-10 lg:min-h-[650px]">
           <svg
             viewBox="0 0 1000 650"
-            preserveAspectRatio="none"
+            preserveAspectRatio="xMidYMid slice"
             className="absolute inset-0 h-full w-full overflow-visible"
             role="img"
             aria-label={hero.photo.alt}
@@ -114,7 +115,9 @@ export function HeroSection() {
             <div key={item.label} className={`flex items-center gap-3 px-2 py-4 sm:justify-center lg:px-5 lg:py-0 ${index % 2 ? 'border-l border-white/20' : ''} ${index > 1 ? 'border-t border-white/15 lg:border-t-0' : ''} ${index > 0 ? 'lg:border-l lg:border-white/25' : ''}`}>
               <span className="text-[#f4b728]"><BrandIcon name={item.icon} className="h-7 w-7 lg:h-9 lg:w-9" /></span>
               <span>
-                <strong className="block text-xl font-extrabold leading-none sm:text-2xl">{item.value}</strong>
+                <strong className="block text-xl font-extrabold leading-none sm:text-2xl">
+                  <AnimatedCounter value={item.value} />
+                </strong>
                 <span className="mt-1.5 block text-[11px] leading-4 text-white/90 sm:text-xs">{item.label}</span>
               </span>
             </div>

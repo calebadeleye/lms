@@ -21,22 +21,23 @@ export default async function CoachingCataloguePage() {
   const config = BRANDING;
 
   const user = await getOptionalUser();
-  const coaches = await apiFetch<{ data: CoachSummary[] }>('/api/v1/coaches');
-
-  const coachesGrid = (
-    <div className="grid gap-6 sm:grid-cols-2">
-      {coaches.data.map((coach) => (
-        <CoachCard key={coach.id} coach={coach} />
-      ))}
-      {coaches.data.length === 0 && <p className="col-span-full text-sm text-neutral-500">No coaches are available yet.</p>}
-    </div>
-  );
 
   // Reachable both from the public marketing nav and from "Browse coaches"
   // on the student's own bookings page — an already-logged-in visitor
   // should stay inside the dashboard shell rather than being dropped onto
   // the public/marketing layout.
   if (user) {
+    const coaches = await apiFetch<{ data: CoachSummary[] }>('/api/v1/coaches');
+
+    const coachesGrid = (
+      <div className="grid gap-6 sm:grid-cols-2">
+        {coaches.data.map((coach) => (
+          <CoachCard key={coach.id} coach={coach} />
+        ))}
+        {coaches.data.length === 0 && <p className="col-span-full text-sm text-neutral-500">No coaches are available yet.</p>}
+      </div>
+    );
+
     return (
       <DashboardShell tenantName={config.tenant.name} navItems={studentNav} userName={user.user.name} activeHref="/my/bookings">
         <h1 className="text-xl font-bold text-neutral-900">Coaching</h1>
@@ -46,19 +47,28 @@ export default async function CoachingCataloguePage() {
     );
   }
 
+  const contactEmail = 'hrgemcoaches@gmail.com';
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding?.logo_url ?? null} isAuthenticated={false} />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12 sm:px-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-neutral-900 sm:text-3xl">Coaching</h1>
-          <p className="mx-auto mt-2 max-w-xl text-sm text-neutral-600">
-            Book one-on-one or group sessions with our coaches.
+      <main className="flex flex-1 items-center justify-center px-4 py-20 sm:px-6">
+        <div className="mx-auto w-full max-w-lg rounded-2xl border border-neutral-200 bg-white p-10 text-center shadow-sm">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[var(--brand-primary)] text-2xl text-[var(--brand-accent)]">
+            ✉
+          </span>
+          <h1 className="mt-5 text-2xl font-bold text-neutral-900 sm:text-3xl">Coaching</h1>
+          <p className="mx-auto mt-3 max-w-sm text-sm text-neutral-600">
+            To book a coaching session, send a mail to
           </p>
+          <a
+            href={`mailto:${contactEmail}`}
+            className="mt-3 inline-block break-all rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90"
+          >
+            {contactEmail}
+          </a>
         </div>
-
-        <div className="mx-auto mt-10 max-w-4xl">{coachesGrid}</div>
       </main>
 
       <SiteFooter tenantName={config.tenant.name} />

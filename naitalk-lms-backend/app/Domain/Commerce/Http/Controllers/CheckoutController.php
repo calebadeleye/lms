@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\Http\Controllers;
 
 use App\Domain\Coaching\Models\Booking;
+use App\Domain\Commerce\Models\MembershipFeePayment;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Services\CheckoutService;
 use App\Domain\Commerce\Services\OrderFulfillmentService;
@@ -95,6 +96,52 @@ class CheckoutController extends Controller
         $data = $request->validate(['callback_url' => ['required', 'url']]);
 
         return $this->checkout->checkoutRegistrationFee($application->user, $application, $data['callback_url']);
+    }
+
+    /**
+     * Public (no session): the membership page's pay modal collects only a
+     * name + email, then fires this straight into the org's own activated
+     * Paystack/Flutterwave config — see CheckoutService::checkoutMembershipFee().
+     */
+    public function startMembershipFee(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'callback_url' => ['required', 'url'],
+        ]);
+
+        $result = $this->checkout->checkoutMembershipFee($data['name'], $data['email'], $data['callback_url']);
+
+        return response()->json(['data' => $result]);
+    }
+
+    /**
+     * Public (no session) status check for the membership fee, keyed by the
+     * reference embedded in the redirect back from the provider — safe
+     * without auth because it only ever exposes the state of one payment
+     * record, not anything account-scoped.
+     */
+    public function membershipFeeStatus(Request $request)
+    {
+        $data = $request->validate(['reference' => ['required', 'string']]);
+
+        if (! preg_match('/^membershipfee_(\d+)_/', $data['reference'], $matches)) {
+            throw ValidationException::withMessages(['reference' => ['Invalid reference.']]);
+        }
+
+        $payment = MembershipFeePayment::findOrFail($matches[1]);
+
+        if ($payment->status === 'pending') {
+            $payment = $this->checkout->reconcileMembershipFee($payment);
+        }
+
+        return response()->json(['data' => [
+            'status' => $payment->status,
+            'amount_cents' => $payment->amount_cents,
+            'currency' => $payment->currency,
+            'email' => $payment->email,
+        ]]);
     }
 
     public function course(Request $request, string $courseId)

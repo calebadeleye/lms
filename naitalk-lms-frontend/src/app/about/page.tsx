@@ -44,6 +44,22 @@ export default async function AboutPage() {
             </Link>
           </div>
         </section>
+
+        <section className="mx-auto max-w-4xl px-4 pb-16 sm:px-6">
+          <div className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--brand-accent)]">Watch</p>
+            <h2 className="mt-2 text-2xl font-bold text-[var(--brand-primary)]">Get to Know HR GEMs</h2>
+          </div>
+          <div className="mt-6 aspect-video w-full overflow-hidden rounded-2xl border border-neutral-200 shadow-sm">
+            <iframe
+              src="https://drive.google.com/file/d/1mG0MYLO90255b3USk5aCNgybfmD3sYKn/preview"
+              title="Get to Know HR GEMs"
+              className="h-full w-full"
+              allow="autoplay"
+              allowFullScreen
+            />
+          </div>
+        </section>
       </main>
 
       <SiteFooter tenantName={config.tenant.name} />

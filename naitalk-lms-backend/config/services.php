@@ -58,6 +58,14 @@ return [
         'registration_split_code' => env('PAYSTACK_REGISTRATION_SPLIT_CODE'),
     ],
 
+    // The public membership page's pre-account "pay, then register" fee —
+    // unlike the registration fee above, this always goes through the
+    // organization's own activated PaymentConfig (whatever gateway/mode the
+    // admin has set up at /admin/payments), not a platform-managed account.
+    'membership' => [
+        'fee_cents' => (int) env('MEMBERSHIP_FEE_CENTS', 2_500_000),
+    ],
+
     'flutterwave' => [
         'public_key' => env('FLUTTERWAVE_PUBLIC_KEY'),
         'secret_key' => env('FLUTTERWAVE_SECRET_KEY'),

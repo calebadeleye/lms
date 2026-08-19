@@ -10,7 +10,7 @@ const descriptions = [
   'Transform from within and thrive daily.',
 ];
 
-const shortTitles = ['Group Coaching', 'Peer Learning', 'Mentorship', 'Networking', 'Workshops', 'Personal Growth'];
+const shortTitles = ['Group Coaching', 'Peer Learning', 'Mentorship', 'Workers Day Event', 'Workshops', 'Personal Growth'];
 const icons: BrandIconName[] = ['compass', 'people', 'community', 'people', 'star', 'target'];
 
 export function CommunityGallerySection() {

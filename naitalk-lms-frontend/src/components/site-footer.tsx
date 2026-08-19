@@ -14,7 +14,7 @@ const quickLinks = [
 
 const resources = [
   { label: 'Blog', href: '/coming-soon?feature=Blog' },
-  { label: 'Events', href: '/coming-soon?feature=Events' },
+  { label: 'Events', href: '/events' },
   { label: 'Downloads', href: '/coming-soon?feature=Downloads' },
   { label: 'FAQs', href: '/coming-soon?feature=FAQs' },
   { label: 'Contact Us', href: '/coming-soon?feature=Contact' },
@@ -52,7 +52,7 @@ export function SiteFooter({ tenantName }: { tenantName: string }) {
           <h2 className="text-sm font-bold">Contact Us</h2>
           <ul className="mt-3 space-y-3 text-xs leading-5 text-white/72">
             <li><a href={`mailto:${footer.contactEmail}`} className="flex gap-2 hover:text-white"><span className="text-[#f4b728]">✉</span>{footer.contactEmail}</a></li>
-            <li className="flex gap-2"><span className="text-[#f4b728]">●</span>+234 802 345 1054</li>
+            <li className="flex gap-2"><span className="text-[#f4b728]">●</span>0912 258 4917</li>
             <li className="flex gap-2"><span className="text-[#f4b728]">◆</span>Lagos, Nigeria</li>
           </ul>
         </div>

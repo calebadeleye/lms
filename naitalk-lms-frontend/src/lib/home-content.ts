@@ -40,10 +40,10 @@ export const HOME_CONTENT = {
   },
 
   impact: [
-    { icon: 'people', value: '5+', label: 'Years of Impact' },
-    { icon: 'community', value: '2,000+', label: 'Members Supported' },
+    { icon: 'people', value: '7+', label: 'Years of Impact' },
+    { icon: 'community', value: '200+', label: 'Members Supported' },
     { icon: 'calendar', value: '1,200+', label: 'Coaching Sessions' },
-    { icon: 'award', value: '80+', label: 'Courses Delivered' },
+    { icon: 'award', value: '1000+', label: 'Social Impact' },
   ],
 
   programmes: {
@@ -153,7 +153,7 @@ export const HOME_CONTENT = {
       { caption: 'Group Coaching Sessions', photo: { src: '/marketing/hero-career-fit.png', alt: 'Professionals taking part in group coaching' } as PhotoSlot },
       { caption: 'Peer Learning', photo: { src: '/marketing/hero.jpg', alt: 'Two peers learning together' } as PhotoSlot },
       { caption: 'Mentorship', photo: { src: '/marketing/community-3.jpg', alt: 'Mentorship conversation' } as PhotoSlot },
-      { caption: 'Professional Networking', photo: { src: '/marketing/community-4.jpg', alt: 'Professional networking event' } as PhotoSlot },
+      { caption: 'Workers Day Event', photo: { src: '/marketing/community-4.jpg', alt: 'Workers Day event celebration' } as PhotoSlot },
       { caption: 'Transformational Workshops', photo: { src: '/marketing/community-1.jpg', alt: 'Collaborative learning workshop' } as PhotoSlot },
       { caption: 'Personal & Career Development', photo: { src: '/marketing/community-2.jpg', alt: 'A professional focused on personal growth' } as PhotoSlot },
     ],
@@ -196,7 +196,7 @@ export const HOME_CONTENT = {
       { platform: 'instagram', href: 'https://instagram.com/hrgemscoaches' },
       { platform: 'youtube', href: 'https://www.youtube.com/channel/UCngn418q588vUVd9G4DSbzw' },
     ] as { platform: 'facebook' | 'twitter' | 'linkedin' | 'instagram' | 'youtube'; href: string }[],
-    contactEmail: 'info@hrgemscoachnetwork.com',
+    contactEmail: 'hrgemcoaches@gmail.com',
     legalLinks: [
       { label: 'Privacy Policy', href: '/coming-soon?feature=Privacy%20Policy' },
       { label: 'Terms of Service', href: '/coming-soon?feature=Terms%20of%20Service' },

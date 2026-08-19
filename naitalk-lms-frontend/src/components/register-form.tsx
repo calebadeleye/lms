@@ -87,15 +87,16 @@ export function RegisterForm() {
       if (photo) formData.append('photo', photo);
 
       const res = await fetch('/api/auth/register', { method: 'POST', body: formData });
-      const body = await res.json();
+      const body = await res.json().catch(() => null);
 
-      if (!res.ok) {
-        setErrors(body.errors ?? { email: ['Something went wrong. Please try again.'] });
+      if (!res.ok || !body) {
+        const bodyErrors = body?.errors ?? null;
+        setErrors(bodyErrors ?? { email: ['Something went wrong. Please try again.'] });
         // Validation failures for acknowledgement/account fields mean those
         // earlier steps need another look, not the welcome step we're on.
-        if (body.errors && REQUIREMENTS.some((r) => body.errors[r.key])) {
+        if (bodyErrors && REQUIREMENTS.some((r) => bodyErrors[r.key])) {
           setStep('requirements');
-        } else if (body.errors && ('name' in body.errors || 'email' in body.errors || 'password' in body.errors)) {
+        } else if (bodyErrors && ('name' in bodyErrors || 'email' in bodyErrors || 'password' in bodyErrors)) {
           setStep('account');
         }
         return;
@@ -204,7 +205,21 @@ export function RegisterForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
               />
-              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email[0]}</p>}
+              {errors.email && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.email[0]}
+                  {errors.email[0]?.toLowerCase().includes('already exists') && (
+                    <>
+                      {' '}
+                      Already started signing up?{' '}
+                      <a href="/login" className="font-medium underline">
+                        Log in instead
+                      </a>
+                      .
+                    </>
+                  )}
+                </p>
+              )}
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-neutral-700">

@@ -90,6 +90,11 @@ Route::middleware('auth:sanctum')->get('/members/{userId}/photo', [MemberPhotoCo
 Route::post('/checkout/registration-fee/start', [CheckoutController::class, 'startRegistrationFee']);
 Route::get('/checkout/registration-fee/status', [CheckoutController::class, 'registrationFeeStatus']);
 
+// Public — the /membership page's pay modal, reachable with no account at
+// all. See CheckoutController::startMembershipFee()'s docblock.
+Route::post('/checkout/membership-fee/start', [CheckoutController::class, 'startMembershipFee']);
+Route::get('/checkout/membership-fee/status', [CheckoutController::class, 'membershipFeeStatus']);
+
 // Reachable by a still-pending (not yet `approved`) applicant: paying the
 // registration fee, and checking on that payment, are exactly what a
 // pending applicant needs to do before they can ever become approved. Order

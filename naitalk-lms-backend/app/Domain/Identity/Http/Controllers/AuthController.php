@@ -36,7 +36,14 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request)
     {
-        if (User::where('email', $request->string('email'))->exists()) {
+        // withTrashed(): the `users.email` column has a plain (not
+        // soft-delete-aware) unique index, so a soft-deleted account still
+        // occupies its email at the DB level. Without withTrashed() here,
+        // this check would report the email as free (SoftDeletes' default
+        // scope hides trashed rows), pass validation, and then blow up with
+        // an unhandled duplicate-key QueryException on User::create() below
+        // — surfacing as a raw 500 instead of this clean message.
+        if (User::withTrashed()->where('email', $request->string('email'))->exists()) {
             throw ValidationException::withMessages([
                 'email' => ['An account with this email already exists.'],
             ]);

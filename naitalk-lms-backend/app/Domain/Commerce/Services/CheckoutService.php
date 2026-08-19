@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\Services;
 
+use App\Domain\Commerce\Models\MembershipFeePayment;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\PaymentConfig;
 use App\Domain\Identity\Models\MembershipApplication;
@@ -137,5 +138,87 @@ class CheckoutService
         $order->update(['provider_reference' => $result['provider_reference']]);
 
         return ['authorization_url' => $result['authorization_url'], 'order' => $order->fresh('items')];
+    }
+
+    /**
+     * The public membership page's "pay first, then register" flow — no
+     * user account exists yet, just a name + email typed into the pay
+     * modal. Uses the organization's own activated PaymentConfig (whatever
+     * the admin has set up at /admin/payments), unlike
+     * checkoutRegistrationFee()'s platform-managed account. Matching this
+     * payment to the account the payer later creates via /register (with
+     * the same email) is a manual step, not reconciled automatically here.
+     */
+    public function checkoutMembershipFee(string $name, string $email, string $callbackUrl): array
+    {
+        $config = PaymentConfig::where('status', 'active')->first();
+
+        if (! $config) {
+            throw ValidationException::withMessages([
+                'payment' => ['Membership payments are not configured yet. Please try again later.'],
+            ]);
+        }
+
+        $priceCents = (int) config('services.membership.fee_cents');
+        $currency = 'NGN';
+
+        $payment = MembershipFeePayment::create([
+            'name' => $name,
+            'email' => $email,
+            'amount_cents' => $priceCents,
+            'currency' => $currency,
+            'provider' => $config->provider,
+            'status' => 'pending',
+        ]);
+
+        $reference = "membershipfee_{$payment->id}_{$payment->idempotency_key}";
+
+        $provider = $this->providers->forConfig($config);
+
+        $result = $provider->initializePayment([
+            'email' => $email,
+            'amount_cents' => $priceCents,
+            'currency' => $currency,
+            'reference' => $reference,
+            'callback_url' => $callbackUrl,
+            'subaccount_code' => $config->subaccount_code,
+        ]);
+
+        $payment->update(['provider_reference' => $result['provider_reference']]);
+
+        return ['authorization_url' => $result['authorization_url'], 'reference' => $reference];
+    }
+
+    /**
+     * Called from the public status-polling endpoint once the payer's
+     * browser returns from the provider — mirrors
+     * OrderFulfillmentService::reconcileRegistrationFee()'s "verify
+     * directly, no webhook needed" approach, since this payment isn't tied
+     * to any organization webhook subscription either.
+     */
+    public function reconcileMembershipFee(MembershipFeePayment $payment): MembershipFeePayment
+    {
+        if ($payment->isPaid() || ! $payment->provider_reference) {
+            return $payment;
+        }
+
+        $config = PaymentConfig::where('status', 'active')->first();
+
+        if (! $config) {
+            return $payment;
+        }
+
+        $verified = $this->providers->forConfig($config)->verifyPayment($payment->provider_reference);
+
+        if ($verified['status'] !== 'success') {
+            return $payment;
+        }
+
+        $raw = $verified['raw'];
+        unset($raw['authorization'], $raw['card'], $raw['customer']['phone']);
+
+        $payment->update(['status' => 'paid', 'paid_at' => now(), 'raw_response' => $raw]);
+
+        return $payment;
     }
 }

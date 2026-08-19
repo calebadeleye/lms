@@ -74,14 +74,28 @@ class CheckoutService
 
         $provider = $this->providers->forConfig($config);
 
-        $result = $provider->initializePayment([
-            'email' => $user->email,
-            'amount_cents' => $totalCents,
-            'currency' => $order->currency,
-            'reference' => $reference,
-            'callback_url' => $callbackUrl,
-            'subaccount_code' => $config->subaccount_code,
-        ]);
+        // See checkoutMembershipFee()'s identical catch for why this is
+        // here: without it, a gateway-side rejection (deactivated
+        // integration, bad keys, network hiccup) surfaces to the buyer as
+        // a raw 500 instead of any message, and leaves the order stuck
+        // "pending" with no provider_reference to ever reconcile.
+        try {
+            $result = $provider->initializePayment([
+                'email' => $user->email,
+                'amount_cents' => $totalCents,
+                'currency' => $order->currency,
+                'reference' => $reference,
+                'callback_url' => $callbackUrl,
+                'subaccount_code' => $config->subaccount_code,
+            ]);
+        } catch (\Throwable $e) {
+            $order->update(['status' => 'failed']);
+            report($e);
+
+            throw ValidationException::withMessages([
+                'payment' => ['We couldn\'t start your payment right now. Please try again shortly, or contact us if this continues.'],
+            ]);
+        }
 
         $order->update(['provider_reference' => $result['provider_reference']]);
 
@@ -175,14 +189,29 @@ class CheckoutService
 
         $provider = $this->providers->forConfig($config);
 
-        $result = $provider->initializePayment([
-            'email' => $email,
-            'amount_cents' => $priceCents,
-            'currency' => $currency,
-            'reference' => $reference,
-            'callback_url' => $callbackUrl,
-            'subaccount_code' => $config->subaccount_code,
-        ]);
+        // The gateway itself can reject this (expired/deactivated
+        // integration, bad live keys, network hiccup) — without this catch,
+        // Http::throw() inside initializePayment() propagates as an
+        // uncaught RequestException and the payer sees a raw 500 instead of
+        // any message. Mark the payment failed rather than leaving it
+        // stuck "pending" forever with no provider_reference to reconcile.
+        try {
+            $result = $provider->initializePayment([
+                'email' => $email,
+                'amount_cents' => $priceCents,
+                'currency' => $currency,
+                'reference' => $reference,
+                'callback_url' => $callbackUrl,
+                'subaccount_code' => $config->subaccount_code,
+            ]);
+        } catch (\Throwable $e) {
+            $payment->update(['status' => 'failed']);
+            report($e);
+
+            throw ValidationException::withMessages([
+                'payment' => ['We couldn\'t start your payment right now. Please try again shortly, or contact us if this continues.'],
+            ]);
+        }
 
         $payment->update(['provider_reference' => $result['provider_reference']]);
 

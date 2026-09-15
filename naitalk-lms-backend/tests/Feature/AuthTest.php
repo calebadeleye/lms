@@ -53,6 +53,46 @@ it('accepts registration with just a single acknowledgement checked', function (
     expect($application->ack_growth_mindset)->toBeFalse();
 });
 
+it('tells a re-registering applicant to log in and retry payment when their fee was never paid', function () {
+    $user = User::factory()->create(['email' => 'jane@example.com', 'status' => 'pending']);
+    MembershipApplication::create([
+        'user_id' => $user->id,
+        'ack_impact_beyond_earning' => true,
+        'status' => 'pending',
+        'payment_status' => 'pending',
+    ]);
+
+    $response = $this->postJson('/api/v1/auth/register', [
+        'name' => 'Jane Learner',
+        'email' => 'jane@example.com',
+        'password' => 'Passw0rd123',
+        'password_confirmation' => 'Passw0rd123',
+        'ack_impact_beyond_earning' => '1',
+    ])->assertStatus(422);
+
+    expect($response->json('errors.email.0'))->toContain('already exists')->toContain('Log in to retry payment');
+});
+
+it('gives the generic already-exists message when the existing account already paid', function () {
+    $user = User::factory()->create(['email' => 'jane@example.com', 'status' => 'active']);
+    MembershipApplication::create([
+        'user_id' => $user->id,
+        'ack_impact_beyond_earning' => true,
+        'status' => 'approved',
+        'payment_status' => 'paid',
+    ]);
+
+    $response = $this->postJson('/api/v1/auth/register', [
+        'name' => 'Jane Learner',
+        'email' => 'jane@example.com',
+        'password' => 'Passw0rd123',
+        'password_confirmation' => 'Passw0rd123',
+        'ack_impact_beyond_earning' => '1',
+    ])->assertStatus(422);
+
+    expect($response->json('errors.email.0'))->toBe('An account with this email already exists.');
+});
+
 it('rejects registration with no acknowledgement checked at all', function () {
     $this->postJson('/api/v1/auth/register', [
         'name' => 'Jane Learner',

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 type Errors = Record<string, string[]>;
 
@@ -27,7 +26,6 @@ const REQUIREMENTS = [
 type Step = 'requirements' | 'account' | 'welcome';
 
 export function RegisterForm() {
-  const router = useRouter();
   const [step, setStep] = useState<Step>('requirements');
 
   const [acks, setAcks] = useState<Record<string, boolean>>({});
@@ -119,10 +117,15 @@ export function RegisterForm() {
         return;
       }
 
-      // Account was created either way — they can log in and retry payment
-      // from the pending page rather than being stranded on this form.
-      router.push('/login');
-      router.refresh();
+      // The account was created either way, so don't strand them silently —
+      // tell them what happened and let them retry payment after logging in
+      // (see /onboarding/pending's "Pay registration fee" retry button).
+      setStep('welcome');
+      setErrors({
+        payment: feeBody?.errors?.payment ?? [
+          'Your account was created, but we couldn\'t start your payment. Please log in and retry from your account page.',
+        ],
+      });
     } finally {
       setPending(false);
     }
@@ -311,6 +314,15 @@ export function RegisterForm() {
           </div>
 
           {errors.email && <p className="text-sm text-red-600">{errors.email[0]}</p>}
+          {errors.payment && (
+            <p className="text-sm text-red-600">
+              {errors.payment[0]}{' '}
+              <a href="/login" className="font-medium underline">
+                Log in
+              </a>
+              .
+            </p>
+          )}
 
           <p className="rounded-md bg-[var(--brand-primary)]/5 p-3 text-xs text-neutral-600">
             A one-time registration fee of <span className="font-semibold">₦20,000</span>{' '}

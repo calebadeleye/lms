@@ -140,14 +140,28 @@ class CheckoutService
 
         $reference = "order_{$order->id}_{$order->idempotency_key}";
 
-        $result = $this->providers->forManagedPaystack()->initializePayment([
-            'email' => $user->email,
-            'amount_cents' => $priceCents,
-            'currency' => $currency,
-            'reference' => $reference,
-            'callback_url' => $callbackUrl,
-            'split_code' => config('services.paystack.registration_split_code'),
-        ]);
+        // See checkout()/checkoutMembershipFee()'s identical catch for why
+        // this is here: without it, a gateway-side rejection (deactivated
+        // integration, bad keys, network hiccup) surfaces to the applicant
+        // as a raw 500 instead of any message, and leaves the order stuck
+        // "pending" with no provider_reference to ever reconcile.
+        try {
+            $result = $this->providers->forManagedPaystack()->initializePayment([
+                'email' => $user->email,
+                'amount_cents' => $priceCents,
+                'currency' => $currency,
+                'reference' => $reference,
+                'callback_url' => $callbackUrl,
+                'split_code' => config('services.paystack.registration_split_code'),
+            ]);
+        } catch (\Throwable $e) {
+            $order->update(['status' => 'failed']);
+            report($e);
+
+            throw ValidationException::withMessages([
+                'payment' => ['We couldn\'t start your payment right now. Please try again shortly, or contact us if this continues.'],
+            ]);
+        }
 
         $order->update(['provider_reference' => $result['provider_reference']]);
 

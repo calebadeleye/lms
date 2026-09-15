@@ -43,9 +43,25 @@ class AuthController extends Controller
         // scope hides trashed rows), pass validation, and then blow up with
         // an unhandled duplicate-key QueryException on User::create() below
         // — surfacing as a raw 500 instead of this clean message.
-        if (User::withTrashed()->where('email', $request->string('email'))->exists()) {
+        $existing = User::withTrashed()->where('email', $request->string('email'))->first();
+
+        if ($existing) {
+            // A common dead end: the applicant registered fine but the
+            // registration-fee payment never went through (gateway hiccup,
+            // or they just abandoned the Paystack redirect), so they're
+            // stuck re-submitting this form with an account that already
+            // exists. They can't retry payment here without proving they
+            // own it — but at least tell them what actually happened
+            // instead of a bare "already exists", so they know to log in
+            // rather than keep trying new emails.
+            $unpaid = MembershipApplication::where('user_id', $existing->id)
+                ->where('payment_status', '!=', 'paid')
+                ->exists();
+
             throw ValidationException::withMessages([
-                'email' => ['An account with this email already exists.'],
+                'email' => [$unpaid
+                    ? 'An account with this email already exists, but the registration fee was never completed. Log in to retry payment.'
+                    : 'An account with this email already exists.'],
             ]);
         }
 

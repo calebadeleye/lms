@@ -51,10 +51,11 @@ Route::get('/course-assets/{courseId}/{filename}', [CourseAssetController::class
     ->where('filename', 'thumbnail\.[a-zA-Z0-9]+');
 
 // Named `verification.verify` to match what Laravel's VerifyEmail
-// notification generates via route(). Signed, so the middleware validates
-// the URL hasn't been tampered with.
+// notification generates via route(). Signed (path + query only — see
+// AppServiceProvider::boot(), the host is never part of the signature), so
+// the middleware validates the URL hasn't been tampered with.
 Route::get('/auth/verify-email/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-    ->middleware('signed')
+    ->middleware('signed:relative')
     ->name('verification.verify');
 
 // Public — invitee has no account yet (or isn't logged in).

@@ -12,10 +12,15 @@ use App\Domain\Membership\Models\LearnerMembershipPlan;
 use App\Domain\Membership\Models\LearnerSubscription;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -45,6 +50,42 @@ class AppServiceProvider extends ServiceProvider
             $frontendUrl = rtrim((string) config('services.frontend.url'), '/');
 
             return "{$frontendUrl}/reset-password?token={$token}&email=".urlencode($notifiable->getEmailForPasswordReset());
+        });
+
+        // Laravel's default VerifyEmail link is an absolute signed URL built
+        // from the host of the *current request* — and here that request
+        // arrives via the Next.js server-side proxy, so the host is the
+        // internal 127.0.0.1:<port> address and the email ends up linking to
+        // localhost. Sign only the path (verified with `signed:relative` on
+        // the route, so the host never matters) and hand the link to the
+        // frontend's own /api/auth/verify-email route, which relays it to the
+        // backend and lands the user on a proper page.
+        VerifyEmail::createUrlUsing(function (User $notifiable) {
+            $id = $notifiable->getKey();
+            $hash = sha1($notifiable->getEmailForVerification());
+
+            $relative = URL::temporarySignedRoute(
+                'verification.verify',
+                Carbon::now()->addMinutes((int) Config::get('auth.verification.expire', 60)),
+                ['id' => $id, 'hash' => $hash],
+                absolute: false,
+            );
+
+            $frontendUrl = rtrim((string) config('services.frontend.url'), '/');
+
+            return "{$frontendUrl}/api/auth/verify-email/{$id}/{$hash}?".parse_url($relative, PHP_URL_QUERY);
+        });
+
+        VerifyEmail::toMailUsing(function (User $notifiable, string $url) {
+            $minutes = (int) Config::get('auth.verification.expire', 60);
+
+            return (new MailMessage)
+                ->subject('Verify your email address')
+                ->greeting("Hello {$notifiable->name},")
+                ->line('Welcome to '.config('app.name').'! Please confirm your email address to finish setting up your account.')
+                ->action('Verify email address', $url)
+                ->line("This link will expire in {$minutes} minutes.")
+                ->line('If you did not create an account, no further action is required.');
         });
 
         // Short, stable aliases for every polymorphic *_type column

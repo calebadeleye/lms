@@ -350,3 +350,60 @@ it('still creates the account when the verification email cannot be sent', funct
 
     expect(User::whereIn('email', ['sam@example.com', 'jane@example.com'])->count())->toBe(2);
 });
+
+it('puts a working frontend link in the verification email even when the API is reached via an internal host', function () {
+    config(['services.frontend.url' => 'https://frontend.test']);
+    \Illuminate\Support\Facades\Notification::fake();
+
+    // The Next.js proxy reaches the API on an internal address — the link
+    // in the email must not inherit it.
+    $this->postJson('http://127.0.0.1:8124/api/v1/auth/signup', [
+        'name' => 'Sam Buyer',
+        'email' => 'sam@example.com',
+        'password' => 'simple',
+        'password_confirmation' => 'simple',
+    ])->assertCreated();
+
+    $user = User::where('email', 'sam@example.com')->firstOrFail();
+    $url = null;
+
+    \Illuminate\Support\Facades\Notification::assertSentTo(
+        $user,
+        \Illuminate\Auth\Notifications\VerifyEmail::class,
+        function ($notification) use ($user, &$url) {
+            $url = $notification->toMail($user)->actionUrl;
+
+            return true;
+        }
+    );
+
+    expect($url)->toStartWith('https://frontend.test/api/auth/verify-email/');
+    expect($url)->not->toContain('127.0.0.1')->not->toContain('localhost');
+
+    // What the frontend route relays to the backend: same path + query.
+    $backendPath = '/api/v1/auth/'.str($url)->after('/api/auth/');
+
+    // A tampered signature is refused...
+    $this->get(preg_replace('/signature=[^&]+/', 'signature=forged', $backendPath))->assertForbidden();
+    expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
+
+    // ...and the genuine link verifies the account, whatever host serves it.
+    $this->get("http://127.0.0.1:8124{$backendPath}")
+        ->assertRedirect('https://frontend.test/verify-email?status=verified');
+    expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
+});
+
+it('renders emails with the HR GEMs brand colours and logo instead of the Laravel defaults', function () {
+    config(['services.frontend.url' => 'https://frontend.test', 'app.name' => 'HR GEMs Coach Network']);
+    $user = User::factory()->create(['name' => 'Sam Buyer']);
+
+    $html = (string) (new \Illuminate\Auth\Notifications\VerifyEmail)->toMail($user)->render();
+
+    expect($html)
+        ->toContain('https://frontend.test/branding/logo.png')
+        ->toContain('#f4b728')   // gold action button
+        ->toContain('#006c70')   // teal accents
+        ->toContain('HR GEMs Coach Network')
+        ->not->toContain('NAI TALK')
+        ->not->toContain('laravel.com');
+});

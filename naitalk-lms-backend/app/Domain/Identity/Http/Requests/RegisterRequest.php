@@ -22,7 +22,7 @@ class RegisterRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
-            'password' => ['required', 'confirmed', Password::min(10)->mixedCase()->numbers()],
+            'password' => ['required', 'confirmed', Password::min(6)],
             // The 4 membership requirements, mirroring the client's manual
             // Google Form — but only one needs to be true, not all four (see
             // withValidator() below for the actual "at least one" check).

@@ -232,7 +232,7 @@ export function RegisterForm() {
                 id="password"
                 type="password"
                 required
-                minLength={10}
+                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"

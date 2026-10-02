@@ -85,6 +85,26 @@ it('accepts a simple 6-character learner password with no complexity rules', fun
     ])->assertCreated();
 });
 
+it('accepts a simple 6-character password on Coach Network registration', function () {
+    $this->postJson('/api/v1/auth/register', [
+        'name' => 'Jane Learner',
+        'email' => 'jane@example.com',
+        'password' => 'simple',
+        'password_confirmation' => 'simple',
+        'ack_impact_beyond_earning' => '1',
+    ])->assertCreated();
+});
+
+it('rejects a Coach Network registration password under 6 characters', function () {
+    $this->postJson('/api/v1/auth/register', [
+        'name' => 'Jane Learner',
+        'email' => 'jane@example.com',
+        'password' => 'short',
+        'password_confirmation' => 'short',
+        'ack_impact_beyond_earning' => '1',
+    ])->assertUnprocessable()->assertJsonValidationErrors('password');
+});
+
 it('accepts registration with just a single acknowledgement checked', function () {
     $this->postJson('/api/v1/auth/register', [
         'name' => 'Jane Learner',

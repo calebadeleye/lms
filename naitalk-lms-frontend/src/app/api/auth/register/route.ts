@@ -12,7 +12,7 @@ const registerSchema = z
   .object({
     name: z.string().min(1).max(255),
     email: z.string().email(),
-    password: z.string().min(10),
+    password: z.string().min(6),
     password_confirmation: z.string(),
     // handleSubmit() always sends all four as '1' or '0' (never omits a
     // key) — only one needs to actually be '1', enforced below, since Zod

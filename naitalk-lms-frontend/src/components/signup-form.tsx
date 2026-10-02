@@ -102,12 +102,12 @@ export function SignupForm({ redirectTo }: { redirectTo: string }) {
           id="password"
           type="password"
           required
-          minLength={10}
+          minLength={6}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className={inputClass}
         />
-        <p className="mt-1 text-xs text-neutral-400">At least 10 characters, with upper and lower case letters and a number.</p>
+        <p className="mt-1 text-xs text-neutral-400">At least 6 characters.</p>
         {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password[0]}</p>}
       </div>
       <div>

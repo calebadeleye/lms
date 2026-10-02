@@ -21,7 +21,7 @@ class SignupRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
-            'password' => ['required', 'confirmed', Password::min(10)->mixedCase()->numbers()],
+            'password' => ['required', 'confirmed', Password::min(6)],
             'device_label' => ['nullable', 'string', 'max:255'],
         ];
     }

@@ -67,13 +67,22 @@ it('rejects learner sign-up for an email that already has an account', function 
     ])->assertUnprocessable()->assertJsonValidationErrors('email');
 });
 
-it('rejects learner sign-up with a weak password', function () {
+it('rejects learner sign-up with a password under 6 characters', function () {
     $this->postJson('/api/v1/auth/signup', [
         'name' => 'Sam Buyer',
         'email' => 'sam@example.com',
         'password' => 'short',
         'password_confirmation' => 'short',
     ])->assertUnprocessable()->assertJsonValidationErrors('password');
+});
+
+it('accepts a simple 6-character learner password with no complexity rules', function () {
+    $this->postJson('/api/v1/auth/signup', [
+        'name' => 'Sam Buyer',
+        'email' => 'sam@example.com',
+        'password' => 'simple',
+        'password_confirmation' => 'simple',
+    ])->assertCreated();
 });
 
 it('accepts registration with just a single acknowledgement checked', function () {

@@ -4,6 +4,7 @@ namespace App\Domain\Identity\Http\Controllers;
 
 use App\Domain\Identity\Http\Requests\LoginRequest;
 use App\Domain\Identity\Http\Requests\RegisterRequest;
+use App\Domain\Identity\Http\Requests\SignupRequest;
 use App\Domain\Identity\Models\MembershipApplication;
 use App\Domain\Identity\Models\Role;
 use App\Domain\Identity\Models\UserSession;
@@ -113,6 +114,48 @@ class AuthController extends Controller
                 'user' => $user->only(['id', 'public_id', 'name', 'email']),
                 'membership_status' => 'pending',
                 'payment_token' => $application->payment_token,
+            ],
+        ], 201);
+    }
+
+    /**
+     * Learner sign-up — the path for someone who just wants an account to
+     * buy and take courses. Unlike register(), there is no membership
+     * application, no registration fee and no admin review: the account is
+     * `active` straight away (email verification still applies via the
+     * `verified` middleware) and the caller is logged in immediately.
+     * Joining the Coach Network remains the separate register() flow.
+     */
+    public function signup(SignupRequest $request)
+    {
+        // withTrashed() for the same reason as register(): the unique index
+        // on users.email still counts soft-deleted rows.
+        if (User::withTrashed()->where('email', $request->string('email'))->exists()) {
+            throw ValidationException::withMessages([
+                'email' => ['An account with this email already exists.'],
+            ]);
+        }
+
+        $studentRole = Role::where('slug', 'student')->firstOrFail();
+
+        $user = User::create([
+            'name' => $request->string('name'),
+            'email' => $request->string('email'),
+            'password' => $request->string('password'),
+            'role_id' => $studentRole->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        $user->sendEmailVerificationNotification();
+
+        $issued = $this->auth->issueToken($user, $request);
+
+        return response()->json([
+            'data' => [
+                'user' => $user->only(['id', 'public_id', 'name', 'email']),
+                'token' => $issued['token'],
+                'expires_at' => $issued['expires_at'],
             ],
         ], 201);
     }

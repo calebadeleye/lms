@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckoutButton } from '@/components/checkout-button';
 
@@ -21,6 +21,7 @@ export function EnrollButton({
   priceLabel?: string;
 }) {
   const router = useRouter();
+  const redirect = encodeURIComponent(usePathname());
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,12 +39,20 @@ export function EnrollButton({
   if (!isFree && !isMembershipOnly) {
     if (!isAuthenticated) {
       return (
-        <button
-          onClick={() => router.push(`/login?redirect=/courses`)}
-          className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90"
-        >
-          Log in to Purchase
-        </button>
+        <div>
+          <button
+            onClick={() => router.push(`/signup?redirect=${redirect}`)}
+            className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90"
+          >
+            Sign Up to Purchase
+          </button>
+          <p className="mt-2 text-center text-xs text-neutral-500">
+            Already have an account?{' '}
+            <Link href={`/login?redirect=${redirect}`} className="font-medium text-[var(--brand-primary)] underline">
+              Log in
+            </Link>
+          </p>
+        </div>
       );
     }
 
@@ -56,7 +65,7 @@ export function EnrollButton({
   // immediately and a non-member gets the real reason back as a 422.
   async function handleEnroll() {
     if (!isAuthenticated) {
-      router.push(`/login?redirect=/courses`);
+      router.push(`/signup?redirect=${redirect}`);
       return;
     }
 

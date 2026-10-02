@@ -355,6 +355,13 @@ export function RegisterForm() {
           Sign in
         </a>
       </p>
+      <p className="text-center text-xs text-neutral-500">
+        Just want to buy a course? You don&apos;t need to join the network —{' '}
+        <a href="/signup" className="font-medium text-[var(--brand-primary)]">
+          create a free learner account
+        </a>
+        .
+      </p>
     </div>
   );
 }

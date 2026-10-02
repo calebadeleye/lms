@@ -63,6 +63,7 @@ Route::post('/invitations/{token}/accept', [InvitationController::class, 'accept
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/signup', [AuthController::class, 'signup']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/mfa/verify', [AuthController::class, 'verifyMfa']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);

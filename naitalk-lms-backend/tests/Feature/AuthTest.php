@@ -39,6 +39,43 @@ it('registers a new applicant with a pending status and a membership application
     expect($application->ack_impact_beyond_earning)->toBeTrue();
 });
 
+it('signs up a learner as an active student with no application, no fee, and a session', function () {
+    $response = $this->postJson('/api/v1/auth/signup', [
+        'name' => 'Sam Buyer',
+        'email' => 'sam@example.com',
+        'password' => 'Passw0rd123',
+        'password_confirmation' => 'Passw0rd123',
+    ])->assertCreated();
+
+    expect($response->json('data.token'))->not->toBeEmpty();
+
+    $user = User::where('email', 'sam@example.com')->firstOrFail();
+    expect($user->status)->toBe('active');
+    expect($user->role->slug)->toBe('student');
+    expect($user->email_verified_at)->toBeNull();
+    expect(MembershipApplication::where('user_id', $user->id)->exists())->toBeFalse();
+});
+
+it('rejects learner sign-up for an email that already has an account', function () {
+    User::factory()->create(['email' => 'sam@example.com']);
+
+    $this->postJson('/api/v1/auth/signup', [
+        'name' => 'Sam Buyer',
+        'email' => 'sam@example.com',
+        'password' => 'Passw0rd123',
+        'password_confirmation' => 'Passw0rd123',
+    ])->assertUnprocessable()->assertJsonValidationErrors('email');
+});
+
+it('rejects learner sign-up with a weak password', function () {
+    $this->postJson('/api/v1/auth/signup', [
+        'name' => 'Sam Buyer',
+        'email' => 'sam@example.com',
+        'password' => 'short',
+        'password_confirmation' => 'short',
+    ])->assertUnprocessable()->assertJsonValidationErrors('password');
+});
+
 it('accepts registration with just a single acknowledgement checked', function () {
     $this->postJson('/api/v1/auth/register', [
         'name' => 'Jane Learner',

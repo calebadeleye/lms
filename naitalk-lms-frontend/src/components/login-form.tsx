@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 type Errors = Record<string, string[]>;
 
-export function LoginForm() {
+export function LoginForm({ redirectTo, signupHref }: { redirectTo: string; signupHref: string }) {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,7 +37,7 @@ export function LoginForm() {
         return;
       }
 
-      router.push('/dashboard');
+      router.push(redirectTo);
       router.refresh();
     } finally {
       setPending(false);
@@ -62,7 +62,7 @@ export function LoginForm() {
         return;
       }
 
-      router.push('/dashboard');
+      router.push(redirectTo);
       router.refresh();
     } finally {
       setPending(false);
@@ -141,8 +141,14 @@ export function LoginForm() {
       </button>
       <p className="text-center text-sm text-neutral-500">
         Don&apos;t have an account?{' '}
-        <a href="/register" className="font-medium text-[var(--brand-primary)]">
+        <a href={signupHref} className="font-medium text-[var(--brand-primary)]">
           Sign up
+        </a>
+      </p>
+      <p className="text-center text-xs text-neutral-500">
+        Want to become a coach or join our community?{' '}
+        <a href="/register" className="font-medium text-[var(--brand-primary)]">
+          Join the HR GEMs Coach Network
         </a>
       </p>
     </form>

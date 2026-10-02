@@ -142,6 +142,7 @@ Route::middleware('optional-auth')->group(function () {
 */
 Route::middleware(['auth:sanctum', 'verified', 'approved'])->group(function () {
     Route::post('/courses/{courseId}/enrol', [CourseController::class, 'enrol']);
+    Route::post('/courses/{courseId}/personality-type', [EnrolmentController::class, 'selectPersonalityType']);
     Route::post('/courses/{courseId}/reviews', [ReviewController::class, 'store']);
     Route::delete('/reviews/{reviewId}', [ReviewController::class, 'destroy']);
 

@@ -52,27 +52,38 @@ class CourseController extends Controller
             ? Enrolment::where('course_id', $course->id)->where('user_id', $user->id)->first()
             : null;
 
+        $allLessons = $course->modules->flatMap->lessons;
+        $personalityLessons = $allLessons->whereNotNull('personality_type_code');
+        $personalityModuleId = $personalityLessons->first()?->course_module_id;
+
         return response()->json(['data' => [
             ...$this->summarize($course),
             'description' => $course->description,
             'reviews_count' => $course->reviews()->count(),
             'is_enrolled' => $enrolment !== null,
+            'personality_type_module_id' => $personalityModuleId,
+            'personality_type_options' => $personalityLessons->pluck('personality_type_code')->unique()->sort()->values(),
+            'my_personality_type' => $enrolment?->personality_type,
             'modules' => $course->modules->map(fn ($module) => [
                 'id' => $module->id,
                 'title' => $module->title,
-                'lessons' => $module->lessons->map(function ($lesson) use ($enrolment) {
-                    $unlocked = $lesson->is_preview || ($enrolment && $lesson->isAvailableFor($enrolment));
+                'lessons' => $module->lessons
+                    ->filter(fn ($lesson) => $lesson->personality_type_code === null
+                        || $enrolment?->personality_type === $lesson->personality_type_code)
+                    ->values()
+                    ->map(function ($lesson) use ($enrolment) {
+                        $unlocked = $lesson->is_preview || ($enrolment && $lesson->isAvailableFor($enrolment));
 
-                    return [
-                        'id' => $lesson->id,
-                        'title' => $lesson->title,
-                        'type' => $lesson->type,
-                        'duration_seconds' => $lesson->duration_seconds,
-                        'is_preview' => $lesson->is_preview,
-                        'is_mandatory' => $lesson->is_mandatory,
-                        'locked' => ! $unlocked,
-                    ];
-                }),
+                        return [
+                            'id' => $lesson->id,
+                            'title' => $lesson->title,
+                            'type' => $lesson->type,
+                            'duration_seconds' => $lesson->duration_seconds,
+                            'is_preview' => $lesson->is_preview,
+                            'is_mandatory' => $lesson->is_mandatory,
+                            'locked' => ! $unlocked,
+                        ];
+                    }),
             ]),
         ]]);
     }

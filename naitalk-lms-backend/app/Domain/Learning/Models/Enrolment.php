@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Enrolment extends Model
 {
 
-    protected $fillable = ['course_id', 'user_id', 'status', 'source', 'enrolled_at', 'completed_at'];
+    protected $fillable = ['course_id', 'user_id', 'status', 'source', 'personality_type', 'enrolled_at', 'completed_at'];
 
     protected $casts = [
         'enrolled_at' => 'datetime',

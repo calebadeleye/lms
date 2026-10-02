@@ -42,6 +42,12 @@ export interface CourseDetail extends CourseSummary {
   reviews_count: number;
   is_enrolled: boolean;
   modules: CourseModuleSummary[];
+  /** Id of the module whose lessons are each one personality type's video, or null if this course has none. */
+  personality_type_module_id: number | null;
+  /** All personality type codes (e.g. MBTI codes) this course has a video for. */
+  personality_type_options: string[];
+  /** The current learner's selected personality type, or null if unset / not enrolled. */
+  my_personality_type: string | null;
 }
 
 export interface LessonNavItem {

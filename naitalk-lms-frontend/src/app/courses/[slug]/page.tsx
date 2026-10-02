@@ -63,7 +63,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
             <div className="mt-8">
               <h2 className="mb-3 text-lg font-semibold text-neutral-900">Course Curriculum</h2>
-              <CourseCurriculum modules={course.modules} isEnrolled={course.is_enrolled} />
+              <CourseCurriculum
+                modules={course.modules}
+                isEnrolled={course.is_enrolled}
+                courseId={course.id}
+                personalityTypeModuleId={course.personality_type_module_id}
+                personalityTypeOptions={course.personality_type_options}
+                myPersonalityType={course.my_personality_type}
+              />
             </div>
           </div>
 

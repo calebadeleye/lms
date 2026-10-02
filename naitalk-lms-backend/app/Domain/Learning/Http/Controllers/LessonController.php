@@ -55,16 +55,17 @@ class LessonController extends Controller
     {
         $lesson = Lesson::with('courseModule.course.modules.lessons')->findOrFail($lessonId);
         $user = $request->user();
+        $enrolment = $user
+            ? Enrolment::where('course_id', $lesson->courseModule->course_id)->where('user_id', $user->id)->first()
+            : null;
 
-        if ($failure = $this->authorizeAccess($lesson, $user, $membershipGate)) {
+        if ($failure = $this->authorizeAccess($lesson, $user, $membershipGate, $enrolment)) {
             return $failure;
         }
 
         if ($lesson->is_preview) {
-            return response()->json(['data' => $this->present($lesson)]);
+            return response()->json(['data' => $this->present($lesson, $enrolment)]);
         }
-
-        $enrolment = Enrolment::where('course_id', $lesson->courseModule->course_id)->where('user_id', $user->id)->firstOrFail();
 
         $progress = LessonProgress::firstOrCreate(
             ['enrolment_id' => $enrolment->id, 'lesson_id' => $lesson->id],
@@ -76,7 +77,7 @@ class LessonController extends Controller
         }
 
         return response()->json(['data' => [
-            ...$this->present($lesson),
+            ...$this->present($lesson, $enrolment),
             'progress' => [
                 'status' => $progress->status,
                 'video_position_seconds' => $progress->video_position_seconds,
@@ -92,8 +93,12 @@ class LessonController extends Controller
     public function downloadMaterial(Request $request, string $lessonId, MembershipGateService $membershipGate)
     {
         $lesson = Lesson::with('courseModule.course')->findOrFail($lessonId);
+        $user = $request->user();
+        $enrolment = $user
+            ? Enrolment::where('course_id', $lesson->courseModule->course_id)->where('user_id', $user->id)->first()
+            : null;
 
-        if ($failure = $this->authorizeAccess($lesson, $request->user(), $membershipGate)) {
+        if ($failure = $this->authorizeAccess($lesson, $user, $membershipGate, $enrolment)) {
             return $failure;
         }
 
@@ -143,15 +148,11 @@ class LessonController extends Controller
     }
 
     /** Null if accessible; otherwise the 403 JSON response to return as-is. */
-    private function authorizeAccess(Lesson $lesson, ?User $user, MembershipGateService $membershipGate): ?JsonResponse
+    private function authorizeAccess(Lesson $lesson, ?User $user, MembershipGateService $membershipGate, ?Enrolment $enrolment): ?JsonResponse
     {
         if ($lesson->is_preview) {
             return null;
         }
-
-        $enrolment = $user
-            ? Enrolment::where('course_id', $lesson->courseModule->course_id)->where('user_id', $user->id)->first()
-            : null;
 
         if (! $enrolment) {
             return response()->json(['errors' => [['code' => 'not_enrolled', 'message' => 'Enrol in this course to view this lesson.']]], 403);
@@ -166,6 +167,21 @@ class LessonController extends Controller
             ], 403);
         }
 
+        // A personality-type video is only for the learner whose selected
+        // type matches it — keeps the other 15 videos truly inaccessible,
+        // not just hidden from the curriculum/sidebar.
+        if ($lesson->personality_type_code !== null && $lesson->personality_type_code !== $enrolment->personality_type) {
+            if ($enrolment->personality_type === null) {
+                return response()->json([
+                    'errors' => [['code' => 'personality_type_not_selected', 'message' => 'Select your personality type on the course page before watching this video.']],
+                ], 403);
+            }
+
+            return response()->json([
+                'errors' => [['code' => 'personality_type_mismatch', 'message' => "This video isn't part of your selected personality type."]],
+            ], 403);
+        }
+
         if (! $lesson->isAvailableFor($enrolment)) {
             $unlocksAt = $enrolment->enrolled_at->addDays($lesson->available_after_days);
 
@@ -177,7 +193,7 @@ class LessonController extends Controller
         return null;
     }
 
-    private function present(Lesson $lesson): array
+    private function present(Lesson $lesson, ?Enrolment $enrolment): array
     {
         $course = $lesson->courseModule->course;
 
@@ -195,12 +211,15 @@ class LessonController extends Controller
             'modules' => $course->modules->map(fn ($module) => [
                 'id' => $module->id,
                 'title' => $module->title,
-                'lessons' => $module->lessons->map(fn ($l) => [
-                    'id' => $l->id,
-                    'title' => $l->title,
-                    'type' => $l->type,
-                    'is_current' => $l->id === $lesson->id,
-                ]),
+                'lessons' => $module->lessons
+                    ->filter(fn ($l) => $l->personality_type_code === null || $l->personality_type_code === $enrolment?->personality_type)
+                    ->values()
+                    ->map(fn ($l) => [
+                        'id' => $l->id,
+                        'title' => $l->title,
+                        'type' => $l->type,
+                        'is_current' => $l->id === $lesson->id,
+                    ]),
             ]),
         ];
     }
@@ -212,6 +231,7 @@ class LessonController extends Controller
             'type' => ['required', 'in:video,rich_text,audio,file,external_link,quiz,assignment,live'],
             'content' => ['nullable', 'array'],
             'video_path' => ['nullable', 'string', 'max:2048'],
+            'personality_type_code' => ['nullable', 'string', 'max:10'],
             'duration_seconds' => ['nullable', 'integer', 'min:0'],
             'is_preview' => ['boolean'],
             'is_mandatory' => ['boolean'],

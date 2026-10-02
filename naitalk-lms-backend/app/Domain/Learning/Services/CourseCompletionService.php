@@ -16,12 +16,27 @@ class CourseCompletionService
 
     public function recompute(Enrolment $enrolment): int
     {
+        // Personality-type videos are mutually exclusive — a learner only
+        // ever needs to watch the one matching their selection, so they
+        // count as a single slot in the denominator rather than one slot
+        // per video. That slot exists (and is unmet) even before a
+        // selection is made, so completion can never reach 100% by having
+        // the other videos silently excluded from the count.
         $mandatoryLessonIds = Lesson::query()
             ->whereHas('courseModule', fn ($q) => $q->where('course_id', $enrolment->course_id))
             ->where('is_mandatory', true)
+            ->whereNull('personality_type_code')
             ->pluck('id');
 
-        if ($mandatoryLessonIds->isEmpty()) {
+        $hasPersonalitySlot = Lesson::query()
+            ->whereHas('courseModule', fn ($q) => $q->where('course_id', $enrolment->course_id))
+            ->where('is_mandatory', true)
+            ->whereNotNull('personality_type_code')
+            ->exists();
+
+        $totalSlots = $mandatoryLessonIds->count() + ($hasPersonalitySlot ? 1 : 0);
+
+        if ($totalSlots === 0) {
             return 0;
         }
 
@@ -30,7 +45,18 @@ class CourseCompletionService
             ->where('status', 'completed')
             ->count();
 
-        $percent = (int) round(($completedCount / $mandatoryLessonIds->count()) * 100);
+        if ($hasPersonalitySlot && $enrolment->personality_type) {
+            $myPersonalityLessonId = Lesson::query()
+                ->whereHas('courseModule', fn ($q) => $q->where('course_id', $enrolment->course_id))
+                ->where('personality_type_code', $enrolment->personality_type)
+                ->value('id');
+
+            if ($myPersonalityLessonId && $enrolment->progress()->where('lesson_id', $myPersonalityLessonId)->where('status', 'completed')->exists()) {
+                $completedCount++;
+            }
+        }
+
+        $percent = (int) round(($completedCount / $totalSlots) * 100);
 
         if ($percent >= 100 && ! $enrolment->isCompleted()) {
             $enrolment->update(['status' => 'completed', 'completed_at' => now()]);

@@ -3,9 +3,11 @@
 namespace App\Domain\Learning\Http\Controllers;
 
 use App\Domain\Learning\Models\Enrolment;
+use App\Domain\Learning\Models\Lesson;
 use App\Domain\Learning\Services\CourseCompletionService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EnrolmentController extends Controller
 {
@@ -35,6 +37,31 @@ class EnrolmentController extends Controller
                 'instructors' => $e->course->instructors->map->only(['id', 'name']),
             ],
         ])]);
+    }
+
+    /**
+     * POST /courses/{course}/personality-type — learner self-selects which
+     * of the course's personality-type videos is theirs. Changeable anytime
+     * by resubmitting; valid codes are derived live from the course's own
+     * tagged lessons rather than a hardcoded list.
+     */
+    public function selectPersonalityType(Request $request, string $courseId)
+    {
+        $enrolment = Enrolment::where('course_id', $courseId)->where('user_id', $request->user()->id)->firstOrFail();
+
+        $validCodes = Lesson::query()
+            ->whereHas('courseModule', fn ($q) => $q->where('course_id', $courseId))
+            ->whereNotNull('personality_type_code')
+            ->distinct()
+            ->pluck('personality_type_code');
+
+        $data = $request->validate([
+            'personality_type' => ['required', 'string', Rule::in($validCodes)],
+        ]);
+
+        $enrolment->update(['personality_type' => $data['personality_type']]);
+
+        return response()->json(['data' => $enrolment->fresh()]);
     }
 
     /** GET /courses/{course}/learner-enrolments — instructor/admin roster. */

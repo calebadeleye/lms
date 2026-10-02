@@ -12,8 +12,8 @@ class Lesson extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'course_module_id', 'title', 'type', 'content', 'video_path', 'duration_seconds',
-        'is_preview', 'is_mandatory', 'available_after_days', 'sort_order',
+        'course_module_id', 'title', 'type', 'content', 'video_path', 'personality_type_code',
+        'duration_seconds', 'is_preview', 'is_mandatory', 'available_after_days', 'sort_order',
     ];
 
     protected $casts = [

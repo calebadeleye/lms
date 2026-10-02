@@ -128,8 +128,25 @@ class CareerFitCourseSeeder extends Seeder
             'sort_order' => 1,
         ]);
 
-        // Module 2: Part Two - Career Mapping
-        $partTwo = $course->modules()->create(['title' => 'Part Two: Career Mapping – Design Your Future', 'sort_order' => $moduleIndex++]);
+        // Module 2: Part Two - Discover Your Personality Type. Each lesson is
+        // one personality type's video, tagged with its code — the learner
+        // picks theirs (POST /courses/{id}/personality-type) and only that
+        // one lesson is ever shown to them (see CourseController::show()).
+        // Real content has 16 MBTI types; seeding 2 representative ones here
+        // keeps fresh/staging environments fast while covering the feature.
+        $personalityTypes = $course->modules()->create(['title' => 'Part Two: Discover Your Personality Type', 'sort_order' => $moduleIndex++]);
+        foreach (['INTJ', 'ENFP'] as $index => $code) {
+            $personalityTypes->lessons()->create([
+                'title' => "Personality Type: {$code}",
+                'type' => 'video',
+                'personality_type_code' => $code,
+                'is_mandatory' => true,
+                'sort_order' => $index,
+            ]);
+        }
+
+        // Module 3: Part Three - Career Mapping
+        $partTwo = $course->modules()->create(['title' => 'Part Three: Career Mapping – Design Your Future', 'sort_order' => $moduleIndex++]);
         $partTwo->lessons()->create([
             'title' => 'Why This Matters',
             'type' => 'rich_text',
@@ -167,42 +184,6 @@ class CareerFitCourseSeeder extends Seeder
                 "- A practical action plan for achieving those goals\n".
                 "- Greater confidence in your career direction\n".
                 "- A roadmap for continuous professional growth",
-            ],
-            'is_mandatory' => true,
-            'sort_order' => 1,
-        ]);
-
-        // Module 3: wrap-up
-        $wrapUp = $course->modules()->create(['title' => 'Course Summary & Promise', 'sort_order' => $moduleIndex++]);
-        $wrapUp->lessons()->create([
-            'title' => 'Overall Course Objectives & Outcomes',
-            'type' => 'rich_text',
-            'content' => ['body' =>
-                "Overall Course Objectives\n\nAt the end of this course, you will be able to:\n".
-                "- Develop deep self-awareness through personality and strengths assessment.\n".
-                "- Understand how your personality, values, and interests influence career success.\n".
-                "- Identify careers that align with your unique strengths and aspirations.\n".
-                "- Create a personalized career roadmap with clear milestones.\n".
-                "- Make informed career decisions based on evidence rather than assumptions.\n".
-                "- Build confidence to pursue opportunities that align with your purpose.\n".
-                "- Develop a strategy for continuous learning and career growth in a dynamic workplace.\n\n".
-                "Overall Course Outcomes\n\nUpon successful completion of this course, you will have:\n".
-                "- A clear understanding of your personality, strengths, values, and purpose.\n".
-                "- Confidence in choosing a career that aligns with who you are.\n".
-                "- A personalized Career Fit Profile to guide your career decisions.\n".
-                "- A practical Career Mapping Blueprint with actionable next steps.\n".
-                "- Greater clarity about your professional direction and long-term aspirations.\n".
-                "- The knowledge and tools to make intentional, purpose-driven career decisions with confidence.",
-            ],
-            'is_mandatory' => true,
-            'sort_order' => 0,
-        ]);
-        $wrapUp->lessons()->create([
-            'title' => 'Course Promise',
-            'type' => 'rich_text',
-            'content' => ['body' =>
-                "Your future shouldn't be determined by chance—it should be shaped by clarity.\n\n".
-                "This course will empower you to stop guessing, start discovering, and confidently pursue a career that reflects your strengths, personality, and purpose. Because when you find the right fit, you don't just build a career—you build a life of impact, fulfillment, and lasting success.",
             ],
             'is_mandatory' => true,
             'sort_order' => 1,

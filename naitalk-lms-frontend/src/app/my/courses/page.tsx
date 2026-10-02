@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -25,8 +24,7 @@ export default async function MyCoursesPage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const me = await requireUser();
   const { tab = 'enrolled' } = await searchParams;
@@ -58,7 +56,7 @@ export default async function MyCoursesPage({
             href={`/my/courses?tab=${t.key}`}
             className={`px-4 py-2 text-sm font-medium ${
               tab === t.key
-                ? 'border-b-2 border-[var(--tenant-primary)] text-[var(--tenant-primary)]'
+                ? 'border-b-2 border-[var(--brand-primary)] text-[var(--brand-primary)]'
                 : 'text-neutral-500 hover:text-neutral-700'
             }`}
           >
@@ -82,7 +80,7 @@ export default async function MyCoursesPage({
           {filtered.length === 0 && (
             <p className="text-sm text-neutral-500">
               No {tab === 'completed' ? 'completed' : 'enrolled'} courses yet.{' '}
-              <Link href="/courses" className="font-medium text-[var(--tenant-primary)] underline">
+              <Link href="/courses" className="font-medium text-[var(--brand-primary)] underline">
                 Browse courses
               </Link>
               .
@@ -110,16 +108,16 @@ function CourseCard({
         // eslint-disable-next-line @next/next/no-img-element
         <img src={course.thumbnail_url} alt="" className="aspect-video w-full object-cover" />
       ) : (
-        <div className="aspect-video bg-linear-to-br from-[var(--tenant-primary)] to-[var(--tenant-secondary)]/60" />
+        <div className="aspect-video bg-linear-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)]/60" />
       )}
       <div className="p-4">
-        <p className="text-xs text-[var(--tenant-primary)]">{course.category?.name}</p>
+        <p className="text-xs text-[var(--brand-primary)]">{course.category?.name}</p>
         <h3 className="mt-1 font-medium text-neutral-900">{course.title}</h3>
         {course.instructors[0] && <p className="mt-1 text-xs text-neutral-500">{course.instructors[0].name}</p>}
         {completionPercent !== undefined && (
           <div className="mt-3">
             <div className="h-1.5 w-full rounded-full bg-neutral-100">
-              <div className="h-1.5 rounded-full bg-[var(--tenant-accent)]" style={{ width: `${completionPercent}%` }} />
+              <div className="h-1.5 rounded-full bg-[var(--brand-accent)]" style={{ width: `${completionPercent}%` }} />
             </div>
             <p className="mt-1 text-xs text-neutral-500">{completionPercent}% complete</p>
           </div>

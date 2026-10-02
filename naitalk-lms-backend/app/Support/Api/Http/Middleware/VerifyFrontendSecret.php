@@ -8,10 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Marks a request as coming from the Next.js BFF's trusted server-to-server
- * channel. Only requests that pass this check may use headers like
- * X-Tenant-Hostname to influence tenant resolution — the public internet
- * cannot forge those. The secret is a static shared value for Phase 1;
- * rotating/short-lived signing is documented remaining work.
+ * channel. The secret is a static shared value; rotating/short-lived signing
+ * is documented remaining work.
  */
 class VerifyFrontendSecret
 {

@@ -2,7 +2,6 @@
 
 namespace App\Domain\Coaching\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Coach extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = ['user_id', 'title', 'bio', 'years_experience', 'timezone', 'is_active'];
 

@@ -14,19 +14,15 @@ class CertificateController extends Controller
     public function __construct(private CertificateService $certificates) {}
 
     /**
-     * Public — no `tenant` or `auth` middleware. Whoever is checking a
-     * certificate's authenticity (an employer scanning a printed QR code)
-     * has no tenant hostname context, so the tenant is resolved from the
-     * globally-unique verification code instead. A revoked certificate
-     * still resolves (valid: false) rather than 404ing, so "revoked" stays
+     * Public — no auth. Whoever is checking a certificate's authenticity
+     * (an employer scanning a printed QR code) resolves it from the
+     * globally-unique verification code. A revoked certificate still
+     * resolves (valid: false) rather than 404ing, so "revoked" stays
      * distinguishable from "never existed."
      */
     public function verify(string $code)
     {
-        $certificate = Certificate::withoutTenancy(fn () => Certificate::where('verification_code', $code)
-            ->with('tenant:id,name')
-            ->first()
-        );
+        $certificate = Certificate::where('verification_code', $code)->first();
 
         if (! $certificate) {
             return response()->json(['data' => null], 404);
@@ -36,7 +32,7 @@ class CertificateController extends Controller
             'certificate_number' => $certificate->certificate_number,
             'recipient_name' => $certificate->recipient_name,
             'course_title' => $certificate->course_title,
-            'tenant_name' => $certificate->tenant->name,
+            'issuer_name' => config('app.name'),
             'completed_at' => $certificate->completed_at,
             'issued_at' => $certificate->issued_at,
             'valid' => $certificate->isValid(),
@@ -53,7 +49,7 @@ class CertificateController extends Controller
         return response()->json(['data' => $certificates]);
     }
 
-    /** Admin — every certificate issued in the tenant (certificates.issue). */
+    /** Admin — every certificate issued (certificates.issue). */
     public function adminIndex()
     {
         $certificates = Certificate::with('user:id,name,email')

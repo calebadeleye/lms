@@ -10,14 +10,13 @@ return new class extends Migration
     {
         Schema::create('quiz_options', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('quiz_question_id')->constrained('quiz_questions')->cascadeOnDelete();
             $table->string('option_text');
             $table->boolean('is_correct')->default(false);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
 
-            $table->index(['tenant_id', 'quiz_question_id']);
+            $table->index('quiz_question_id');
         });
     }
 

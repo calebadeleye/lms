@@ -1,22 +1,22 @@
-import { notFound, redirect } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { redirect } from 'next/navigation';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
-import { tenantAdminNav } from '@/lib/nav';
+import { adminNav } from '@/lib/nav';
 import { TestimonialManager, type Testimonial } from '@/components/admin/testimonial-manager';
 
 export default async function TestimonialsPage() {
-  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
-  if (!config) notFound();
-  if (!me.permissions.includes('branding.manage')) redirect('/dashboard');
+  const config = BRANDING;
+  const me = await requireUser();
+  if (!me.permissions.includes('settings.manage')) redirect('/dashboard');
 
-  const testimonials = await apiFetch<{ data: Testimonial[] }>('/api/v1/tenant/testimonials');
+  const testimonials = await apiFetch<{ data: Testimonial[] }>('/api/v1/testimonials');
 
   return (
     <DashboardShell
       tenantName={config.tenant.name}
-      navItems={tenantAdminNav}
+      navItems={adminNav}
       userName={me.user.name}
       activeHref="/admin/testimonials"
     >

@@ -4,12 +4,12 @@ namespace App\Domain\Identity\Http\Controllers;
 
 use App\Domain\Identity\Http\Requests\LoginRequest;
 use App\Domain\Identity\Http\Requests\RegisterRequest;
+use App\Domain\Identity\Http\Requests\SignupRequest;
+use App\Domain\Identity\Models\MembershipApplication;
 use App\Domain\Identity\Models\Role;
-use App\Domain\Identity\Models\TenantUser;
 use App\Domain\Identity\Models\UserSession;
 use App\Domain\Identity\Services\AuthService;
 use App\Domain\Identity\Services\MfaService;
-use App\Domain\Tenancy\Services\TenantContext;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,46 +25,131 @@ class AuthController extends Controller
     public function __construct(
         private AuthService $auth,
         private MfaService $mfa,
-        private TenantContext $tenantContext,
     ) {}
 
     /**
-     * Self-registration on a tenant domain. Always assigns the tenant's
-     * default "Student" role — staff accounts are created via invitations,
-     * never self-registration.
+     * Self-registration. Always assigns the default "student" role and
+     * lands the account in `pending` status — a submitted membership
+     * application (the 4 acknowledgements + optional welcome photo,
+     * replacing the client's manual Google Form) is what an admin reviews
+     * before EnsureMemberApproved lets the account through to anything.
+     * Staff accounts are created via invitations, never self-registration.
      */
     public function register(RegisterRequest $request)
     {
-        $tenant = $this->tenantContext->tenant();
+        // withTrashed(): the `users.email` column has a plain (not
+        // soft-delete-aware) unique index, so a soft-deleted account still
+        // occupies its email at the DB level. Without withTrashed() here,
+        // this check would report the email as free (SoftDeletes' default
+        // scope hides trashed rows), pass validation, and then blow up with
+        // an unhandled duplicate-key QueryException on User::create() below
+        // — surfacing as a raw 500 instead of this clean message.
+        $existing = User::withTrashed()->where('email', $request->string('email'))->first();
 
-        if (User::where('email', $request->string('email'))->exists()) {
+        if ($existing) {
+            // A common dead end: the applicant registered fine but the
+            // registration-fee payment never went through (gateway hiccup,
+            // or they just abandoned the Paystack redirect), so they're
+            // stuck re-submitting this form with an account that already
+            // exists. They can't retry payment here without proving they
+            // own it — but at least tell them what actually happened
+            // instead of a bare "already exists", so they know to log in
+            // rather than keep trying new emails.
+            $unpaid = MembershipApplication::where('user_id', $existing->id)
+                ->where('payment_status', '!=', 'paid')
+                ->exists();
+
+            throw ValidationException::withMessages([
+                'email' => [$unpaid
+                    ? 'An account with this email already exists, but the registration fee was never completed. Log in to retry payment.'
+                    : 'An account with this email already exists.'],
+            ]);
+        }
+
+        $studentRole = Role::where('slug', 'student')->firstOrFail();
+
+        [$user, $application] = DB::transaction(function () use ($request, $studentRole) {
+            $user = User::create([
+                'name' => $request->string('name'),
+                'email' => $request->string('email'),
+                'password' => $request->string('password'),
+                'role_id' => $studentRole->id,
+                'status' => 'pending',
+                'joined_at' => now(),
+            ]);
+
+            $photoPath = null;
+            if ($request->hasFile('photo')) {
+                $file = $request->file('photo');
+                $extension = $file->extension() ?: $file->getClientOriginalExtension();
+                $directory = "membership-applications/{$user->id}";
+                $file->storeAs($directory, "photo.{$extension}", ['disk' => 'uploads']);
+                $photoPath = "{$directory}/photo.{$extension}";
+            }
+
+            $application = MembershipApplication::create([
+                'user_id' => $user->id,
+                'ack_impact_beyond_earning' => $request->boolean('ack_impact_beyond_earning'),
+                'ack_growth_mindset' => $request->boolean('ack_growth_mindset'),
+                'ack_interest_in_coaching' => $request->boolean('ack_interest_in_coaching'),
+                'ack_positive_impact' => $request->boolean('ack_positive_impact'),
+                'motivation' => $request->string('motivation')->isEmpty() ? null : $request->string('motivation'),
+                'photo_path' => $photoPath,
+                'status' => 'pending',
+            ]);
+
+            return [$user, $application];
+        });
+
+        $user->sendEmailVerificationNotification();
+
+        // Deliberately no session/token here — the applicant isn't "logged
+        // in" until the registration fee is paid (see
+        // CheckoutController::startRegistrationFee()/registrationFeeStatus(),
+        // which use the application's own payment_token instead of a
+        // Sanctum token). They log in normally, with the password they just
+        // set, once they're ready to check their status or retry payment.
+        return response()->json([
+            'data' => [
+                'user' => $user->only(['id', 'public_id', 'name', 'email']),
+                'membership_status' => 'pending',
+                'payment_token' => $application->payment_token,
+            ],
+        ], 201);
+    }
+
+    /**
+     * Learner sign-up — the path for someone who just wants an account to
+     * buy and take courses. Unlike register(), there is no membership
+     * application, no registration fee and no admin review: the account is
+     * `active` straight away (email verification still applies via the
+     * `verified` middleware) and the caller is logged in immediately.
+     * Joining the Coach Network remains the separate register() flow.
+     */
+    public function signup(SignupRequest $request)
+    {
+        // withTrashed() for the same reason as register(): the unique index
+        // on users.email still counts soft-deleted rows.
+        if (User::withTrashed()->where('email', $request->string('email'))->exists()) {
             throw ValidationException::withMessages([
                 'email' => ['An account with this email already exists.'],
             ]);
         }
 
-        $studentRole = Role::forTenant($tenant->id)->where('slug', 'student')->firstOrFail();
+        $studentRole = Role::where('slug', 'student')->firstOrFail();
 
-        $user = DB::transaction(function () use ($request, $tenant, $studentRole) {
-            $user = User::create([
-                'name' => $request->string('name'),
-                'email' => $request->string('email'),
-                'password' => $request->string('password'),
-            ]);
-
-            TenantUser::create([
-                'user_id' => $user->id,
-                'role_id' => $studentRole->id,
-                'status' => 'active',
-                'joined_at' => now(),
-            ]);
-
-            return $user;
-        });
+        $user = User::create([
+            'name' => $request->string('name'),
+            'email' => $request->string('email'),
+            'password' => $request->string('password'),
+            'role_id' => $studentRole->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
 
         $user->sendEmailVerificationNotification();
 
-        $issued = $this->auth->issueToken($user, $request, $tenant->id);
+        $issued = $this->auth->issueToken($user, $request);
 
         return response()->json([
             'data' => [
@@ -75,10 +160,22 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /** The caller's own membership application — lets the frontend show a
+     * pending/rejected holding page without needing admin permissions. */
+    public function application(Request $request)
+    {
+        $application = MembershipApplication::where('user_id', $request->user()->id)->first();
+
+        return response()->json(['data' => $application ? [
+            'status' => $application->status,
+            'payment_status' => $application->payment_status,
+            'review_note' => $application->review_note,
+            'submitted_at' => $application->created_at,
+        ] : null]);
+    }
+
     public function login(LoginRequest $request)
     {
-        $tenant = $this->tenantContext->tenant();
-
         $rateLimitKey = 'login:'.$request->ip().'|'.$request->string('email');
 
         if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
@@ -91,26 +188,15 @@ class AuthController extends Controller
 
         $user = $this->auth->verifyCredentials($request->string('email'), $request->string('password'));
 
-        if (! $user) {
+        // Only a deactivated account is rejected outright — `pending` and
+        // `rejected` members can still log in (so the frontend can show
+        // their application status); EnsureMemberApproved is what actually
+        // gates course/community routes.
+        if (! $user || $user->status === 'inactive') {
             RateLimiter::hit($rateLimitKey, 60);
 
             throw ValidationException::withMessages([
                 'email' => ['These credentials do not match our records.'],
-            ]);
-        }
-
-        $membership = TenantUser::withoutTenancy(fn () => TenantUser::query()
-            ->where('tenant_id', $tenant->id)
-            ->where('user_id', $user->id)
-            ->where('status', 'active')
-            ->exists()
-        );
-
-        if (! $membership) {
-            RateLimiter::hit($rateLimitKey, 60);
-
-            throw ValidationException::withMessages([
-                'email' => ['Your account does not have access to this academy.'],
             ]);
         }
 
@@ -121,7 +207,6 @@ class AuthController extends Controller
 
             Cache::put("mfa_challenge:{$challenge}", [
                 'user_id' => $user->id,
-                'tenant_id' => $tenant->id,
                 'device_label' => $request->input('device_label'),
             ], now()->addMinutes(5));
 
@@ -130,7 +215,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $issued = $this->auth->issueToken($user, $request, $tenant->id);
+        $issued = $this->auth->issueToken($user, $request);
 
         return response()->json([
             'data' => [
@@ -159,7 +244,7 @@ class AuthController extends Controller
 
         Cache::forget("mfa_challenge:{$request->string('mfa_token')}");
 
-        $issued = $this->auth->issueToken($user, $request, $challenge['tenant_id']);
+        $issued = $this->auth->issueToken($user, $request);
 
         return response()->json([
             'data' => [
@@ -172,20 +257,14 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        $user = $request->user();
-        $tenant = $this->tenantContext->tenant();
-
-        $membership = TenantUser::query()
-            ->where('user_id', $user->id)
-            ->with('role.permissions')
-            ->first();
+        $user = $request->user()->loadMissing('role.permissions');
 
         return response()->json([
             'data' => [
                 'user' => $user->only(['id', 'public_id', 'name', 'email', 'email_verified_at']),
-                'tenant_id' => $tenant->id,
-                'role' => $membership?->role?->only(['id', 'name', 'slug']),
-                'permissions' => $membership?->role?->permissions->pluck('key') ?? [],
+                'membership_status' => $user->status,
+                'role' => $user->role?->only(['id', 'name', 'slug']),
+                'permissions' => $user->role?->permissions->pluck('key') ?? [],
             ],
         ]);
     }
@@ -200,7 +279,7 @@ class AuthController extends Controller
     public function verifyEmail(Request $request, int $id, string $hash)
     {
         $user = User::findOrFail($id);
-        $frontendUrl = $user->frontendUrl();
+        $frontendUrl = rtrim((string) config('services.frontend.url'), '/');
 
         if (! hash_equals($hash, sha1($user->getEmailForVerification()))) {
             return redirect()->away("{$frontendUrl}/verify-email?status=invalid");

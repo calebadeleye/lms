@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { apiFetch, ApiError } from '@/lib/api-server';
 import { SiteHeader } from '@/components/site-header';
@@ -9,8 +9,7 @@ import { OneToOneBookingForm, GroupSessionList } from '@/components/coach-bookin
 import { DAY_NAMES, type CoachDetail } from '@/lib/coaching-types';
 
 export default async function CoachProfilePage({ params }: { params: Promise<{ coachId: string }> }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const { coachId } = await params;
 
@@ -27,14 +26,14 @@ export default async function CoachProfilePage({ params }: { params: Promise<{ c
   const availabilityByDay = [...coach.availability_rules].sort((a, b) => a.day_of_week - b.day_of_week);
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding?.logo_url ?? null} isAuthenticated={user !== null} />
 
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-12 sm:px-6">
         <div className="flex items-center gap-4">
           <span
             aria-hidden
-            className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-[var(--tenant-primary)] text-2xl font-bold text-[var(--tenant-accent)]"
+            className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-[var(--brand-primary)] text-2xl font-bold text-[var(--brand-accent)]"
           >
             {coach.name.charAt(0)}
           </span>

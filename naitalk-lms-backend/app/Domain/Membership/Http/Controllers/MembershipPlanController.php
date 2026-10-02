@@ -8,7 +8,6 @@ use App\Domain\Membership\Services\MembershipService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class MembershipPlanController extends Controller
 {
@@ -52,20 +51,6 @@ class MembershipPlanController extends Controller
         return response()->json(['data' => ['success' => true]]);
     }
 
-    /** Free plans activate instantly; paid plans go through CheckoutController::membership(). */
-    public function subscribe(Request $request, string $planId)
-    {
-        $plan = LearnerMembershipPlan::where('is_active', true)->findOrFail($planId);
-
-        if (! $plan->isFree()) {
-            throw ValidationException::withMessages(['plan' => ['This plan requires payment — use the checkout endpoint instead.']]);
-        }
-
-        $subscription = $this->memberships->activate($request->user(), $plan);
-
-        return response()->json(['data' => $subscription], 201);
-    }
-
     public function mySubscription(Request $request)
     {
         $subscription = LearnerSubscription::where('user_id', $request->user()->id)
@@ -89,7 +74,7 @@ class MembershipPlanController extends Controller
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'billing_period' => ['required', 'in:monthly,annual,free'],
+            'billing_period' => ['required', 'in:monthly,annual'],
             'price_cents' => ['integer', 'min:0'],
             'currency' => ['string', 'size:3'],
             'benefits' => ['array'],

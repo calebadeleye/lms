@@ -2,7 +2,6 @@
 
 namespace App\Domain\Learning\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Course extends Model
 {
-    use BelongsToTenant, HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'category_id', 'title', 'slug', 'excerpt', 'description', 'thumbnail_path', 'promo_video_path',
@@ -70,12 +69,10 @@ class Course extends Model
     }
 
     /**
-     * Stored as `{tenant}/courses/{course}/thumbnail.{ext}` on the private
-     * `tenants` disk — not browser-loadable directly. Root-relative rather
-     * than absolute: the browser only ever talks to the Next.js app's own
-     * origin, never the backend's host directly (see
-     * TenantConfigController::assetUrl() for the identical reasoning with
-     * branding logos). The `?v=` suffix cache-busts
+     * Stored as `courses/{course}/thumbnail.{ext}` on the private `uploads`
+     * disk — not browser-loadable directly. Root-relative rather than
+     * absolute: the browser only ever talks to the Next.js app's own origin,
+     * never the backend's host directly. The `?v=` suffix cache-busts
      * CourseAssetController's `max-age=3600` response header after a
      * re-upload replaces the same filename.
      */
@@ -85,8 +82,8 @@ class Course extends Model
             return null;
         }
 
-        $path = "/api/v1/course-assets/{$this->tenant_id}/{$this->id}/".basename($this->thumbnail_path);
-        $version = Storage::disk('tenants')->lastModified($this->thumbnail_path);
+        $path = "/api/v1/course-assets/{$this->id}/".basename($this->thumbnail_path);
+        $version = Storage::disk('uploads')->lastModified($this->thumbnail_path);
 
         return $version ? "{$path}?v={$version}" : $path;
     }

@@ -4,7 +4,6 @@ namespace App\Domain\Learning\Services;
 
 use App\Domain\Learning\Models\Certificate;
 use App\Domain\Learning\Models\Enrolment;
-use App\Domain\Tenancy\Services\TenantContext;
 use Illuminate\Support\Str;
 
 /**
@@ -15,8 +14,6 @@ use Illuminate\Support\Str;
  */
 class CertificateService
 {
-    public function __construct(private TenantContext $tenantContext) {}
-
     public function issueForEnrolment(Enrolment $enrolment): ?Certificate
     {
         $course = $enrolment->course;
@@ -34,13 +31,12 @@ class CertificateService
         }
 
         $enrolment->loadMissing('user');
-        $tenant = $this->tenantContext->tenant();
 
         return Certificate::create([
             'user_id' => $enrolment->user_id,
             'course_id' => $course->id,
             'enrolment_id' => $enrolment->id,
-            'certificate_number' => $this->nextCertificateNumber($tenant->slug),
+            'certificate_number' => $this->nextCertificateNumber(),
             'verification_code' => (string) Str::uuid(),
             'recipient_name' => $enrolment->user->name,
             'course_title' => $course->title,
@@ -58,16 +54,17 @@ class CertificateService
 
     /**
      * Count-then-format rather than a dedicated sequence table — simple, and
-     * a collision needs two completions in the same tenant/year landing in
-     * the same instant, which `unique(tenant_id, certificate_number)` would
-     * reject outright. Accepted at this scale; a real sequence table is the
-     * production hardening if that ever becomes a measured problem.
+     * a collision needs two completions landing in the same instant, which
+     * `unique(certificate_number)` would reject outright. Accepted at this
+     * scale; a real sequence table is the production hardening if that ever
+     * becomes a measured problem.
      */
-    private function nextCertificateNumber(string $tenantSlug): string
+    private function nextCertificateNumber(): string
     {
         $year = now()->year;
         $countThisYear = Certificate::whereYear('issued_at', $year)->count();
+        $prefix = Str::upper(Str::slug(config('app.name'), ''));
 
-        return sprintf('%s-%d-%04d', strtoupper($tenantSlug), $year, $countThisYear + 1);
+        return sprintf('%s-%d-%04d', $prefix, $year, $countThisYear + 1);
     }
 }

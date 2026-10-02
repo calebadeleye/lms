@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             // Course|LearnerMembershipPlan|CoachingService — polymorphic on
             // purpose (see ARCHITECTURE.md §11 for why there's no separate
@@ -24,7 +23,7 @@ return new class extends Migration
             $table->unsignedInteger('quantity')->default(1);
             $table->timestamps();
 
-            $table->index(['tenant_id', 'order_id']);
+            $table->index('order_id');
             $table->index(['itemable_type', 'itemable_id']);
         });
     }

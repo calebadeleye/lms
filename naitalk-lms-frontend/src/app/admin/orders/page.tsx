@@ -1,9 +1,9 @@
-import { notFound, redirect } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { redirect } from 'next/navigation';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
-import { tenantAdminNav } from '@/lib/nav';
+import { adminNav } from '@/lib/nav';
 import { formatPrice } from '@/lib/learning-types';
 import { RefundButton } from '@/components/admin/refund-button';
 import { ReconcileButton } from '@/components/admin/reconcile-button';
@@ -30,8 +30,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function AdminOrdersPage() {
-  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
-  if (!config) notFound();
+  const config = BRANDING;
+  const me = await requireUser();
   if (!me.permissions.includes('payments.view')) redirect('/dashboard');
 
   const orders = await apiFetch<{ data: AdminOrder[]; meta: { pagination: { total: number } } }>(
@@ -39,7 +39,7 @@ export default async function AdminOrdersPage() {
   );
 
   return (
-    <DashboardShell tenantName={config.tenant.name} navItems={tenantAdminNav} userName={me.user.name} activeHref="/admin/orders">
+    <DashboardShell tenantName={config.tenant.name} navItems={adminNav} userName={me.user.name} activeHref="/admin/orders">
       <h1 className="text-xl font-bold text-neutral-900">Orders</h1>
       <p className="mt-1 text-sm text-neutral-500">{orders.meta.pagination.total} total transactions.</p>
 

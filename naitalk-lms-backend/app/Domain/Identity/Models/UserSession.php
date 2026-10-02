@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class UserSession extends Model
 {
     protected $fillable = [
-        'user_id', 'personal_access_token_id', 'tenant_id', 'device_label',
+        'user_id', 'personal_access_token_id', 'device_label',
         'ip_address', 'user_agent', 'last_used_at', 'revoked_at',
     ];
 

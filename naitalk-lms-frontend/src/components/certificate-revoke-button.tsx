@@ -39,7 +39,7 @@ export function CertificateRevokeButton({ certificateId }: { certificateId: numb
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         placeholder="Reason"
-        className="w-32 rounded-md border border-neutral-300 px-2 py-1 text-xs focus:border-[var(--tenant-primary)] focus:outline-none"
+        className="w-32 rounded-md border border-neutral-300 px-2 py-1 text-xs focus:border-[var(--brand-primary)] focus:outline-none"
       />
       <button
         type="submit"

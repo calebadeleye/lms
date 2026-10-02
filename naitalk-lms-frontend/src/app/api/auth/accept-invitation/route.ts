@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getCurrentHostname } from '@/lib/tenant';
 import { getSession } from '@/lib/session';
 
 const acceptSchema = z
@@ -23,14 +22,12 @@ export async function POST(request: Request) {
   }
 
   const { token, ...body } = parsed.data;
-  const hostname = await getCurrentHostname();
 
   const response = await fetch(`${process.env.BACKEND_SERVER_URL}/api/v1/invitations/${token}/accept`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      'X-Tenant-Hostname': hostname,
       'X-Internal-Secret': process.env.BACKEND_INTERNAL_SECRET as string,
     },
     body: JSON.stringify(body),

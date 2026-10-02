@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('category_id')->nullable()->constrained('course_categories')->nullOnDelete();
             $table->string('title');
             $table->string('slug');
@@ -35,9 +34,9 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['tenant_id', 'slug']);
-            $table->index(['tenant_id', 'status']);
-            $table->index(['tenant_id', 'category_id']);
+            $table->unique('slug');
+            $table->index('status');
+            $table->index('category_id');
         });
     }
 

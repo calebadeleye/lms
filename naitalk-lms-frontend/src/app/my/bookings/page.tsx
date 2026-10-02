@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -17,8 +16,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function MyBookingsPage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const me = await requireUser();
   const bookings = await apiFetch<{ data: BookingRecord[] }>('/api/v1/my/bookings');
@@ -31,7 +29,7 @@ export default async function MyBookingsPage() {
         {bookings.data.length === 0 ? (
           <p className="p-6 text-sm text-neutral-500">
             You haven&apos;t booked any coaching sessions yet.{' '}
-            <Link href="/coaching" className="font-medium text-[var(--tenant-primary)] underline">
+            <Link href="/coaching" className="font-medium text-[var(--brand-primary)] underline">
               Browse coaches
             </Link>
             .
@@ -50,7 +48,7 @@ export default async function MyBookingsPage() {
                       href={booking.session.meeting_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="mt-1 inline-block text-xs font-medium text-[var(--tenant-primary)] underline"
+                      className="mt-1 inline-block text-xs font-medium text-[var(--brand-primary)] underline"
                     >
                       Join meeting
                     </a>

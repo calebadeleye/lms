@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('coaching_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('coaching_service_id')->constrained('coaching_services')->cascadeOnDelete();
             $table->foreignId('coach_id')->constrained('coaches')->cascadeOnDelete();
             $table->timestamp('scheduled_start');
@@ -21,7 +20,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->index(['tenant_id', 'coach_id', 'scheduled_start']);
+            $table->index(['coach_id', 'scheduled_start']);
         });
     }
 

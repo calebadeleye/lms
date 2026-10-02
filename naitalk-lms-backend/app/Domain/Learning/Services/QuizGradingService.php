@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
  * points-possible totals, so an ungraded free-text question neither helps
  * nor hurts the score. Manual grading of free-text answers (an instructor
  * reviewing and setting points_awarded) is documented remaining work, not
- * implemented this phase — tenants building free-text quizzes today should
+ * implemented this phase — anyone building free-text quizzes today should
  * know those questions don't currently affect pass/fail.
  */
 class QuizGradingService

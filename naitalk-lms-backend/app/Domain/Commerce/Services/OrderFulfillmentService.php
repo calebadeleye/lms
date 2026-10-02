@@ -7,7 +7,8 @@ use App\Domain\Commerce\Contracts\PaymentProviderInterface;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\Payment;
 use App\Domain\Commerce\Models\PaymentAllocation;
-use App\Domain\Commerce\Models\TenantPaymentConfig;
+use App\Domain\Commerce\Models\PaymentConfig;
+use App\Domain\Identity\Models\MembershipApplication;
 use App\Domain\Learning\Models\Course;
 use App\Domain\Learning\Services\EnrolmentService;
 use App\Domain\Membership\Models\LearnerMembershipPlan;
@@ -41,7 +42,7 @@ class OrderFulfillmentService
      */
     public function reconcileWithProvider(
         Order $order,
-        TenantPaymentConfig $config,
+        PaymentConfig $config,
         PaymentProviderInterface $provider,
         CommissionService $commission,
     ): string {
@@ -70,8 +71,54 @@ class OrderFulfillmentService
             'currency' => $verified['currency'],
             'provider_fee_cents' => $verified['provider_fee_cents'],
             'platform_commission_cents' => $split['commission_cents'],
-            'tenant_net_cents' => $split['tenant_net_cents'],
+            'org_net_cents' => $split['org_net_cents'],
             'fee_bearer' => $config->fee_bearer,
+            'paid_at' => now(),
+            'raw_response' => $this->stripSecrets($verified['raw']),
+        ]);
+
+        $order->markPaid();
+        $this->fulfill($order, $payment);
+
+        return 'fulfilled';
+    }
+
+    /**
+     * The registration-fee equivalent of reconcileWithProvider() — no
+     * PaymentConfig involved at all (see CheckoutService::checkoutRegistrationFee()),
+     * so there's no org commission split to calculate: the platform receives
+     * the whole amount, already divided at Paystack's end by the
+     * registration split code. Called synchronously from the checkout
+     * status-polling endpoint rather than waiting on a webhook, since this
+     * charge isn't tied to any organization's own configured gateway/webhook.
+     */
+    public function reconcileRegistrationFee(Order $order, PaymentProviderInterface $provider): string
+    {
+        if ($order->isPaid()) {
+            return 'already_paid';
+        }
+
+        if (! $order->provider_reference) {
+            return 'no_reference';
+        }
+
+        $verified = $provider->verifyPayment($order->provider_reference);
+
+        if ($verified['status'] !== 'success') {
+            return 'not_paid';
+        }
+
+        $payment = Payment::create([
+            'order_id' => $order->id,
+            'provider' => $order->provider,
+            'provider_reference' => $verified['provider_reference'],
+            'status' => 'success',
+            'gross_amount_cents' => $verified['amount_cents'],
+            'currency' => $verified['currency'],
+            'provider_fee_cents' => $verified['provider_fee_cents'],
+            'platform_commission_cents' => 0,
+            'org_net_cents' => $verified['amount_cents'],
+            'fee_bearer' => 'platform',
             'paid_at' => now(),
             'raw_response' => $this->stripSecrets($verified['raw']),
         ]);
@@ -98,6 +145,7 @@ class OrderFulfillmentService
                 'course' => $this->fulfillCourse($order, $item),
                 'membership_plan' => $this->fulfillMembership($order, $item),
                 'booking' => $this->fulfillBooking($item),
+                'membership_application' => $this->fulfillMembershipApplicationFee($item),
                 default => throw new \LogicException("Unknown order item type: {$item->itemable_type}"),
             };
 
@@ -130,5 +178,13 @@ class OrderFulfillmentService
         $booking->update(['status' => 'confirmed']);
 
         return $booking;
+    }
+
+    private function fulfillMembershipApplicationFee($item)
+    {
+        $application = MembershipApplication::findOrFail($item->itemable_id);
+        $application->update(['payment_status' => 'paid']);
+
+        return $application;
     }
 }

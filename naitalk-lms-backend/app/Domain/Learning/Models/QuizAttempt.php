@@ -2,7 +2,6 @@
 
 namespace App\Domain\Learning\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class QuizAttempt extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = [
         'quiz_id', 'user_id', 'enrolment_id', 'attempt_number', 'started_at',

@@ -2,8 +2,10 @@
 
 namespace App\Domain\Commerce\Services;
 
+use App\Domain\Commerce\Models\MembershipFeePayment;
 use App\Domain\Commerce\Models\Order;
-use App\Domain\Commerce\Models\TenantPaymentConfig;
+use App\Domain\Commerce\Models\PaymentConfig;
+use App\Domain\Identity\Models\MembershipApplication;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +34,7 @@ class CheckoutService
         string $currency,
         string $callbackUrl,
     ): array {
-        $config = TenantPaymentConfig::where('status', 'active')->first();
+        $config = PaymentConfig::where('status', 'active')->first();
 
         if (! $config) {
             throw ValidationException::withMessages([
@@ -41,7 +43,7 @@ class CheckoutService
         }
 
         $estimatedFeeCents = $config->fee_bearer === 'learner'
-            ? (int) round($priceCents * (config('services.platform_billing.estimated_provider_fee_percent', 1.5) / 100))
+            ? (int) round($priceCents * (config('services.managed_payments.estimated_provider_fee_percent', 1.5) / 100))
             : 0;
         $totalCents = $priceCents + $estimatedFeeCents;
 
@@ -70,19 +72,196 @@ class CheckoutService
 
         $reference = "order_{$order->id}_{$order->idempotency_key}";
 
-        $provider = $this->providers->forTenantConfig($config);
+        $provider = $this->providers->forConfig($config);
 
-        $result = $provider->initializePayment([
-            'email' => $user->email,
-            'amount_cents' => $totalCents,
-            'currency' => $order->currency,
-            'reference' => $reference,
-            'callback_url' => $callbackUrl,
-            'subaccount_code' => $config->subaccount_code,
-        ]);
+        // See checkoutMembershipFee()'s identical catch for why this is
+        // here: without it, a gateway-side rejection (deactivated
+        // integration, bad keys, network hiccup) surfaces to the buyer as
+        // a raw 500 instead of any message, and leaves the order stuck
+        // "pending" with no provider_reference to ever reconcile.
+        try {
+            $result = $provider->initializePayment([
+                'email' => $user->email,
+                'amount_cents' => $totalCents,
+                'currency' => $order->currency,
+                'reference' => $reference,
+                'callback_url' => $callbackUrl,
+                'subaccount_code' => $config->subaccount_code,
+            ]);
+        } catch (\Throwable $e) {
+            $order->update(['status' => 'failed']);
+            report($e);
+
+            throw ValidationException::withMessages([
+                'payment' => ['We couldn\'t start your payment right now. Please try again shortly, or contact us if this continues.'],
+            ]);
+        }
 
         $order->update(['provider_reference' => $result['provider_reference']]);
 
         return ['authorization_url' => $result['authorization_url'], 'order' => $order->fresh('items')];
+    }
+
+    /**
+     * The one-time HR GEMs membership registration fee. Deliberately doesn't
+     * go through the org's own PaymentConfig at all — this always charges
+     * via the platform's own managed Paystack account (see
+     * PaymentProviderFactory::forManagedPaystack()) and its own
+     * pre-configured Transaction Split, regardless of whatever gateway (if
+     * any) the org has configured for its own course/membership sales.
+     */
+    public function checkoutRegistrationFee(User $user, MembershipApplication $application, string $callbackUrl): array
+    {
+        $priceCents = (int) config('services.paystack.registration_fee_cents');
+        $currency = 'NGN';
+
+        $order = DB::transaction(function () use ($user, $application, $priceCents, $currency) {
+            $order = Order::create([
+                'user_id' => $user->id,
+                'status' => 'pending',
+                'currency' => $currency,
+                'subtotal_cents' => $priceCents,
+                'fee_cents' => 0,
+                'total_cents' => $priceCents,
+                'payment_mode' => 'managed',
+                'provider' => 'paystack',
+            ]);
+
+            $order->items()->create([
+                'itemable_type' => $application->getMorphClass(),
+                'itemable_id' => $application->id,
+                'name' => 'HR GEMs membership registration fee',
+                'unit_price_cents' => $priceCents,
+                'quantity' => 1,
+            ]);
+
+            return $order;
+        });
+
+        $reference = "order_{$order->id}_{$order->idempotency_key}";
+
+        // See checkout()/checkoutMembershipFee()'s identical catch for why
+        // this is here: without it, a gateway-side rejection (deactivated
+        // integration, bad keys, network hiccup) surfaces to the applicant
+        // as a raw 500 instead of any message, and leaves the order stuck
+        // "pending" with no provider_reference to ever reconcile.
+        try {
+            $result = $this->providers->forManagedPaystack()->initializePayment([
+                'email' => $user->email,
+                'amount_cents' => $priceCents,
+                'currency' => $currency,
+                'reference' => $reference,
+                'callback_url' => $callbackUrl,
+                'split_code' => config('services.paystack.registration_split_code'),
+            ]);
+        } catch (\Throwable $e) {
+            $order->update(['status' => 'failed']);
+            report($e);
+
+            throw ValidationException::withMessages([
+                'payment' => ['We couldn\'t start your payment right now. Please try again shortly, or contact us if this continues.'],
+            ]);
+        }
+
+        $order->update(['provider_reference' => $result['provider_reference']]);
+
+        return ['authorization_url' => $result['authorization_url'], 'order' => $order->fresh('items')];
+    }
+
+    /**
+     * The public membership page's "pay first, then register" flow — no
+     * user account exists yet, just a name + email typed into the pay
+     * modal. Uses the organization's own activated PaymentConfig (whatever
+     * the admin has set up at /admin/payments), unlike
+     * checkoutRegistrationFee()'s platform-managed account. Matching this
+     * payment to the account the payer later creates via /register (with
+     * the same email) is a manual step, not reconciled automatically here.
+     */
+    public function checkoutMembershipFee(string $name, string $email, string $callbackUrl): array
+    {
+        $config = PaymentConfig::where('status', 'active')->first();
+
+        if (! $config) {
+            throw ValidationException::withMessages([
+                'payment' => ['Membership payments are not configured yet. Please try again later.'],
+            ]);
+        }
+
+        $priceCents = (int) config('services.membership.fee_cents');
+        $currency = 'NGN';
+
+        $payment = MembershipFeePayment::create([
+            'name' => $name,
+            'email' => $email,
+            'amount_cents' => $priceCents,
+            'currency' => $currency,
+            'provider' => $config->provider,
+            'status' => 'pending',
+        ]);
+
+        $reference = "membershipfee_{$payment->id}_{$payment->idempotency_key}";
+
+        $provider = $this->providers->forConfig($config);
+
+        // The gateway itself can reject this (expired/deactivated
+        // integration, bad live keys, network hiccup) — without this catch,
+        // Http::throw() inside initializePayment() propagates as an
+        // uncaught RequestException and the payer sees a raw 500 instead of
+        // any message. Mark the payment failed rather than leaving it
+        // stuck "pending" forever with no provider_reference to reconcile.
+        try {
+            $result = $provider->initializePayment([
+                'email' => $email,
+                'amount_cents' => $priceCents,
+                'currency' => $currency,
+                'reference' => $reference,
+                'callback_url' => $callbackUrl,
+                'subaccount_code' => $config->subaccount_code,
+            ]);
+        } catch (\Throwable $e) {
+            $payment->update(['status' => 'failed']);
+            report($e);
+
+            throw ValidationException::withMessages([
+                'payment' => ['We couldn\'t start your payment right now. Please try again shortly, or contact us if this continues.'],
+            ]);
+        }
+
+        $payment->update(['provider_reference' => $result['provider_reference']]);
+
+        return ['authorization_url' => $result['authorization_url'], 'reference' => $reference];
+    }
+
+    /**
+     * Called from the public status-polling endpoint once the payer's
+     * browser returns from the provider — mirrors
+     * OrderFulfillmentService::reconcileRegistrationFee()'s "verify
+     * directly, no webhook needed" approach, since this payment isn't tied
+     * to any organization webhook subscription either.
+     */
+    public function reconcileMembershipFee(MembershipFeePayment $payment): MembershipFeePayment
+    {
+        if ($payment->isPaid() || ! $payment->provider_reference) {
+            return $payment;
+        }
+
+        $config = PaymentConfig::where('status', 'active')->first();
+
+        if (! $config) {
+            return $payment;
+        }
+
+        $verified = $this->providers->forConfig($config)->verifyPayment($payment->provider_reference);
+
+        if ($verified['status'] !== 'success') {
+            return $payment;
+        }
+
+        $raw = $verified['raw'];
+        unset($raw['authorization'], $raw['card'], $raw['customer']['phone']);
+
+        $payment->update(['status' => 'paid', 'paid_at' => now(), 'raw_response' => $raw]);
+
+        return $payment;
     }
 }

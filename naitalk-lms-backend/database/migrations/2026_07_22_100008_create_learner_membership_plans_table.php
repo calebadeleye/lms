@@ -10,10 +10,9 @@ return new class extends Migration
     {
         Schema::create('learner_membership_plans', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->string('name');
             $table->string('slug');
-            // monthly|annual|free
+            // monthly|annual
             $table->string('billing_period');
             $table->unsignedBigInteger('price_cents')->default(0);
             $table->string('currency', 3)->default('NGN');
@@ -22,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['tenant_id', 'slug']);
+            $table->unique('slug');
         });
     }
 

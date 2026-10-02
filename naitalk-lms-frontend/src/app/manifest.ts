@@ -1,10 +1,9 @@
 import type { MetadataRoute } from 'next';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 
-export default async function manifest(): Promise<MetadataRoute.Manifest> {
-  const config = await getTenantConfig();
-  const branding = config?.branding;
-  const name = branding?.pwa.name ?? config?.tenant.name ?? 'NAI TALK LMS';
+export default function manifest(): MetadataRoute.Manifest {
+  const { branding } = BRANDING;
+  const name = branding.pwa.name;
 
   return {
     name,
@@ -13,8 +12,8 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     start_url: '/dashboard',
     display: 'standalone',
     background_color: '#ffffff',
-    theme_color: branding?.pwa.theme_color ?? branding?.primary_color ?? '#3B0F32',
-    icons: branding?.pwa.icon_url
+    theme_color: branding.pwa.theme_color,
+    icons: branding.pwa.icon_url
       ? [{ src: branding.pwa.icon_url, sizes: 'any', type: 'image/png' }]
       : [{ src: '/favicon.ico', sizes: 'any', type: 'image/x-icon' }],
   };

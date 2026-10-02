@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckoutButton } from '@/components/checkout-button';
 
@@ -11,14 +11,17 @@ export function EnrollButton({
   isMembershipOnly,
   isEnrolled,
   isAuthenticated,
+  priceLabel,
 }: {
   courseId: number;
   isFree: boolean;
   isMembershipOnly?: boolean;
   isEnrolled: boolean;
   isAuthenticated: boolean;
+  priceLabel?: string;
 }) {
   const router = useRouter();
+  const redirect = encodeURIComponent(usePathname());
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +29,7 @@ export function EnrollButton({
     return (
       <button
         onClick={() => router.push('/my/courses')}
-        className="w-full rounded-md bg-[var(--tenant-accent)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90"
+        className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90"
       >
         Continue Learning
       </button>
@@ -36,16 +39,24 @@ export function EnrollButton({
   if (!isFree && !isMembershipOnly) {
     if (!isAuthenticated) {
       return (
-        <button
-          onClick={() => router.push(`/login?redirect=/courses`)}
-          className="w-full rounded-md bg-[var(--tenant-accent)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90"
-        >
-          Log in to Purchase
-        </button>
+        <div>
+          <button
+            onClick={() => router.push(`/signup?redirect=${redirect}`)}
+            className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90"
+          >
+            Sign Up to Purchase
+          </button>
+          <p className="mt-2 text-center text-xs text-neutral-500">
+            Already have an account?{' '}
+            <Link href={`/login?redirect=${redirect}`} className="font-medium text-[var(--brand-primary)] underline">
+              Log in
+            </Link>
+          </p>
+        </div>
       );
     }
 
-    return <CheckoutButton kind="courses" id={courseId} label="Buy Now" pendingLabel="Redirecting to payment…" />;
+    return <CheckoutButton kind="courses" id={courseId} label={priceLabel ? `Buy Now — ${priceLabel}` : 'Buy Now'} pendingLabel="Redirecting to payment…" />;
   }
 
   // Free courses enrol directly. Membership-only courses go through the
@@ -54,7 +65,7 @@ export function EnrollButton({
   // immediately and a non-member gets the real reason back as a 422.
   async function handleEnroll() {
     if (!isAuthenticated) {
-      router.push(`/login?redirect=/courses`);
+      router.push(`/signup?redirect=${redirect}`);
       return;
     }
 
@@ -82,7 +93,7 @@ export function EnrollButton({
       <button
         onClick={handleEnroll}
         disabled={pending}
-        className="w-full rounded-md bg-[var(--tenant-accent)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="w-full rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
       >
         {pending ? 'Enrolling…' : isMembershipOnly ? 'Enrol with Membership' : 'Enrol Now — Free'}
       </button>

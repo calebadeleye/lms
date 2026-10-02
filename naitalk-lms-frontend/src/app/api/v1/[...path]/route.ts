@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { getSession } from '@/lib/session';
-import { getCurrentHostname } from '@/lib/tenant';
 
 /**
  * Generic authenticated proxy for Client Components, which can't read the
@@ -11,14 +10,12 @@ import { getCurrentHostname } from '@/lib/tenant';
  */
 async function forward(request: NextRequest, segments: string[]) {
   const session = await getSession();
-  const hostname = await getCurrentHostname();
 
   const targetUrl = new URL(`/api/v1/${segments.join('/')}`, process.env.BACKEND_SERVER_URL);
   targetUrl.search = request.nextUrl.search;
 
   const headers = new Headers();
   headers.set('Accept', 'application/json');
-  headers.set('X-Tenant-Hostname', hostname);
   headers.set('X-Internal-Secret', process.env.BACKEND_INTERNAL_SECRET as string);
 
   const incomingContentType = request.headers.get('content-type');

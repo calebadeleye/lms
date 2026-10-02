@@ -1,6 +1,5 @@
 import 'server-only';
 import { getSession } from '@/lib/session';
-import { getCurrentHostname } from '@/lib/tenant';
 
 export class ApiError extends Error {
   constructor(
@@ -23,11 +22,9 @@ export async function apiFetch<T = unknown>(
   path: string,
   init: RequestInit & { skipAuth?: boolean } = {},
 ): Promise<T> {
-  const hostname = await getCurrentHostname();
   const session = init.skipAuth ? null : await getSession();
 
   const headers = new Headers(init.headers);
-  headers.set('X-Tenant-Hostname', hostname);
   headers.set('X-Internal-Secret', process.env.BACKEND_INTERNAL_SECRET as string);
   headers.set('Accept', 'application/json');
 

@@ -12,8 +12,6 @@ return new class extends Migration
             $table->id();
             $table->string('key')->unique(); // e.g. courses.publish
             $table->string('label');
-            // platform|tenant
-            $table->string('scope');
             $table->timestamps();
         });
     }

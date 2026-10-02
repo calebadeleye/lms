@@ -18,6 +18,13 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
+    // Used only to auto-fill a course thumbnail with a fitting stock photo
+    // when an admin publishes a course without uploading one of their own —
+    // see CourseThumbnailFallbackService.
+    'pexels' => [
+        'key' => env('PEXELS_API_KEY'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
@@ -38,12 +45,25 @@ return [
     'frontend' => [
         'url' => env('FRONTEND_URL', 'http://localhost:3000'),
         'internal_secret' => env('FRONTEND_INTERNAL_SECRET'),
-        'neutral_platform_domain' => env('NEUTRAL_PLATFORM_DOMAIN', 'localhost'),
     ],
 
     'paystack' => [
         'public_key' => env('PAYSTACK_PUBLIC_KEY'),
         'secret_key' => env('PAYSTACK_SECRET_KEY'),
+        // The one-time HR GEMs membership registration fee — always charged
+        // via the platform's own managed Paystack account above (not the
+        // org's own gateway, if it ever configures one), split at Paystack's
+        // level via a pre-configured Transaction Split code.
+        'registration_fee_cents' => (int) env('PAYSTACK_REGISTRATION_FEE_CENTS', 2_000_000),
+        'registration_split_code' => env('PAYSTACK_REGISTRATION_SPLIT_CODE'),
+    ],
+
+    // The public membership page's pre-account "pay, then register" fee —
+    // unlike the registration fee above, this always goes through the
+    // organization's own activated PaymentConfig (whatever gateway/mode the
+    // admin has set up at /admin/payments), not a platform-managed account.
+    'membership' => [
+        'fee_cents' => (int) env('MEMBERSHIP_FEE_CENTS', 2_500_000),
     ],
 
     'flutterwave' => [
@@ -55,8 +75,10 @@ return [
         'webhook_secret' => env('FLUTTERWAVE_WEBHOOK_SECRET'),
     ],
 
-    'platform_billing' => [
-        'provider' => env('PLATFORM_PAYMENT_PROVIDER', 'paystack'),
+    // Managed-payments mode: NAI TALK collects on the organization's behalf
+    // via its own gateway credentials and remits net of a commission.
+    'managed_payments' => [
+        'provider' => env('MANAGED_PAYMENT_PROVIDER', 'paystack'),
         'default_commission_percent' => (float) env('DEFAULT_MANAGED_COMMISSION_PERCENT', 1.0),
         // Used only to estimate the up-front charge when fee_bearer =
         // "learner" — the real fee is always re-read from the provider's

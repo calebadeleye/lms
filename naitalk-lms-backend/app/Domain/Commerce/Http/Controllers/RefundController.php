@@ -4,7 +4,7 @@ namespace App\Domain\Commerce\Http\Controllers;
 
 use App\Domain\Commerce\Models\Payment;
 use App\Domain\Commerce\Services\RefundService;
-use App\Domain\Platform\Services\AuditLogger;
+use App\Domain\Audit\Services\AuditLogger;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 

@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             // Nullable — a certificate must survive the course or enrolment
             // it was earned from being deleted later; recipient_name/course_title
@@ -28,8 +27,8 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamps();
 
-            $table->unique(['tenant_id', 'certificate_number']);
-            $table->index(['tenant_id', 'user_id']);
+            $table->unique('certificate_number');
+            $table->index('user_id');
         });
     }
 

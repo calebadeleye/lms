@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('quiz_answers', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('quiz_attempt_id')->constrained('quiz_attempts')->cascadeOnDelete();
             $table->foreignId('quiz_question_id')->constrained('quiz_questions')->cascadeOnDelete();
             $table->json('selected_option_ids')->nullable();

@@ -1,11 +1,9 @@
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { AuthCard } from '@/components/auth-card';
 import { ForgotPasswordForm } from '@/components/forgot-password-form';
 
 export default async function ForgotPasswordPage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   return (
     <AuthCard

@@ -2,14 +2,12 @@
 
 namespace App\Domain\Coaching\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CoachingSession extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = [
         'coaching_service_id', 'coach_id', 'scheduled_start', 'scheduled_end',

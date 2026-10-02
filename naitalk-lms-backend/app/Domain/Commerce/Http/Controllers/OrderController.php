@@ -3,7 +3,7 @@
 namespace App\Domain\Commerce\Http\Controllers;
 
 use App\Domain\Commerce\Models\Order;
-use App\Domain\Commerce\Models\TenantPaymentConfig;
+use App\Domain\Commerce\Models\PaymentConfig;
 use App\Domain\Commerce\Services\CommissionService;
 use App\Domain\Commerce\Services\OrderFulfillmentService;
 use App\Domain\Commerce\Services\PaymentProviderFactory;
@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
-    /** Tenant staff — transaction list (payments.view). */
+    /** Staff — transaction list (payments.view). */
     public function index(Request $request)
     {
         $orders = Order::with('user:id,name,email', 'items', 'payment')
@@ -39,11 +39,11 @@ class OrderController extends Controller
     }
 
     /**
-     * Tenant staff — manually re-checks a stuck "pending" order directly
+     * Staff — manually re-checks a stuck "pending" order directly
      * with the payment provider and fulfils it if it actually succeeded.
      * The normal path is the webhook; this exists for when that never
      * arrives (most commonly: the webhook URL was never configured on the
-     * provider's dashboard — see TenantPaymentConfig::webhookUrl()).
+     * provider's dashboard — see PaymentConfig::webhookUrl()).
      */
     public function reconcile(
         string $orderId,
@@ -52,7 +52,7 @@ class OrderController extends Controller
         OrderFulfillmentService $fulfillment,
     ) {
         $order = Order::findOrFail($orderId);
-        $config = TenantPaymentConfig::where('status', 'active')->first();
+        $config = PaymentConfig::where('status', 'active')->first();
 
         if (! $config) {
             throw ValidationException::withMessages([
@@ -60,7 +60,7 @@ class OrderController extends Controller
             ]);
         }
 
-        $provider = $providers->forTenantConfig($config);
+        $provider = $providers->forConfig($config);
         $result = $fulfillment->reconcileWithProvider($order, $config, $provider, $commission);
 
         return response()->json(['data' => ['order' => $order->fresh('items', 'payment'), 'result' => $result]]);

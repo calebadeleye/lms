@@ -2,14 +2,12 @@
 
 namespace App\Domain\Learning\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Wishlist extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = ['user_id', 'course_id'];
 

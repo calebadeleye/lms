@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->string('email');
             $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
             $table->string('token')->unique();
@@ -21,7 +20,7 @@ return new class extends Migration
             $table->timestamp('accepted_at')->nullable();
             $table->timestamps();
 
-            $table->index(['tenant_id', 'email']);
+            $table->index('email');
         });
     }
 

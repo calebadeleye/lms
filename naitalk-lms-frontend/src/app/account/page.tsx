@@ -1,5 +1,4 @@
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -15,8 +14,7 @@ interface Session {
 }
 
 export default async function AccountPage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const me = await requireUser();
   const sessionsBody = await apiFetch<{ data: Session[] }>('/api/v1/auth/sessions');

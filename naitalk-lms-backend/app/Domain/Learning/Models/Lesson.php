@@ -2,7 +2,6 @@
 
 namespace App\Domain\Learning\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -10,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lesson extends Model
 {
-    use BelongsToTenant, SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'course_module_id', 'title', 'type', 'content', 'video_path', 'duration_seconds',

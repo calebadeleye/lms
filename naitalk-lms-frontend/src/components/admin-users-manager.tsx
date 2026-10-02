@@ -42,7 +42,7 @@ export function AdminUsersManager({
     if (includeInactive) params.set('include_inactive', '1');
     if (query) params.set('search', query);
 
-    const res = await fetch(`/api/v1/admin/tenant-users?${params.toString()}`);
+    const res = await fetch(`/api/v1/admin/members?${params.toString()}`);
     const body = await res.json();
     setMembers(body.data ?? []);
     setMeta(body.meta?.pagination ?? { page: 1, per_page: PER_PAGE, total: (body.data ?? []).length });
@@ -94,7 +94,7 @@ export function AdminUsersManager({
 
   async function changeRole(userId: number, newRoleId: string) {
     setError(null);
-    const res = await fetch(`/api/v1/admin/tenant-users/${userId}/role`, {
+    const res = await fetch(`/api/v1/admin/members/${userId}/role`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role_id: Number(newRoleId) }),
@@ -113,14 +113,14 @@ export function AdminUsersManager({
 
   async function deactivate(userId: number) {
     if (!window.confirm('Remove this person\'s access to the admin panel?')) return;
-    await fetch(`/api/v1/admin/tenant-users/${userId}`, { method: 'DELETE' });
+    await fetch(`/api/v1/admin/members/${userId}`, { method: 'DELETE' });
     await loadMembers();
     router.refresh();
   }
 
   async function reactivate(userId: number) {
     setError(null);
-    const res = await fetch(`/api/v1/admin/tenant-users/${userId}/reactivate`, { method: 'POST' });
+    const res = await fetch(`/api/v1/admin/members/${userId}/reactivate`, { method: 'POST' });
     if (res.ok) {
       await loadMembers();
       router.refresh();
@@ -147,7 +147,7 @@ export function AdminUsersManager({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="colleague@example.com"
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
         </div>
         <div>
@@ -155,7 +155,7 @@ export function AdminUsersManager({
           <select
             value={roleId}
             onChange={(e) => setRoleId(e.target.value)}
-            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           >
             {roles.map((r) => (
               <option key={r.id} value={r.id}>
@@ -168,7 +168,7 @@ export function AdminUsersManager({
           <button
             type="submit"
             disabled={pending || !email}
-            className="w-full rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
           >
             {pending ? 'Sending…' : 'Invite'}
           </button>
@@ -229,7 +229,7 @@ export function AdminUsersManager({
                     <select
                       value={member.role_id}
                       onChange={(e) => changeRole(member.id, e.target.value)}
-                      className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs focus:border-[var(--tenant-primary)] focus:outline-none"
+                      className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs focus:border-[var(--brand-primary)] focus:outline-none"
                     >
                       {roles.map((r) => (
                         <option key={r.id} value={r.id}>

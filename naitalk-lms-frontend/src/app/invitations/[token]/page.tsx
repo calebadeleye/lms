@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { apiFetch, ApiError } from '@/lib/api-server';
 import { AuthCard } from '@/components/auth-card';
 import { AcceptInvitationForm } from '@/components/accept-invitation-form';
@@ -11,8 +11,7 @@ interface InvitationPreview {
 }
 
 export default async function AcceptInvitationPage({ params }: { params: Promise<{ token: string }> }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const { token } = await params;
 

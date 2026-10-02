@@ -2,14 +2,11 @@
 
 namespace App\Domain\Identity\Http\Controllers;
 
-use App\Domain\Billing\Services\TenantUsageService;
 use App\Domain\Identity\Models\Invitation;
 use App\Domain\Identity\Models\Role;
-use App\Domain\Identity\Models\TenantUser;
-use App\Domain\Identity\Notifications\AddedToTenantNotification;
-use App\Domain\Identity\Notifications\TenantInvitationNotification;
+use App\Domain\Identity\Notifications\AddedAsMemberNotification;
+use App\Domain\Identity\Notifications\MemberInvitationNotification;
 use App\Domain\Identity\Services\AuthService;
-use App\Domain\Tenancy\Services\TenantContext;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,13 +18,9 @@ use Illuminate\Validation\ValidationException;
 
 class InvitationController extends Controller
 {
-    public function __construct(
-        private TenantContext $tenantContext,
-        private AuthService $auth,
-        private TenantUsageService $usage,
-    ) {}
+    public function __construct(private AuthService $auth) {}
 
-    /** Admin — pending invitations for this tenant. */
+    /** Admin — pending invitations. */
     public function index()
     {
         $invitations = Invitation::where('status', 'pending')->with('role:id,name')->orderByDesc('created_at')->get();
@@ -37,9 +30,8 @@ class InvitationController extends Controller
 
     /**
      * Admin — invite someone by email. Two paths: if that email already has
-     * an account (anywhere — a User row isn't tenant-scoped), they're added
-     * to this tenant directly since there's no need to make them set a
-     * password again; otherwise a real invitation + accept-by-token flow.
+     * an account, they're added directly since there's no need to make them
+     * set a password again; otherwise a real invitation + accept-by-token flow.
      */
     public function store(Request $request)
     {
@@ -48,31 +40,13 @@ class InvitationController extends Controller
             'role_id' => ['required', 'exists:roles,id'],
         ]);
 
-        $tenant = $this->tenantContext->tenant();
-        $role = Role::forTenant($tenant->id)->findOrFail($data['role_id']);
+        $role = Role::findOrFail($data['role_id']);
         $existingUser = User::where('email', $data['email'])->first();
 
-        $metric = $this->usage->metricForRole($role->slug);
-        if ($metric && ! $this->usage->hasCapacity($tenant, $metric)) {
-            throw ValidationException::withMessages([
-                'role_id' => ["Your plan's limit for this role has been reached. Upgrade your plan to add more."],
-            ]);
-        }
-
         if ($existingUser) {
-            if (TenantUser::where('user_id', $existingUser->id)->exists()) {
-                throw ValidationException::withMessages(['email' => ['This person is already a member of this tenant.']]);
-            }
+            $existingUser->update(['role_id' => $role->id, 'status' => 'active']);
 
-            TenantUser::create([
-                'user_id' => $existingUser->id, 'role_id' => $role->id, 'status' => 'active', 'joined_at' => now(),
-            ]);
-
-            if ($metric) {
-                $this->usage->forget($tenant, $metric);
-            }
-
-            Notification::route('mail', $existingUser->email)->notify(new AddedToTenantNotification($tenant, $role));
+            Notification::route('mail', $existingUser->email)->notify(new AddedAsMemberNotification($role));
 
             return response()->json(['data' => ['status' => 'added_existing_user']], 201);
         }
@@ -90,29 +64,20 @@ class InvitationController extends Controller
             'expires_at' => now()->addDays(7),
         ]);
 
-        if ($metric) {
-            $this->usage->forget($tenant, $metric);
-        }
-
-        Notification::route('mail', $data['email'])->notify(new TenantInvitationNotification($invitation));
+        Notification::route('mail', $data['email'])->notify(new MemberInvitationNotification($invitation));
 
         return response()->json(['data' => $invitation->load('role:id,name')], 201);
     }
 
     public function destroy(string $invitationId)
     {
-        $invitation = Invitation::where('status', 'pending')->findOrFail($invitationId);
-        $invitation->update(['status' => 'revoked']);
-
-        if ($metric = $this->usage->metricForRole($invitation->role->slug)) {
-            $this->usage->forget($this->tenantContext->tenant(), $metric);
-        }
+        Invitation::where('status', 'pending')->findOrFail($invitationId)->update(['status' => 'revoked']);
 
         return response()->json(['data' => ['success' => true]]);
     }
 
     /** Public — preview for the accept-invitation page ("You've been
-     * invited to join X as Y"), before the invitee commits to anything. */
+     * invited to join as Y"), before the invitee commits to anything. */
     public function show(string $token)
     {
         $invitation = Invitation::where('token', $token)->where('status', 'pending')->firstOrFail();
@@ -123,7 +88,6 @@ class InvitationController extends Controller
 
         return response()->json(['data' => [
             'email' => $invitation->email,
-            'tenant_name' => $invitation->tenant->name,
             'role_name' => $invitation->role->name,
         ]]);
     }
@@ -145,34 +109,24 @@ class InvitationController extends Controller
             'password' => ['required', 'confirmed', Password::min(10)->mixedCase()->numbers()],
         ]);
 
-        $tenant = $invitation->tenant;
-
-        $user = DB::transaction(function () use ($data, $invitation, $tenant) {
+        $user = DB::transaction(function () use ($data, $invitation) {
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $invitation->email,
                 'password' => $data['password'],
-            ]);
-            $user->forceFill(['email_verified_at' => now()])->save();
-
-            TenantUser::create([
-                'user_id' => $user->id,
                 'role_id' => $invitation->role_id,
                 'status' => 'active',
-                'invited_by' => $invitation->invited_by,
                 'joined_at' => now(),
+                'invited_by' => $invitation->invited_by,
             ]);
-
-            if ($invitation->role->slug === 'tenant-owner' && ! $tenant->owner_user_id) {
-                $tenant->update(['owner_user_id' => $user->id]);
-            }
+            $user->forceFill(['email_verified_at' => now()])->save();
 
             $invitation->update(['status' => 'accepted', 'accepted_at' => now()]);
 
             return $user;
         });
 
-        $issued = $this->auth->issueToken($user, $request, $tenant->id);
+        $issued = $this->auth->issueToken($user, $request);
 
         return response()->json([
             'data' => [

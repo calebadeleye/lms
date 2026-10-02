@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
@@ -19,8 +18,7 @@ export default async function VerifyEmailPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const { status } = await searchParams;
   const user = await getOptionalUser();
@@ -33,7 +31,7 @@ export default async function VerifyEmailPage({
         : { icon: '📧', title: 'Check your email', message: "We've sent a confirmation link to your email address." };
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding?.logo_url ?? null} isAuthenticated={user !== null} />
 
       <main className="flex flex-1 items-center justify-center px-4 py-20">
@@ -54,7 +52,7 @@ export default async function VerifyEmailPage({
             {status === 'verified' ? (
               <Link
                 href="/dashboard"
-                className="inline-block rounded-md bg-[var(--tenant-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                className="inline-block rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-neutral-900 hover:opacity-90"
               >
                 Go to Dashboard
               </Link>
@@ -63,7 +61,7 @@ export default async function VerifyEmailPage({
             ) : (
               <Link
                 href="/login"
-                className="inline-block rounded-md bg-[var(--tenant-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                className="inline-block rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-neutral-900 hover:opacity-90"
               >
                 Log in
               </Link>

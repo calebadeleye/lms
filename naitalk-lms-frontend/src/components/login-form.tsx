@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 type Errors = Record<string, string[]>;
 
-export function LoginForm() {
+export function LoginForm({ redirectTo, signupHref }: { redirectTo: string; signupHref: string }) {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,7 +37,7 @@ export function LoginForm() {
         return;
       }
 
-      router.push('/dashboard');
+      router.push(redirectTo);
       router.refresh();
     } finally {
       setPending(false);
@@ -62,7 +62,7 @@ export function LoginForm() {
         return;
       }
 
-      router.push('/dashboard');
+      router.push(redirectTo);
       router.refresh();
     } finally {
       setPending(false);
@@ -82,14 +82,14 @@ export function LoginForm() {
             autoFocus
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
           />
           {errors.code && <p className="mt-1 text-xs text-red-600">{errors.code[0]}</p>}
         </div>
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+          className="w-full rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
         >
           {pending ? 'Verifying…' : 'Verify'}
         </button>
@@ -109,7 +109,7 @@ export function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
         {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email[0]}</p>}
       </div>
@@ -118,7 +118,7 @@ export function LoginForm() {
           <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
             Password
           </label>
-          <a href="/forgot-password" className="text-xs font-medium text-[var(--tenant-primary)]">
+          <a href="/forgot-password" className="text-xs font-medium text-[var(--brand-primary)]">
             Forgot password?
           </a>
         </div>
@@ -128,21 +128,27 @@ export function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--tenant-primary)] focus:outline-none"
+          className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-[var(--brand-primary)] focus:outline-none"
         />
         {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password[0]}</p>}
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-[var(--tenant-accent)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="w-full rounded-md bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
       >
         {pending ? 'Signing in…' : 'Sign In'}
       </button>
       <p className="text-center text-sm text-neutral-500">
         Don&apos;t have an account?{' '}
-        <a href="/register" className="font-medium text-[var(--tenant-primary)]">
+        <a href={signupHref} className="font-medium text-[var(--brand-primary)]">
           Sign up
+        </a>
+      </p>
+      <p className="text-center text-xs text-neutral-500">
+        Want to become a coach or join our community?{' '}
+        <a href="/register" className="font-medium text-[var(--brand-primary)]">
+          Join the HR GEMs Coach Network
         </a>
       </p>
     </form>

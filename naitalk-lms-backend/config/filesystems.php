@@ -60,12 +60,10 @@ return [
             'report' => false,
         ],
 
-        // All tenant-owned files (branding, courses, resources, certificates,
-        // exports) live here under tenants/{tenant_uuid}/... — see
-        // App\Domain\Tenancy\Services\TenantStoragePath. S3-compatible in
-        // production; falls back to a local disk when no AWS_BUCKET is set
-        // so the app runs out of the box in local development.
-        'tenants' => env('AWS_BUCKET') ? [
+        // Private uploads (course thumbnails, lesson materials) live here.
+        // S3-compatible in production; falls back to a local disk when no
+        // AWS_BUCKET is set so the app runs out of the box in local dev.
+        'uploads' => env('AWS_BUCKET') ? [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
@@ -79,7 +77,7 @@ return [
             'report' => false,
         ] : [
             'driver' => 'local',
-            'root' => storage_path('app/tenants'),
+            'root' => storage_path('app/uploads'),
             'visibility' => 'private',
             'throw' => true,
             'report' => false,

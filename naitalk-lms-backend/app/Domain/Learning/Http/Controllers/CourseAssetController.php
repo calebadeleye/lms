@@ -6,26 +6,24 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Public — no `tenant` or `auth` middleware. Serves a course's thumbnail
- * from the otherwise-private `tenants` disk so a logged-out browser
- * (browsing the public course catalogue) can load it. Mirrors
- * TenantAssetController's reasoning exactly: the route's regex constraints
- * (see routes/api.php) are what keep this from reaching any other file on
- * the disk — `courseId` is digits-only and `filename` must match
- * `thumbnail.<ext>`, so there's no user-suppliable path segment that could
- * traverse elsewhere.
+ * Public — no auth. Serves a course's thumbnail from the otherwise-private
+ * `uploads` disk so a logged-out browser (browsing the public course
+ * catalogue) can load it. The route's regex constraints (see routes/api.php)
+ * are what keep this from reaching any other file on the disk — `courseId`
+ * is digits-only and `filename` must match `thumbnail.<ext>`, so there's no
+ * user-suppliable path segment that could traverse elsewhere.
  */
 class CourseAssetController extends Controller
 {
-    public function show(string $tenantId, string $courseId, string $filename)
+    public function show(string $courseId, string $filename)
     {
-        $path = "{$tenantId}/courses/{$courseId}/{$filename}";
+        $path = "courses/{$courseId}/{$filename}";
 
-        if (! Storage::disk('tenants')->exists($path)) {
+        if (! Storage::disk('uploads')->exists($path)) {
             abort(404);
         }
 
-        return Storage::disk('tenants')->response($path, null, [
+        return Storage::disk('uploads')->response($path, null, [
             'Cache-Control' => 'public, max-age=3600',
         ]);
     }

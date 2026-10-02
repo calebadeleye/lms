@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('learner_subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('plan_id')->constrained('learner_membership_plans')->restrictOnDelete();
             // active|cancelled|past_due|expired
@@ -21,7 +20,7 @@ return new class extends Migration
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
 
-            $table->index(['tenant_id', 'user_id', 'status']);
+            $table->index(['user_id', 'status']);
         });
     }
 

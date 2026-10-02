@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { redirect } from 'next/navigation';
+import { BRANDING } from '@/lib/branding';
 import { requireUser } from '@/lib/auth-server';
 import { apiFetch } from '@/lib/api-server';
 import { DashboardShell } from '@/components/dashboard-shell';
-import { tenantAdminNav } from '@/lib/nav';
+import { adminNav } from '@/lib/nav';
 import { IssueCertificateButton } from '@/components/admin/issue-certificate-button';
 
 interface EnrolmentRosterItem {
@@ -18,15 +18,15 @@ interface EnrolmentRosterItem {
 }
 
 export default async function CourseEnrolmentsPage({ params }: { params: Promise<{ courseId: string }> }) {
-  const [config, me] = await Promise.all([getTenantConfig(), requireUser()]);
-  if (!config) notFound();
+  const config = BRANDING;
+  const me = await requireUser();
   if (!me.permissions.includes('students.manage')) redirect('/dashboard');
 
   const { courseId } = await params;
   const enrolments = await apiFetch<{ data: EnrolmentRosterItem[] }>(`/api/v1/admin/courses/${courseId}/enrolments`);
 
   return (
-    <DashboardShell tenantName={config.tenant.name} navItems={tenantAdminNav} userName={me.user.name} activeHref="/admin/courses">
+    <DashboardShell tenantName={config.tenant.name} navItems={adminNav} userName={me.user.name} activeHref="/admin/courses">
       <Link href={`/admin/courses/${courseId}`} className="text-xs font-medium text-neutral-500 hover:underline">
         ← Back to course
       </Link>

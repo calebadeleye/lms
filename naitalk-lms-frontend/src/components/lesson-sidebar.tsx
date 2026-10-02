@@ -19,7 +19,7 @@ export function LessonSidebar({ modules }: { modules: LessonModuleNav[] }) {
                   href={`/learn/${lesson.id}`}
                   className={`flex items-center gap-2 px-4 py-2 text-sm ${
                     lesson.is_current
-                      ? 'bg-[var(--tenant-primary)]/10 font-medium text-[var(--tenant-primary)]'
+                      ? 'bg-[var(--brand-primary)]/10 font-medium text-[var(--brand-primary)]'
                       : 'text-neutral-600 hover:bg-neutral-50'
                   }`}
                 >

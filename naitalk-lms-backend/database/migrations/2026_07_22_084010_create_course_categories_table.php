@@ -10,12 +10,11 @@ return new class extends Migration
     {
         Schema::create('course_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->string('name');
             $table->string('slug');
             $table->timestamps();
 
-            $table->unique(['tenant_id', 'slug']);
+            $table->unique('slug');
         });
     }
 

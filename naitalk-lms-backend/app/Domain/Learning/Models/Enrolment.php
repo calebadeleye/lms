@@ -2,7 +2,6 @@
 
 namespace App\Domain\Learning\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Enrolment extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = ['course_id', 'user_id', 'status', 'source', 'enrolled_at', 'completed_at'];
 

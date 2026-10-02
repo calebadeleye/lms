@@ -1,11 +1,19 @@
-import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import type { Metadata } from 'next';
+import { BRANDING } from '@/lib/branding';
 import { AuthCard } from '@/components/auth-card';
 import { LoginForm } from '@/components/login-form';
+import { safeRedirectPath } from '@/lib/safe-redirect';
 
-export default async function LoginPage() {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+export const metadata: Metadata = {
+  title: 'Sign In',
+  robots: { index: false, follow: true },
+};
+
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ redirect?: string }> }) {
+  const config = BRANDING;
+  const { redirect } = await searchParams;
+  const returnTo = safeRedirectPath(redirect, '');
+  const signupHref = returnTo ? `/signup?redirect=${encodeURIComponent(returnTo)}` : '/signup';
 
   return (
     <AuthCard
@@ -14,7 +22,7 @@ export default async function LoginPage() {
       title="Welcome back"
       subtitle={`Sign in to ${config.tenant.name}`}
     >
-      <LoginForm />
+      <LoginForm redirectTo={safeRedirectPath(redirect)} signupHref={signupHref} />
     </AuthCard>
   );
 }

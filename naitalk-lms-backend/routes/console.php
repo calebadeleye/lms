@@ -8,7 +8,4 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('subscriptions:process-expirations')->daily();
-Schedule::command('domains:verify-pending')->everyFifteenMinutes();
 Schedule::command('memberships:process-renewals')->daily();
-Schedule::command('tenants:process-scheduled-deletions')->daily();

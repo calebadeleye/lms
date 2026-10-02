@@ -2,13 +2,11 @@
 
 namespace App\Domain\Learning\Models;
 
-use App\Domain\Tenancy\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class QuizAnswer extends Model
 {
-    use BelongsToTenant;
 
     protected $fillable = [
         'quiz_attempt_id', 'quiz_question_id', 'selected_option_ids', 'free_text_answer',

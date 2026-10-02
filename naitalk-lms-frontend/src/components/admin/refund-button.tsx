@@ -57,13 +57,13 @@ export function RefundButton({ paymentId, maxAmountCents }: { paymentId: number;
         value={amountNaira}
         onChange={(e) => setAmountNaira(e.target.value)}
         placeholder={`Full (₦${(maxAmountCents / 100).toLocaleString()})`}
-        className="w-28 rounded-md border border-neutral-300 px-2 py-1 text-xs focus:border-[var(--tenant-primary)] focus:outline-none"
+        className="w-28 rounded-md border border-neutral-300 px-2 py-1 text-xs focus:border-[var(--brand-primary)] focus:outline-none"
       />
       <input
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         placeholder="Reason (optional)"
-        className="w-32 rounded-md border border-neutral-300 px-2 py-1 text-xs focus:border-[var(--tenant-primary)] focus:outline-none"
+        className="w-32 rounded-md border border-neutral-300 px-2 py-1 text-xs focus:border-[var(--brand-primary)] focus:outline-none"
       />
       <button
         type="submit"

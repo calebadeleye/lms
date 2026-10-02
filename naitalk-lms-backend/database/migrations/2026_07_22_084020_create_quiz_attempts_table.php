@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('quiz_attempts', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('quiz_id')->constrained('quizzes')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('enrolment_id')->constrained('enrolments')->cascadeOnDelete();
@@ -21,7 +20,7 @@ return new class extends Migration
             $table->boolean('passed')->nullable();
             $table->timestamps();
 
-            $table->index(['tenant_id', 'quiz_id', 'user_id']);
+            $table->index(['quiz_id', 'user_id']);
         });
     }
 

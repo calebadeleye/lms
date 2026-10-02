@@ -19,7 +19,6 @@ class MembershipService
         $periodEnd = match ($plan->billing_period) {
             'monthly' => now()->addMonth(),
             'annual' => now()->addYear(),
-            default => null, // free plans don't expire
         };
 
         return LearnerSubscription::updateOrCreate(

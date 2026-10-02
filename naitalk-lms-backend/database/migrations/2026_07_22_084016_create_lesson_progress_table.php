@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('lesson_progress', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('enrolment_id')->constrained('enrolments')->cascadeOnDelete();
             $table->foreignId('lesson_id')->constrained('lessons')->cascadeOnDelete();
             // not_started|in_progress|completed
@@ -20,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['enrolment_id', 'lesson_id']);
-            $table->index(['tenant_id', 'lesson_id']);
+            $table->index('lesson_id');
         });
     }
 

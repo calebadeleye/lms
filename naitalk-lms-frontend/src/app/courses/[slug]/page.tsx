@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getTenantConfig } from '@/lib/tenant';
+import { BRANDING } from '@/lib/branding';
 import { apiFetch, ApiError } from '@/lib/api-server';
 import { getOptionalUser } from '@/lib/auth-server';
 import { SiteHeader } from '@/components/site-header';
@@ -10,8 +10,7 @@ import { ShareButtons } from '@/components/share-buttons';
 import { formatPrice, type CourseDetail } from '@/lib/learning-types';
 
 export default async function CourseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const config = await getTenantConfig();
-  if (!config) notFound();
+  const config = BRANDING;
 
   const { slug } = await params;
 
@@ -28,13 +27,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const totalLessons = course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <SiteHeader tenantName={config.tenant.name} logoUrl={config.branding?.logo_url ?? null} isAuthenticated={user !== null} />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
         <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
           <div>
-            <p className="text-xs font-medium text-[var(--tenant-primary)]">{course.category?.name}</p>
+            <p className="text-xs font-medium text-[var(--brand-primary)]">{course.category?.name}</p>
             <h1 className="mt-1 text-2xl font-bold text-neutral-900 sm:text-3xl">{course.title}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-neutral-500">
               {course.average_rating > 0 && <span>★ {course.average_rating} ({course.reviews_count} reviews)</span>}
@@ -52,7 +51,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
               // eslint-disable-next-line @next/next/no-img-element
               <img src={course.thumbnail_url} alt="" className="mt-6 aspect-video w-full rounded-xl object-cover" />
             ) : (
-              <div className="mt-6 aspect-video rounded-xl bg-linear-to-br from-[var(--tenant-primary)] to-[var(--tenant-secondary)]/60" />
+              <div className="mt-6 aspect-video rounded-xl bg-linear-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)]/60" />
             )}
 
             <div className="mt-8">
@@ -78,6 +77,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   isMembershipOnly={course.pricing_type === 'membership_only'}
                   isEnrolled={course.is_enrolled}
                   isAuthenticated={user !== null}
+                  priceLabel={formatPrice(course.price_cents, course.currency)}
                 />
               </div>
               <ul className="mt-5 space-y-2 text-sm text-neutral-600">

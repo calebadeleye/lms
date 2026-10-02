@@ -14,7 +14,6 @@ return new class extends Migration
             // Sanctum personal_access_tokens.id this session issued
             $table->foreignId('personal_access_token_id')->nullable()
                 ->constrained('personal_access_tokens')->nullOnDelete();
-            $table->foreignUuid('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->string('device_label')->nullable();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();

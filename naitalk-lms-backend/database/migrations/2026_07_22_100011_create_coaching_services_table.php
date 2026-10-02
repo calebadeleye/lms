@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('coaching_services', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('coach_id')->constrained('coaches')->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
@@ -25,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['tenant_id', 'coach_id']);
+            $table->index('coach_id');
         });
     }
 

@@ -2,24 +2,20 @@
 
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\Payment;
-use App\Domain\Commerce\Models\TenantPaymentConfig;
+use App\Domain\Commerce\Models\PaymentConfig;
 use App\Domain\Learning\Models\Course;
 use App\Domain\Learning\Models\Enrolment;
-use App\Domain\Tenancy\Services\TenantContext;
-use App\Domain\Tenancy\Services\TenantProvisioningService;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
     $this->seed(PermissionSeeder::class);
-    $this->tenant = app(TenantProvisioningService::class)->provision(name: 'Reconcile Co');
 });
 
 it('fulfils a stuck pending order once the provider confirms it actually succeeded', function () {
-    $student = makeUserWithRole($this->tenant, 'student');
+    $student = makeUserWithRole('student');
 
-    app(TenantContext::class)->set($this->tenant);
-    $config = TenantPaymentConfig::create(['provider' => 'paystack', 'mode' => 'client_owned', 'fee_bearer' => 'tenant', 'status' => 'active']);
+    $config = PaymentConfig::create(['provider' => 'paystack', 'mode' => 'client_owned', 'fee_bearer' => 'organization', 'status' => 'active']);
     $config->setSecretKey('sk_test_x');
     $config->save();
     $course = Course::create([
@@ -35,7 +31,6 @@ it('fulfils a stuck pending order once the provider confirms it actually succeed
         'itemable_type' => 'course', 'itemable_id' => $course->id, 'name' => $course->title,
         'unit_price_cents' => 500000, 'quantity' => 1,
     ]);
-    app(TenantContext::class)->clear();
 
     Http::fake([
         'api.paystack.co/transaction/verify/*' => Http::response(['data' => [
@@ -44,27 +39,24 @@ it('fulfils a stuck pending order once the provider confirms it actually succeed
         ]], 200),
     ]);
 
-    $finance = makeUserWithRole($this->tenant, 'finance-manager');
+    $finance = makeUserWithRole('finance-manager');
     $token = $finance->createToken('t')->plainTextToken;
 
-    $response = $this->postJson(tenantUrl($this->tenant, "/api/v1/admin/orders/{$order->id}/reconcile"), [], [
+    $response = $this->postJson("/api/v1/admin/orders/{$order->id}/reconcile", [], [
         'Authorization' => "Bearer {$token}",
     ])->assertOk();
 
     expect($response->json('data.result'))->toBe('fulfilled');
     expect($response->json('data.order.status'))->toBe('paid');
 
-    app(TenantContext::class)->set($this->tenant);
     expect(Payment::where('order_id', $order->id)->exists())->toBeTrue();
     expect(Enrolment::where('user_id', $student->id)->where('course_id', $course->id)->exists())->toBeTrue();
-    app(TenantContext::class)->clear();
 });
 
 it('leaves the order pending when the provider says it was never actually paid', function () {
-    $student = makeUserWithRole($this->tenant, 'student');
+    $student = makeUserWithRole('student');
 
-    app(TenantContext::class)->set($this->tenant);
-    $config = TenantPaymentConfig::create(['provider' => 'paystack', 'mode' => 'client_owned', 'fee_bearer' => 'tenant', 'status' => 'active']);
+    $config = PaymentConfig::create(['provider' => 'paystack', 'mode' => 'client_owned', 'fee_bearer' => 'organization', 'status' => 'active']);
     $config->setSecretKey('sk_test_x');
     $config->save();
     $order = Order::create([
@@ -72,7 +64,6 @@ it('leaves the order pending when the provider says it was never actually paid',
         'subtotal_cents' => 500000, 'fee_cents' => 0, 'total_cents' => 500000,
         'payment_mode' => 'client_owned', 'provider' => 'paystack', 'provider_reference' => 'order_abandoned_ref',
     ]);
-    app(TenantContext::class)->clear();
 
     Http::fake([
         'api.paystack.co/transaction/verify/*' => Http::response(['data' => [
@@ -81,10 +72,10 @@ it('leaves the order pending when the provider says it was never actually paid',
         ]], 200),
     ]);
 
-    $finance = makeUserWithRole($this->tenant, 'finance-manager');
+    $finance = makeUserWithRole('finance-manager');
     $token = $finance->createToken('t')->plainTextToken;
 
-    $response = $this->postJson(tenantUrl($this->tenant, "/api/v1/admin/orders/{$order->id}/reconcile"), [], [
+    $response = $this->postJson("/api/v1/admin/orders/{$order->id}/reconcile", [], [
         'Authorization' => "Bearer {$token}",
     ])->assertOk();
 
@@ -94,34 +85,30 @@ it('leaves the order pending when the provider says it was never actually paid',
 });
 
 it('refuses reconciliation without the payments.refund permission', function () {
-    $student = makeUserWithRole($this->tenant, 'student');
+    $student = makeUserWithRole('student');
 
-    app(TenantContext::class)->set($this->tenant);
-    TenantPaymentConfig::create(['provider' => 'paystack', 'mode' => 'client_owned', 'status' => 'active']);
+    PaymentConfig::create(['provider' => 'paystack', 'mode' => 'client_owned', 'status' => 'active']);
     $order = Order::create([
         'user_id' => $student->id, 'status' => 'pending', 'currency' => 'NGN',
         'subtotal_cents' => 500000, 'fee_cents' => 0, 'total_cents' => 500000,
         'payment_mode' => 'client_owned', 'provider' => 'paystack', 'provider_reference' => 'order_x',
     ]);
-    app(TenantContext::class)->clear();
 
-    $instructor = makeUserWithRole($this->tenant, 'instructor');
+    $instructor = makeUserWithRole('instructor');
     $token = $instructor->createToken('t')->plainTextToken;
 
-    $this->postJson(tenantUrl($this->tenant, "/api/v1/admin/orders/{$order->id}/reconcile"), [], [
+    $this->postJson("/api/v1/admin/orders/{$order->id}/reconcile", [], [
         'Authorization' => "Bearer {$token}",
     ])->assertStatus(403);
 });
 
-it('exposes the webhook URL a tenant must paste into their payment provider dashboard', function () {
-    app(TenantContext::class)->set($this->tenant);
-    $config = TenantPaymentConfig::create(['provider' => 'paystack', 'mode' => 'client_owned', 'status' => 'active']);
-    app(TenantContext::class)->clear();
+it('exposes the webhook URL an admin must paste into their payment provider dashboard', function () {
+    $config = PaymentConfig::create(['provider' => 'paystack', 'mode' => 'client_owned', 'status' => 'active']);
 
-    $owner = makeUserWithRole($this->tenant, 'tenant-owner');
+    $owner = makeUserWithRole('owner');
     $token = $owner->createToken('t')->plainTextToken;
 
-    $response = $this->getJson(tenantUrl($this->tenant, '/api/v1/admin/payment-config'), [
+    $response = $this->getJson('/api/v1/admin/payment-config', [
         'Authorization' => "Bearer {$token}",
     ])->assertOk();
 

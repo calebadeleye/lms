@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('course_module_id')->constrained('course_modules')->cascadeOnDelete();
             $table->string('title');
             // video|rich_text|audio|file|external_link|quiz|assignment|live
@@ -25,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['tenant_id', 'course_module_id', 'sort_order']);
+            $table->index(['course_module_id', 'sort_order']);
         });
     }
 

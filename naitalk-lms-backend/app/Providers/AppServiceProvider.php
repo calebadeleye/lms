@@ -5,11 +5,11 @@ namespace App\Providers;
 use App\Domain\Coaching\Models\Booking;
 use App\Domain\Coaching\Models\CoachingService;
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Identity\Models\MembershipApplication;
 use App\Domain\Learning\Models\Course;
 use App\Domain\Learning\Models\Enrolment;
 use App\Domain\Membership\Models\LearnerMembershipPlan;
 use App\Domain\Membership\Models\LearnerSubscription;
-use App\Domain\Tenancy\Services\TenantContext;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(TenantContext::class);
+        //
     }
 
     /**
@@ -40,14 +40,9 @@ class AppServiceProvider extends ServiceProvider
         // This API has no Blade views of its own, so password-reset links
         // must point into the Next.js frontend rather than a named backend
         // route (which is what Laravel's default ResetPassword notification
-        // assumes exists). $notifiable->frontendUrl() resolves the user's
-        // own tenant subdomain rather than the bare neutral platform
-        // domain — every page in the frontend requires a resolvable tenant
-        // to render at all, so the neutral domain 404s outright. See
-        // User::frontendUrl() and the identical fix in
-        // AuthController::verifyEmail.
+        // assumes exists).
         ResetPassword::createUrlUsing(function (User $notifiable, string $token) {
-            $frontendUrl = $notifiable->frontendUrl();
+            $frontendUrl = rtrim((string) config('services.frontend.url'), '/');
 
             return "{$frontendUrl}/reset-password?token={$token}&email=".urlencode($notifiable->getEmailForPasswordReset());
         });
@@ -71,6 +66,7 @@ class AppServiceProvider extends ServiceProvider
             'learner_subscription' => LearnerSubscription::class,
             'booking' => Booking::class,
             'order' => Order::class,
+            'membership_application' => MembershipApplication::class,
         ]);
     }
 }

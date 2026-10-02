@@ -20,27 +20,6 @@ export function MembershipPlanCard({
   const [error, setError] = useState<string | null>(null);
 
   const isCurrent = mySubscription?.plan.id === plan.id && mySubscription.status === 'active';
-  const isFree = plan.billing_period === 'free' || plan.price_cents === 0;
-
-  async function subscribeFree() {
-    if (!isAuthenticated) {
-      router.push('/login?redirect=/membership');
-      return;
-    }
-    setPending(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/v1/membership-plans/${plan.id}/subscribe`, { method: 'POST' });
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        setError(body?.errors?.plan?.[0] ?? 'Could not subscribe. Please try again.');
-        return;
-      }
-      router.refresh();
-    } finally {
-      setPending(false);
-    }
-  }
 
   async function cancel() {
     if (!mySubscription) return;
@@ -57,18 +36,18 @@ export function MembershipPlanCard({
   return (
     <div
       className={`flex flex-col rounded-xl border bg-white p-6 ${
-        isCurrent ? 'border-[var(--tenant-accent)] ring-1 ring-[var(--tenant-accent)]' : 'border-neutral-200'
+        isCurrent ? 'border-[var(--brand-accent)] ring-1 ring-[var(--brand-accent)]' : 'border-neutral-200'
       }`}
     >
       {isCurrent && (
-        <span className="mb-3 inline-block w-fit rounded-full bg-[var(--tenant-accent)]/15 px-2.5 py-0.5 text-xs font-semibold text-[var(--tenant-accent)]">
+        <span className="mb-3 inline-block w-fit rounded-full bg-[var(--brand-accent)]/15 px-2.5 py-0.5 text-xs font-semibold text-[var(--brand-accent)]">
           Current Plan
         </span>
       )}
       <h3 className="text-lg font-bold text-neutral-900">{plan.name}</h3>
       <p className="mt-1 text-2xl font-bold text-neutral-900">
         {formatPrice(plan.price_cents, plan.currency)}
-        {!isFree && <span className="text-sm font-normal text-neutral-500">/{plan.billing_period}</span>}
+        <span className="text-sm font-normal text-neutral-500">/{plan.billing_period}</span>
       </p>
 
       {plan.benefits && plan.benefits.length > 0 && (
@@ -92,18 +71,10 @@ export function MembershipPlanCard({
               Cancel plan
             </button>
           )
-        ) : isFree ? (
-          <button
-            onClick={subscribeFree}
-            disabled={pending}
-            className="w-full rounded-md bg-[var(--tenant-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
-          >
-            {pending ? 'Subscribing…' : 'Subscribe Free'}
-          </button>
         ) : !isAuthenticated ? (
           <button
             onClick={() => router.push('/login?redirect=/membership')}
-            className="w-full rounded-md bg-[var(--tenant-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-neutral-900 hover:opacity-90"
           >
             Log in to Subscribe
           </button>
@@ -113,7 +84,7 @@ export function MembershipPlanCard({
             id={plan.id}
             label="Subscribe"
             pendingLabel="Redirecting to payment…"
-            className="w-full rounded-md bg-[var(--tenant-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="w-full rounded-md bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-neutral-900 hover:opacity-90 disabled:opacity-60"
           />
         )}
         {error && <p className="mt-2 text-xs text-red-600">{error}</p>}

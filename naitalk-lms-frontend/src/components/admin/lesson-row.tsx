@@ -205,7 +205,7 @@ export function LessonRow({ lesson }: { lesson: AdminLesson }) {
               {uploading && (
                 <div className="mt-1.5 h-1.5 w-40 overflow-hidden rounded-full bg-neutral-100">
                   <div
-                    className="h-full rounded-full bg-[var(--tenant-primary)] transition-all"
+                    className="h-full rounded-full bg-[var(--brand-primary)] transition-all"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
@@ -230,7 +230,7 @@ export function LessonRow({ lesson }: { lesson: AdminLesson }) {
             <button
               onClick={saveLesson}
               disabled={saving}
-              className="rounded-md bg-[var(--tenant-primary)] px-4 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
+              className="rounded-md bg-[var(--brand-primary)] px-4 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-60"
             >
               {saving ? 'Saving…' : 'Save lesson'}
             </button>

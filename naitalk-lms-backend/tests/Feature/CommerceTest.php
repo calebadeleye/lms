@@ -255,3 +255,43 @@ it('lets a finance manager issue a refund', function () {
     expect($response->json('data.status'))->toBe('processed');
     expect($order->fresh()->status)->toBe('refunded');
 });
+
+it('starts a Paystack checkout for the ₦2,500 Career Fit course and enrols the buyer once the callback verifies it', function () {
+    $config = PaymentConfig::create(['provider' => 'paystack', 'mode' => 'managed', 'fee_bearer' => 'organization', 'status' => 'active']);
+
+    $course = Course::create([
+        'title' => 'Find Your Career Fit', 'slug' => 'find-your-career-fit', 'status' => 'published',
+        'pricing_type' => 'paid', 'price_cents' => 250_000, 'currency' => 'NGN', 'published_at' => now(),
+    ]);
+    $student = makeUserWithRole('student');
+
+    Http::fake([
+        'api.paystack.co/transaction/initialize' => Http::response(['data' => [
+            'authorization_url' => 'https://checkout.paystack.com/abc', 'reference' => 'ref_career_fit',
+        ]], 200),
+        'api.paystack.co/transaction/verify/*' => Http::response(['data' => [
+            'status' => 'success', 'amount' => 250_000, 'currency' => 'NGN', 'reference' => 'ref_career_fit',
+            'fees' => 3_750, 'paid_at' => now()->toIso8601String(),
+        ]], 200),
+    ]);
+
+    $response = $this->actingAs($student)
+        ->postJson("/api/v1/checkout/courses/{$course->id}", ['callback_url' => 'https://example.test/checkout/callback'])
+        ->assertOk()
+        ->assertJsonPath('data.authorization_url', 'https://checkout.paystack.com/abc');
+
+    // Paystack was asked for exactly ₦2,500 (250,000 kobo) in NGN.
+    Http::assertSent(fn ($request) => str_ends_with($request->url(), '/transaction/initialize')
+        && $request['amount'] === 250_000 && $request['currency'] === 'NGN');
+
+    $orderId = $response->json('data.order.id');
+
+    // The buyer lands back on the callback page with NO webhook delivered —
+    // polling the status endpoint alone must verify and unlock the course.
+    $this->actingAs($student)
+        ->getJson("/api/v1/checkout/orders/{$orderId}")
+        ->assertOk()
+        ->assertJsonPath('data.status', 'paid');
+
+    expect(\App\Domain\Learning\Models\Enrolment::where('user_id', $student->id)->where('course_id', $course->id)->exists())->toBeTrue();
+});

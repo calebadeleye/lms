@@ -146,7 +146,7 @@ export default function CareerFitWebinarPage() {
                   href="/courses/find-your-career-fit"
                   className="mt-4 inline-block rounded-md bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-neutral-900 hover:opacity-90"
                 >
-                  Take the Free Career Fit Course &rarr;
+                  Take the Career Fit Course &rarr;
                 </Link>
               </div>
             )}

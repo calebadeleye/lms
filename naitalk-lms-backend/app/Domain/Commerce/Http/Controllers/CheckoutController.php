@@ -5,7 +5,9 @@ namespace App\Domain\Commerce\Http\Controllers;
 use App\Domain\Coaching\Models\Booking;
 use App\Domain\Commerce\Models\MembershipFeePayment;
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\Models\PaymentConfig;
 use App\Domain\Commerce\Services\CheckoutService;
+use App\Domain\Commerce\Services\CommissionService;
 use App\Domain\Commerce\Services\OrderFulfillmentService;
 use App\Domain\Commerce\Services\PaymentProviderFactory;
 use App\Domain\Identity\Models\MembershipApplication;
@@ -194,7 +196,7 @@ class CheckoutController extends Controller
      * state has been reached so far (which may still be "pending" if the
      * webhook hasn't landed yet).
      */
-    public function status(Request $request, string $orderId)
+    public function status(Request $request, string $orderId, CommissionService $commission)
     {
         $order = Order::where('user_id', $request->user()->id)->with('items', 'payment')->findOrFail($orderId);
 
@@ -206,6 +208,33 @@ class CheckoutController extends Controller
         if ($order->status === 'pending' && $order->items->first()?->itemable_type === 'membership_application') {
             $this->fulfillment->reconcileRegistrationFee($order, $this->providers->forManagedPaystack());
             $order = $order->fresh(['items', 'payment']);
+        }
+
+        // Every other order type normally waits on the provider's webhook,
+        // which is the one thing that silently never arrives when the
+        // webhook URL was missed on the Paystack dashboard — leaving a
+        // learner who really paid stuck on "confirming" with no access.
+        // Verifying directly with the provider here, the moment the buyer's
+        // browser comes back, removes that dependency. Safe on every poll
+        // (a no-op once paid; payments' unique(provider, provider_reference)
+        // makes a race with the webhook harmless), and a gateway hiccup must
+        // never turn a status check into a 500 — it just stays "pending".
+        // Registration-fee orders are excluded: they were just handled above
+        // against the platform's managed account, not the org's config.
+        $isRegistrationFee = $order->items->first()?->itemable_type === 'membership_application';
+
+        if ($order->status === 'pending' && $order->provider_reference && ! $isRegistrationFee) {
+            $config = PaymentConfig::where('status', 'active')->first();
+
+            if ($config) {
+                try {
+                    $this->fulfillment->reconcileWithProvider($order, $config, $this->providers->forConfig($config), $commission);
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+
+                $order = $order->fresh(['items', 'payment']);
+            }
         }
 
         return response()->json(['data' => [

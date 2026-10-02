@@ -11,12 +11,14 @@ export function EnrollButton({
   isMembershipOnly,
   isEnrolled,
   isAuthenticated,
+  priceLabel,
 }: {
   courseId: number;
   isFree: boolean;
   isMembershipOnly?: boolean;
   isEnrolled: boolean;
   isAuthenticated: boolean;
+  priceLabel?: string;
 }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -45,7 +47,7 @@ export function EnrollButton({
       );
     }
 
-    return <CheckoutButton kind="courses" id={courseId} label="Buy Now" pendingLabel="Redirecting to payment…" />;
+    return <CheckoutButton kind="courses" id={courseId} label={priceLabel ? `Buy Now — ${priceLabel}` : 'Buy Now'} pendingLabel="Redirecting to payment…" />;
   }
 
   // Free courses enrol directly. Membership-only courses go through the

@@ -11,7 +11,8 @@ use Illuminate\Support\Str;
 
 /**
  * Seeds the "Find Your Career Fit" course (the Career FIT™ framework), a
- * free course — the one course in the catalogue now that the placeholder HR
+ * paid course at ₦2,500 (BOT asked for a price so learners take it
+ * seriously) — the one course in the catalogue now that the placeholder HR
  * course set has been removed (see InstructorAndTestimonialSeeder). Run
  * standalone with:
  *   php artisan db:seed --class=CareerFitCourseSeeder
@@ -50,7 +51,11 @@ class CareerFitCourseSeeder extends Seeder
                 "The course is divided into two transformative parts, taking you from self-awareness to career clarity.\n\n".
                 "Your future shouldn't be determined by chance—it should be shaped by clarity. This course will empower you to stop guessing, start discovering, and confidently pursue a career that reflects your strengths, personality, and purpose. Because when you find the right fit, you don't just build a career—you build a life of impact, fulfillment, and lasting success.",
             'status' => 'published',
-            'pricing_type' => 'free',
+            'pricing_type' => 'paid',
+            // Kobo, not naira: 250_000 = ₦2,500. Keep in sync with the
+            // 2026_10_02_000001 data migration that re-prices the live row.
+            'price_cents' => 250_000,
+            'currency' => 'NGN',
             'difficulty_level' => 'beginner',
             'certificate_enabled' => true,
             'published_at' => now(),

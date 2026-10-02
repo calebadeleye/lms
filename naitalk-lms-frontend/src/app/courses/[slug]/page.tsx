@@ -77,6 +77,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   isMembershipOnly={course.pricing_type === 'membership_only'}
                   isEnrolled={course.is_enrolled}
                   isAuthenticated={user !== null}
+                  priceLabel={formatPrice(course.price_cents, course.currency)}
                 />
               </div>
               <ul className="mt-5 space-y-2 text-sm text-neutral-600">

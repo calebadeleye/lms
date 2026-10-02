@@ -326,3 +326,27 @@ it('revokes a session so its token no longer authenticates', function () {
         'Authorization' => "Bearer {$token}",
     ])->assertStatus(401);
 });
+
+it('still creates the account when the verification email cannot be sent', function () {
+    \Illuminate\Support\Facades\Event::listen(
+        \Illuminate\Notifications\Events\NotificationSending::class,
+        fn () => throw new \RuntimeException('smtp down')
+    );
+
+    $this->postJson('/api/v1/auth/signup', [
+        'name' => 'Sam Buyer',
+        'email' => 'sam@example.com',
+        'password' => 'simple',
+        'password_confirmation' => 'simple',
+    ])->assertCreated();
+
+    $this->postJson('/api/v1/auth/register', [
+        'name' => 'Jane Learner',
+        'email' => 'jane@example.com',
+        'password' => 'simple',
+        'password_confirmation' => 'simple',
+        'ack_impact_beyond_earning' => '1',
+    ])->assertCreated();
+
+    expect(User::whereIn('email', ['sam@example.com', 'jane@example.com'])->count())->toBe(2);
+});

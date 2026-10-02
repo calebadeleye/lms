@@ -38,7 +38,16 @@ export async function POST(request: Request) {
     cache: 'no-store',
   });
 
-  const body = await response.json();
+  // A backend crash can return a non-JSON body; surface it as a clean 502
+  // rather than letting this route itself throw and hide the real status.
+  const body = await response.json().catch(() => null);
+
+  if (!body) {
+    return NextResponse.json(
+      { message: 'The service is temporarily unavailable.', errors: {} },
+      { status: 502 }
+    );
+  }
 
   if (!response.ok) {
     return NextResponse.json(body, { status: response.status });

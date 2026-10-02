@@ -101,7 +101,7 @@ class AuthController extends Controller
             return [$user, $application];
         });
 
-        $user->sendEmailVerificationNotification();
+        $this->sendVerificationEmail($user);
 
         // Deliberately no session/token here — the applicant isn't "logged
         // in" until the registration fee is paid (see
@@ -147,7 +147,7 @@ class AuthController extends Controller
             'joined_at' => now(),
         ]);
 
-        $user->sendEmailVerificationNotification();
+        $this->sendVerificationEmail($user);
 
         $issued = $this->auth->issueToken($user, $request);
 
@@ -158,6 +158,22 @@ class AuthController extends Controller
                 'expires_at' => $issued['expires_at'],
             ],
         ], 201);
+    }
+
+    /**
+     * The account already exists by the time this runs, so a mail failure
+     * (SMTP down, a template that can't compile, a broken storage dir) must
+     * not turn a successful sign-up into a bare 500 — the applicant would see
+     * a generic error, retry, and then be told their email "already exists".
+     * They can request another email via POST /auth/email/resend instead.
+     */
+    private function sendVerificationEmail(User $user): void
+    {
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     /** The caller's own membership application — lets the frontend show a

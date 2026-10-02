@@ -41,7 +41,7 @@ export function SignupForm({ redirectTo }: { redirectTo: string }) {
       const body = await res.json().catch(() => null);
 
       if (!res.ok) {
-        setErrors(body?.errors ?? { email: ['Something went wrong. Please try again.'] });
+        setErrors(body?.errors ?? { email: ['We couldn\'t complete this right now. Please try again in a moment — if you\'ve already registered with this email, log in instead.'] });
         return;
       }
 

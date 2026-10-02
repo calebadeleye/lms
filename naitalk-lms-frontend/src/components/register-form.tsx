@@ -89,7 +89,7 @@ export function RegisterForm() {
 
       if (!res.ok || !body) {
         const bodyErrors = body?.errors ?? null;
-        setErrors(bodyErrors ?? { email: ['Something went wrong. Please try again.'] });
+        setErrors(bodyErrors ?? { email: ['We couldn\'t complete this right now. Please try again in a moment — if you\'ve already registered with this email, log in instead.'] });
         // Validation failures for acknowledgement/account fields mean those
         // earlier steps need another look, not the welcome step we're on.
         if (bodyErrors && REQUIREMENTS.some((r) => bodyErrors[r.key])) {

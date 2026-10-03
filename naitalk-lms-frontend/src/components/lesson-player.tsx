@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { resolveVideoEmbed, type LessonContent } from '@/lib/learning-types';
+import { resolveVideoEmbed, type LessonContent, type VideoEmbed } from '@/lib/learning-types';
 import { QuizPlayer } from '@/components/quiz-player';
 import { AssignmentPlayer } from '@/components/assignment-player';
 
@@ -75,16 +75,15 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
               onEnded={(e) => reportPosition(e.currentTarget.duration)}
             />
           ) : (
-            // YouTube/Vimeo embeds are cross-origin iframes — there's no way
-            // to read playback position from them, so progress here relies
-            // on the "Mark as Complete" button below rather than the
+            // YouTube/Vimeo/Drive embeds are cross-origin iframes — there's no
+            // way to read playback position from them, so progress here
+            // relies on the "Mark as Complete" button below rather than the
             // watch-90%-of-it auto-completion a direct file gets.
-            <iframe
-              src={videoEmbed.embedUrl}
+            <EmbeddedVideo
+              key={videoEmbed.embedUrl}
+              embed={videoEmbed}
               title={lesson.title}
-              className="aspect-video w-full rounded-xl"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
+              sourceUrl={lesson.video_path}
             />
           )}
         </>
@@ -168,6 +167,106 @@ export function LessonPlayer({ lesson }: { lesson: LessonContent }) {
           {markError && <p className="mt-2 text-sm text-red-600">{markError}</p>}
         </div>
       )}
+    </div>
+  );
+}
+
+// Drive's preview document fires onLoad well before its own player has
+// finished spinning up, and then shows its own grey spinner for a few more
+// seconds. Keeping our (opaque) loader up for this long after onLoad hides
+// that second spinner, so there's only ever one loader on screen.
+const DRIVE_PLAYER_WARMUP_MS = 3500;
+
+/**
+ * Third-party embeds (Google Drive especially) can take several seconds to
+ * start and sometimes render blank until the whole page is refreshed — and
+ * the iframe's onLoad can't tell us whether the player inside actually
+ * worked. So: one opaque loader covering the (still hidden) frame while it
+ * loads, a nudge if it's slow, and a "Reload player" control that remounts
+ * just the iframe, so a blank player is never a dead end that needs a full
+ * page refresh.
+ */
+function EmbeddedVideo({
+  embed,
+  title,
+  sourceUrl,
+}: {
+  embed: Exclude<VideoEmbed, { kind: 'direct' }>;
+  title: string;
+  sourceUrl: string;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const [slow, setSlow] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  // Reveal the player once the frame has loaded — immediately for
+  // YouTube/Vimeo, after a short warm-up for Drive (see above).
+  useEffect(() => {
+    if (!loaded) return;
+    const timer = setTimeout(() => setRevealed(true), embed.kind === 'google_drive' ? DRIVE_PLAYER_WARMUP_MS : 0);
+    return () => clearTimeout(timer);
+  }, [loaded, embed.kind, reloadKey]);
+
+  useEffect(() => {
+    if (loaded) return;
+    const timer = setTimeout(() => setSlow(true), 8000);
+    return () => clearTimeout(timer);
+  }, [loaded, reloadKey]);
+
+  function reload() {
+    setLoaded(false);
+    setRevealed(false);
+    setSlow(false);
+    setReloadKey((k) => k + 1);
+  }
+
+  return (
+    <div>
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
+        {!revealed && (
+          <div className="absolute inset-0 z-10 grid place-items-center bg-black text-center text-white/80">
+            <div>
+              <div
+                className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-[var(--brand-accent)]"
+                aria-hidden
+              />
+              <p className="mt-3 text-sm" role="status">
+                Loading video…
+              </p>
+              {slow && !loaded && (
+                <p className="mt-1 px-4 text-xs text-white/60">
+                  This is taking longer than usual. You can reload the player or open the video in a new tab.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+        <iframe
+          key={reloadKey}
+          src={embed.embedUrl}
+          title={title}
+          className={`absolute inset-0 h-full w-full ${revealed ? '' : 'pointer-events-none opacity-0'}`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          onLoad={() => setLoaded(true)}
+        />
+      </div>
+      <p className="mt-2 text-xs text-neutral-500">
+        Video not showing or stuck?{' '}
+        <button type="button" onClick={reload} className="font-medium text-[var(--brand-primary)] underline">
+          Reload player
+        </button>
+        {' · '}
+        <a
+          href={sourceUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="font-medium text-[var(--brand-primary)] underline"
+        >
+          Open in a new tab
+        </a>
+      </p>
     </div>
   );
 }

@@ -57,13 +57,60 @@ export function CourseCurriculum({
                 Module {index + 1}: {module.title}
               </span>
               <span className="flex items-center gap-2 text-xs text-neutral-500">
-                {isPersonalityModule && !myPersonalityType ? 'Select yours' : `${module.lessons.length} Lessons`}
+                {isPersonalityModule && !myPersonalityType
+                  ? 'Select yours'
+                  : `${module.lessons.length} ${module.lessons.length === 1 ? 'Lesson' : 'Lessons'}`}
                 <span aria-hidden>{openModuleId === module.id ? '−' : '+'}</span>
               </span>
             </button>
             {openModuleId === module.id && (
               <>
-                {showPicker ? (
+                <ul className="divide-y divide-neutral-100 border-t border-neutral-100">
+                  {module.lessons.map((lesson) => {
+                    const clickable = isEnrolled ? !lesson.locked : lesson.is_preview;
+                    const content = (
+                      <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                        <span className="flex items-center gap-2 text-neutral-700">
+                          <span aria-hidden>{typeIcon[lesson.type] ?? '•'}</span>
+                          {lesson.title}
+                          {lesson.is_preview && (
+                            <span className="rounded-full bg-[var(--brand-accent)]/15 px-2 py-0.5 text-[10px] font-semibold text-[var(--brand-accent)]">
+                              Preview
+                            </span>
+                          )}
+                        </span>
+                        <span className="flex items-center gap-2 text-xs text-neutral-400">
+                          {formatDuration(lesson.duration_seconds)}
+                          {!clickable && <span aria-hidden>🔒</span>}
+                        </span>
+                      </div>
+                    );
+
+                    return (
+                      <li key={lesson.id}>
+                        {clickable ? (
+                          <Link href={`/learn/${lesson.id}`} className="block hover:bg-neutral-50">
+                            {content}
+                          </Link>
+                        ) : (
+                          <div className="opacity-60">{content}</div>
+                        )}
+                      </li>
+                    );
+                  })}
+                  {isPersonalityModule && myPersonalityType && !isChangingType && (
+                    <li className="px-4 py-2 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setIsChangingType(true)}
+                        className="text-xs font-medium text-[var(--brand-primary)] underline"
+                      >
+                        Picked the wrong type? Change it
+                      </button>
+                    </li>
+                  )}
+                </ul>
+                {showPicker && (
                   <div className="border-t border-neutral-100 px-4 py-4">
                     <PersonalityTypePicker
                       courseId={courseId}
@@ -73,52 +120,6 @@ export function CourseCurriculum({
                       onCancel={myPersonalityType ? () => setIsChangingType(false) : undefined}
                     />
                   </div>
-                ) : (
-                  <ul className="divide-y divide-neutral-100 border-t border-neutral-100">
-                    {module.lessons.map((lesson) => {
-                      const clickable = isEnrolled ? !lesson.locked : lesson.is_preview;
-                      const content = (
-                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-                          <span className="flex items-center gap-2 text-neutral-700">
-                            <span aria-hidden>{typeIcon[lesson.type] ?? '•'}</span>
-                            {lesson.title}
-                            {lesson.is_preview && (
-                              <span className="rounded-full bg-[var(--brand-accent)]/15 px-2 py-0.5 text-[10px] font-semibold text-[var(--brand-accent)]">
-                                Preview
-                              </span>
-                            )}
-                          </span>
-                          <span className="flex items-center gap-2 text-xs text-neutral-400">
-                            {formatDuration(lesson.duration_seconds)}
-                            {!clickable && <span aria-hidden>🔒</span>}
-                          </span>
-                        </div>
-                      );
-
-                      return (
-                        <li key={lesson.id}>
-                          {clickable ? (
-                            <Link href={`/learn/${lesson.id}`} className="block hover:bg-neutral-50">
-                              {content}
-                            </Link>
-                          ) : (
-                            <div className="opacity-60">{content}</div>
-                          )}
-                        </li>
-                      );
-                    })}
-                    {isPersonalityModule && myPersonalityType && (
-                      <li className="px-4 py-2 text-right">
-                        <button
-                          type="button"
-                          onClick={() => setIsChangingType(true)}
-                          className="text-xs font-medium text-[var(--brand-primary)] underline"
-                        >
-                          Picked the wrong type? Change it
-                        </button>
-                      </li>
-                    )}
-                  </ul>
                 )}
               </>
             )}

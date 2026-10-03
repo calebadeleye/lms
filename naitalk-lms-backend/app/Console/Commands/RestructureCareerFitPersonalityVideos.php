@@ -119,17 +119,19 @@ class RestructureCareerFitPersonalityVideos extends Command
             }
         }
 
-        // 3. Move the 16 lessons into it, renumbering sort_order alphabetically.
+        // 3. Move the 16 lessons into it, renumbering sort_order alphabetically
+        // from 1 — sort_order 0 belongs to the module's introduction video.
         foreach ($personalityLessons as $index => $lesson) {
+            $sortOrder = $index + 1;
             $needsMove = $personalityModule && $lesson->course_module_id !== $personalityModule->id;
-            $needsReorder = $lesson->sort_order !== $index;
+            $needsReorder = $lesson->sort_order !== $sortOrder;
 
             if ($needsMove || $needsReorder) {
-                $this->line("  Move lesson #{$lesson->id} \"{$lesson->title}\" -> module \"".self::PERSONALITY_MODULE_TITLE."\", sort_order={$index}");
+                $this->line("  Move lesson #{$lesson->id} \"{$lesson->title}\" -> module \"".self::PERSONALITY_MODULE_TITLE."\", sort_order={$sortOrder}");
             }
 
             if (! $dryRun && $personalityModule) {
-                $lesson->update(['course_module_id' => $personalityModule->id, 'sort_order' => $index]);
+                $lesson->update(['course_module_id' => $personalityModule->id, 'sort_order' => $sortOrder]);
             }
         }
 

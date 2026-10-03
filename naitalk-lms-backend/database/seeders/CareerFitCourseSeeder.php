@@ -134,14 +134,23 @@ class CareerFitCourseSeeder extends Seeder
         // one lesson is ever shown to them (see CourseController::show()).
         // Real content has 16 MBTI types; seeding 2 representative ones here
         // keeps fresh/staging environments fast while covering the feature.
+        // The module opens with an introduction video (no type code, so
+        // everyone sees it) before the learner picks their type.
         $personalityTypes = $course->modules()->create(['title' => 'Part Two: Discover Your Personality Type', 'sort_order' => $moduleIndex++]);
+        $personalityTypes->lessons()->create([
+            'title' => 'Introduction to Discover Your Personality Type',
+            'type' => 'video',
+            'video_path' => 'https://drive.google.com/file/d/1B0XHj-NMrTZCRMoJoWg84Py5Iu4oIJt_/view',
+            'is_mandatory' => true,
+            'sort_order' => 0,
+        ]);
         foreach (['INTJ', 'ENFP'] as $index => $code) {
             $personalityTypes->lessons()->create([
                 'title' => "Personality Type: {$code}",
                 'type' => 'video',
                 'personality_type_code' => $code,
                 'is_mandatory' => true,
-                'sort_order' => $index,
+                'sort_order' => $index + 1,
             ]);
         }
 

@@ -28,13 +28,28 @@ class RestructureCareerFitPersonalityVideos extends Command
 
     private const ABOUT_MODULE_TITLE = 'About This Course';
 
-    private const ASSESSMENT_MODULE_TITLE = 'Part One: Personality Assessment – Discover Who You Are';
+    // Module titles lost their "Part One/Two/Three" prefixes (the UI numbers the
+    // modules now — see the 2026_10_03_000003 migration). Lookups accept the
+    // old and the new title so re-running this against either state is safe.
+    private const ASSESSMENT_MODULE_TITLES = [
+        'Part One: Personality Assessment – Discover Who You Are',
+        'Personality Assessment – Discover Who You Are',
+    ];
 
-    private const PERSONALITY_MODULE_TITLE = 'Part Two: Discover Your Personality Type';
+    private const PERSONALITY_MODULE_TITLES = [
+        'Part Two: Discover Your Personality Type',
+        'Discover Your Personality Type',
+    ];
 
-    private const CAREER_MAPPING_OLD_TITLE = 'Part Two: Career Mapping – Design Your Future';
+    private const PERSONALITY_MODULE_TITLE = 'Discover Your Personality Type';
 
-    private const CAREER_MAPPING_NEW_TITLE = 'Part Three: Career Mapping – Design Your Future';
+    private const CAREER_MAPPING_TITLES = [
+        'Part Two: Career Mapping – Design Your Future',
+        'Part Three: Career Mapping – Design Your Future',
+        'Career Mapping – Design Your Future',
+    ];
+
+    private const CAREER_MAPPING_NEW_TITLE = 'Career Mapping – Design Your Future';
 
     private const SUMMARY_MODULE_TITLE = 'Course Summary & Promise';
 
@@ -69,12 +84,12 @@ class RestructureCareerFitPersonalityVideos extends Command
         $dryRun = (bool) $this->option('dry-run');
 
         $aboutModule = $course->modules()->where('title', self::ABOUT_MODULE_TITLE)->first();
-        $assessmentModule = $course->modules()->where('title', self::ASSESSMENT_MODULE_TITLE)->first();
+        $assessmentModule = $course->modules()->whereIn('title', self::ASSESSMENT_MODULE_TITLES)->first();
         $careerMappingModule = $course->modules()
-            ->whereIn('title', [self::CAREER_MAPPING_OLD_TITLE, self::CAREER_MAPPING_NEW_TITLE])
+            ->whereIn('title', self::CAREER_MAPPING_TITLES)
             ->first();
         $summaryModule = $course->modules()->where('title', self::SUMMARY_MODULE_TITLE)->first();
-        $personalityModule = $course->modules()->where('title', self::PERSONALITY_MODULE_TITLE)->first();
+        $personalityModule = $course->modules()->whereIn('title', self::PERSONALITY_MODULE_TITLES)->first();
 
         $personalityLessons = Lesson::query()
             ->whereHas('courseModule', fn ($q) => $q->where('course_id', $course->id))
@@ -137,7 +152,7 @@ class RestructureCareerFitPersonalityVideos extends Command
 
         // 4. Retitle Career Mapping and reorder every module into its final position.
         if ($careerMappingModule && $careerMappingModule->title !== self::CAREER_MAPPING_NEW_TITLE) {
-            $this->line('Retitle "'.self::CAREER_MAPPING_OLD_TITLE.'" -> "'.self::CAREER_MAPPING_NEW_TITLE.'"');
+            $this->line('Retitle "'.$careerMappingModule->title.'" -> "'.self::CAREER_MAPPING_NEW_TITLE.'"');
 
             if (! $dryRun) {
                 $careerMappingModule->update(['title' => self::CAREER_MAPPING_NEW_TITLE]);

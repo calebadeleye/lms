@@ -138,3 +138,83 @@ it('restores the removed lesson in its original place on rollback', function () 
     expect($lessons->pluck('title')->all())->toBe(['Why This Matters', 'Learning Objectives & Outcomes']);
     expect($lessons->pluck('sort_order')->all())->toBe([0, 1]);
 });
+
+function runRenameMigration(string $direction = 'up'): void
+{
+    $migration = require database_path('migrations/2026_10_03_000003_rename_career_fit_modules_and_lessons.php');
+    $migration->{$direction}();
+}
+
+/** The live course as it was before the rename: "Part …" titles, and two modules with a generic "Learning Objectives & Outcomes". */
+function careerFitCourseBeforeRename(): Course
+{
+    $personality = careerFitPersonalityModule();
+    $course = $personality->course;
+
+    $course->modules()->create(['title' => 'About This Course', 'sort_order' => 0]);
+    $partOne = $course->modules()->create(['title' => 'Part One: Personality Assessment – Discover Who You Are', 'sort_order' => 1]);
+    $partOne->lessons()->create(['title' => 'Why This Matters', 'type' => 'video', 'sort_order' => 0]);
+    $partOne->lessons()->create(['title' => 'Learning Objectives & Outcomes', 'type' => 'video', 'sort_order' => 1]);
+
+    $partThree = $course->modules()->create(['title' => 'Part Three: Career Mapping – Design Your Future', 'sort_order' => 3]);
+    $partThree->lessons()->create(['title' => 'Learning Objectives & Outcomes', 'type' => 'video', 'sort_order' => 0]);
+
+    return $course;
+}
+
+function careerFitTitles(Course $course): array
+{
+    return $course->modules()->orderBy('sort_order')->get()
+        ->mapWithKeys(fn ($m) => [$m->title => $m->lessons()->orderBy('sort_order')->pluck('title')->all()])
+        ->all();
+}
+
+it('drops the Part prefixes and names the duplicate lessons after their module', function () {
+    $course = careerFitCourseBeforeRename();
+
+    runRenameMigration();
+
+    expect(careerFitTitles($course))->toBe([
+        'About This Course' => [],
+        'Personality Assessment – Discover Who You Are' => [
+            'Personality Assessment: Why This Matters',
+            'Personality Assessment: Learning Objectives & Outcomes',
+        ],
+        'Discover Your Personality Type' => ['Personality Type: ENFP', 'Personality Type: INTJ'],
+        'Career Mapping – Design Your Future' => ['Career Mapping: Learning Objectives & Outcomes'],
+    ]);
+});
+
+it('does nothing the second time the rename runs', function () {
+    $course = careerFitCourseBeforeRename();
+
+    runRenameMigration();
+    $once = careerFitTitles($course);
+    runRenameMigration();
+
+    expect(careerFitTitles($course))->toBe($once);
+});
+
+it('restores the original module and lesson titles on rollback', function () {
+    $course = careerFitCourseBeforeRename();
+    $before = careerFitTitles($course);
+
+    runRenameMigration();
+    runRenameMigration('down');
+
+    expect(careerFitTitles($course))->toBe($before);
+});
+
+it('leaves other courses alone', function () {
+    $course = careerFitCourseBeforeRename();
+    $other = Course::create([
+        'category_id' => $course->category_id, 'title' => 'Other', 'slug' => 'other', 'status' => 'published',
+        'pricing_type' => 'free', 'currency' => 'NGN', 'difficulty_level' => 'beginner',
+    ]);
+    $module = $other->modules()->create(['title' => 'Part One: Personality Assessment – Discover Who You Are', 'sort_order' => 0]);
+    $module->lessons()->create(['title' => 'Why This Matters', 'type' => 'video', 'sort_order' => 0]);
+
+    runRenameMigration();
+
+    expect(careerFitTitles($other))->toBe(['Part One: Personality Assessment – Discover Who You Are' => ['Why This Matters']]);
+});

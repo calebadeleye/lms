@@ -9,9 +9,9 @@ const typeIcon: Record<string, string> = {
 export function LessonSidebar({ modules }: { modules: LessonModuleNav[] }) {
   return (
     <nav className="divide-y divide-neutral-100 rounded-xl border border-neutral-200 bg-white">
-      {modules.map((module) => (
+      {modules.map((module, index) => (
         <div key={module.id}>
-          <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">{module.title}</p>
+          <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Module {index + 1}: {module.title}</p>
           <ul>
             {module.lessons.map((lesson) => (
               <li key={lesson.id}>

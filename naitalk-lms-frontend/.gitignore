@@ -45,3 +45,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Self-hosted course videos (uploaded to the server directly; see the
+# 2026_10_03_000004 migration) — far too large for git.
+/public/videos/

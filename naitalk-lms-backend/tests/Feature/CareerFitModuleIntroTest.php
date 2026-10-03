@@ -218,3 +218,109 @@ it('leaves other courses alone', function () {
 
     expect(careerFitTitles($other))->toBe(['Part One: Personality Assessment – Discover Who You Are' => ['Why This Matters']]);
 });
+
+const CAREER_FIT_MODULE_4_DRIVE_ID = '14DKTo6u9O9XiBIiEl_ECwEjOy-YAyxa5';
+const CAREER_FIT_MODULE_1_DRIVE_ID = '1cgEmApkEDgYlotCzYRvQYMuTJ48s7BcG';
+
+function runHostVideosMigration(string $direction = 'up'): void
+{
+    $migration = require database_path('migrations/2026_10_03_000004_host_career_fit_videos_on_our_server.php');
+    $migration->{$direction}();
+}
+
+function careerFitDriveLesson(CourseModule $module, string $title, string $driveId, int $sort = 0)
+{
+    return $module->lessons()->create([
+        'title' => $title, 'type' => 'video', 'sort_order' => $sort,
+        'video_path' => "https://drive.google.com/file/d/{$driveId}/view",
+    ]);
+}
+
+it('points the Drive lessons at the self-hosted files and stores their length', function () {
+    $module = careerFitModuleFour();
+    $module->lessons()->delete(); // start from just the Module 4 video
+    $lesson = careerFitDriveLesson($module, 'Learning Objectives & Outcomes', CAREER_FIT_MODULE_4_DRIVE_ID);
+
+    runHostVideosMigration();
+
+    $lesson->refresh();
+    expect($lesson->video_path)->toMatch('#^/videos/[0-9a-f]{24}\.mp4$#');
+    expect($lesson->duration_seconds)->toBeGreaterThan(0);
+});
+
+it('leaves lessons of other courses and unrelated videos alone', function () {
+    $module = careerFitModuleFour();
+    $module->lessons()->delete();
+    $mine = careerFitDriveLesson($module, 'Mine', CAREER_FIT_MODULE_4_DRIVE_ID);
+    $unrelated = $module->lessons()->create(['title' => 'Unrelated', 'type' => 'video', 'video_path' => 'https://www.youtube.com/watch?v=abcdefghijk']);
+
+    $other = Course::create([
+        'category_id' => $module->course->category_id, 'title' => 'Other', 'slug' => 'other', 'status' => 'published',
+        'pricing_type' => 'free', 'currency' => 'NGN', 'difficulty_level' => 'beginner',
+    ]);
+    $theirs = careerFitDriveLesson($other->modules()->create(['title' => 'M', 'sort_order' => 0]), 'Theirs', CAREER_FIT_MODULE_4_DRIVE_ID);
+
+    runHostVideosMigration();
+
+    expect($mine->refresh()->video_path)->toStartWith('/videos/');
+    expect($unrelated->refresh()->video_path)->toBe('https://www.youtube.com/watch?v=abcdefghijk');
+    expect($theirs->refresh()->video_path)->toContain('drive.google.com');
+    expect($theirs->duration_seconds)->toBeNull();
+});
+
+it('does nothing the second time the video switch runs', function () {
+    $module = careerFitModuleFour();
+    $module->lessons()->delete();
+    $lesson = careerFitDriveLesson($module, 'Learning Objectives & Outcomes', CAREER_FIT_MODULE_4_DRIVE_ID);
+
+    runHostVideosMigration();
+    $once = $lesson->refresh()->only(['video_path', 'duration_seconds']);
+    runHostVideosMigration();
+
+    expect($lesson->refresh()->only(['video_path', 'duration_seconds']))->toBe($once);
+});
+
+it('puts the Drive links back on rollback', function () {
+    $module = careerFitModuleFour();
+    $module->lessons()->delete();
+    $lesson = careerFitDriveLesson($module, 'Intro', CAREER_FIT_MODULE_1_DRIVE_ID);
+
+    runHostVideosMigration();
+    runHostVideosMigration('down');
+
+    $lesson->refresh();
+    expect($lesson->video_path)->toBe('https://drive.google.com/file/d/'.CAREER_FIT_MODULE_1_DRIVE_ID.'/view');
+    expect($lesson->duration_seconds)->toBeNull();
+});
+
+it('lets a learner complete a self-hosted lesson by watching 90% of it', function () {
+    // The reason the migration stores a duration: without one a directly
+    // hosted video could never be completed (and the course never certified).
+    $module = careerFitModuleFour();
+    $module->lessons()->delete();
+    $lesson = careerFitDriveLesson($module, 'Learning Objectives & Outcomes', CAREER_FIT_MODULE_4_DRIVE_ID);
+    runHostVideosMigration();
+    $lesson->refresh();
+
+    $this->seed(\Database\Seeders\PermissionSeeder::class);
+    $student = makeUserWithRole('student');
+    $enrolment = \App\Domain\Learning\Models\Enrolment::create([
+        'course_id' => $module->course_id, 'user_id' => $student->id, 'status' => 'active', 'source' => 'manual', 'enrolled_at' => now(),
+    ]);
+
+    $service = app(\App\Domain\Learning\Services\ProgressService::class);
+
+    expect($service->updatePlaybackPosition($enrolment, $lesson, (int) ($lesson->duration_seconds * 0.5))->status)->toBe('in_progress');
+    expect($service->updatePlaybackPosition($enrolment, $lesson, (int) ceil($lesson->duration_seconds * 0.95))->status)->toBe('completed');
+});
+
+it('maps all 21 course videos to distinct, unguessable filenames', function () {
+    $migration = require database_path('migrations/2026_10_03_000004_host_career_fit_videos_on_our_server.php');
+    $videos = (new ReflectionClassConstant($migration, 'VIDEOS'))->getValue();
+
+    expect($videos)->toHaveCount(21);
+    $paths = collect($videos)->map(fn ($v) => $v[0]);
+    expect($paths->unique())->toHaveCount(21);
+    expect($paths->every(fn ($p) => preg_match('#^/videos/[0-9a-f]{24}\.mp4$#', $p)))->toBeTrue();
+    expect(collect($videos)->every(fn ($v) => $v[1] > 0))->toBeTrue();
+});

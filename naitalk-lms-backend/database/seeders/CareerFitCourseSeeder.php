@@ -157,7 +157,7 @@ class CareerFitCourseSeeder extends Seeder
         }
 
         // Module 4: Career Mapping
-        $partTwo = $course->modules()->create(['title' => 'Career Mapping – Design Your Future', 'sort_order' => $moduleIndex++]);
+        $partTwo = $course->modules()->create(['title' => 'Career Mapping: Build Your Career Road Map', 'sort_order' => $moduleIndex++]);
         $partTwo->lessons()->create([
             'title' => 'Career Mapping: Why This Matters',
             'type' => 'rich_text',

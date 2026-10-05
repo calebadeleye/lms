@@ -119,7 +119,7 @@ it('seeds a fresh install with the same Introduction plus four modules', functio
         ['Why This Matters', false],
         ['Understanding Your Personality', false],
         ['Discover Your Personality Type', false],
-        ['Career Mapping – Design Your Future', false],
+        ['Career Mapping: Build Your Career Road Map', false],
     ]);
 });
 
@@ -180,4 +180,50 @@ it('seeds the new lesson titles on a fresh install', function () {
     expect($titles)->toContain('Matching Personality to Careers')->toContain('Career Mapping: Build Your Career Road Map');
     expect($titles)->not->toContain('Introduction to Discover Your Personality Type')
         ->not->toContain('Career Mapping: Learning Objectives & Outcomes');
+});
+
+function runCareerFitModuleRename(string $direction = 'up'): void
+{
+    $migration = require database_path('migrations/2026_10_05_000004_rename_career_fit_module_four.php');
+    $migration->{$direction}();
+}
+
+it('retitles module 4 and leaves its lessons, order and the other modules alone', function () {
+    $course = careerFitBeforeRestructure();
+    runCareerFitRestructure();
+    $before = careerFitOutline($course);
+
+    runCareerFitModuleRename();
+
+    $after = careerFitOutline($course);
+    expect(collect($after)->pluck(0)->all())->toBe([
+        'Introduction', 'Why This Matters', 'Understanding Your Personality',
+        'Discover Your Personality Type', 'Career Mapping: Build Your Career Road Map',
+    ]);
+    // Everything but the one title is identical.
+    $after[4][0] = $before[4][0];
+    expect($after)->toBe($before);
+});
+
+it('is safe to run twice, ignores other courses, and restores the old title on rollback', function () {
+    $course = careerFitBeforeRestructure();
+    $other = Course::create(['title' => 'Other', 'slug' => 'other', 'status' => 'published', 'pricing_type' => 'free']);
+    $other->modules()->create(['title' => 'Career Mapping – Design Your Future', 'sort_order' => 0]);
+    $original = careerFitOutline($course);
+
+    runCareerFitModuleRename();
+    runCareerFitModuleRename();
+
+    expect($course->modules()->where('title', 'Career Mapping: Build Your Career Road Map')->count())->toBe(1);
+    expect($other->modules()->first()->title)->toBe('Career Mapping – Design Your Future'); // untouched
+
+    runCareerFitModuleRename('down');
+
+    expect(careerFitOutline($course))->toBe($original);
+});
+
+it('does nothing to the module title when the Career Fit course does not exist', function () {
+    runCareerFitModuleRename();
+
+    expect(DB::table('course_modules')->count())->toBe(0);
 });

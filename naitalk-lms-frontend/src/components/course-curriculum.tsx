@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import type { CourseModuleSummary } from '@/lib/learning-types';
+import { moduleHeadings, type CourseModuleSummary } from '@/lib/learning-types';
 
 const typeIcon: Record<string, string> = {
   video: '▶',
@@ -39,10 +39,11 @@ export function CourseCurriculum({
 }) {
   const [openModuleId, setOpenModuleId] = useState<number | null>(modules[0]?.id ?? null);
   const [isChangingType, setIsChangingType] = useState(false);
+  const headings = moduleHeadings(modules);
 
   return (
     <div className="divide-y divide-neutral-200 rounded-xl border border-neutral-200 bg-white">
-      {modules.map((module, index) => {
+      {modules.map((module) => {
         const isPersonalityModule = isEnrolled && module.id === personalityTypeModuleId;
         const showPicker = isPersonalityModule && (!myPersonalityType || isChangingType);
 
@@ -54,7 +55,7 @@ export function CourseCurriculum({
               className="flex w-full items-center justify-between px-4 py-3 text-left"
             >
               <span className="text-sm font-semibold text-neutral-900">
-                Module {index + 1}: {module.title}
+                {headings.get(module.id)}
               </span>
               <span className="flex items-center gap-2 text-xs text-neutral-500">
                 {isPersonalityModule && !myPersonalityType

@@ -67,6 +67,7 @@ class CourseController extends Controller
             'modules' => $course->modules->map(fn ($module) => [
                 'id' => $module->id,
                 'title' => $module->title,
+                'is_introduction' => $module->is_introduction,
                 'lessons' => $module->lessons
                     ->filter(fn ($lesson) => $lesson->personality_type_code === null
                         || $enrolment?->personality_type === $lesson->personality_type_code)

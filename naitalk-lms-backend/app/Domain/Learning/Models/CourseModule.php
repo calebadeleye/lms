@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class CourseModule extends Model
 {
 
-    protected $fillable = ['course_id', 'title', 'sort_order'];
+    protected $fillable = ['course_id', 'title', 'is_introduction', 'sort_order'];
+
+    protected function casts(): array
+    {
+        return ['is_introduction' => 'boolean'];
+    }
 
     public function course(): BelongsTo
     {

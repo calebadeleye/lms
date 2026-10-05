@@ -63,6 +63,16 @@ class RestructureCareerFitPersonalityVideos extends Command
             return self::FAILURE;
         }
 
+        // Superseded by the 2026_10_05 restructure migration, which renames
+        // these modules and moves lessons between them — re-running this
+        // against the new titles would not find them and could create a
+        // duplicate personality-type module.
+        if ($course->modules()->where('is_introduction', true)->exists()) {
+            $this->info('This course has already been restructured (it has an Introduction module); nothing to do.');
+
+            return self::SUCCESS;
+        }
+
         $dryRun = (bool) $this->option('dry-run');
         $this->info("Course: {$course->title} (id {$course->id})".($dryRun ? ' — DRY RUN, no changes will be written' : ''));
         $this->line('');

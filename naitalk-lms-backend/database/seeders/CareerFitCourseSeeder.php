@@ -67,8 +67,8 @@ class CareerFitCourseSeeder extends Seeder
 
         $moduleIndex = 0;
 
-        // Module 0: framework overview
-        $intro = $course->modules()->create(['title' => 'About This Course', 'sort_order' => $moduleIndex++]);
+        // Introduction (unnumbered — not one of the course's modules): framework overview
+        $intro = $course->modules()->create(['title' => 'Introduction', 'is_introduction' => true, 'sort_order' => $moduleIndex++]);
         $intro->lessons()->create([
             'title' => 'Welcome to the Career FIT™ Framework',
             'type' => 'rich_text',
@@ -85,10 +85,10 @@ class CareerFitCourseSeeder extends Seeder
             'sort_order' => 0,
         ]);
 
-        // Module 1: Part One - Personality Assessment
-        $partOne = $course->modules()->create(['title' => 'Personality Assessment – Discover Who You Are', 'sort_order' => $moduleIndex++]);
+        // Module 1: Why This Matters
+        $partOne = $course->modules()->create(['title' => 'Why This Matters', 'sort_order' => $moduleIndex++]);
         $partOne->lessons()->create([
-            'title' => 'Personality Assessment: Why This Matters',
+            'title' => 'Why This Matters',
             'type' => 'rich_text',
             'content' => ['body' =>
                 "Your personality influences how you think, communicate, make decisions, solve problems, relate with others, and perform at work.\n\n".
@@ -108,11 +108,13 @@ class CareerFitCourseSeeder extends Seeder
             'is_mandatory' => true,
             'sort_order' => 0,
         ]);
-        $partOne->lessons()->create([
-            'title' => 'Personality Assessment: Learning Objectives & Outcomes',
+        // Module 2: Understanding Your Personality
+        $understanding = $course->modules()->create(['title' => 'Understanding Your Personality', 'sort_order' => $moduleIndex++]);
+        $understanding->lessons()->create([
+            'title' => 'Understanding Your Personality: Learning Objectives & Outcomes',
             'type' => 'rich_text',
             'content' => ['body' =>
-                "Learning Objectives\n\nBy the end of Part One, you will be able to:\n".
+                "Learning Objectives\n\nBy the end of this module, you will be able to:\n".
                 "- Understand your personality profile\n".
                 "- Identify your strengths and development areas\n".
                 "- Recognize your values and intrinsic motivators\n".
@@ -125,10 +127,10 @@ class CareerFitCourseSeeder extends Seeder
                 "- Increased self-awareness for informed career decisions",
             ],
             'is_mandatory' => true,
-            'sort_order' => 1,
+            'sort_order' => 0,
         ]);
 
-        // Module 2: Part Two - Discover Your Personality Type. Each lesson is
+        // Module 3: Discover Your Personality Type. Each lesson is
         // one personality type's video, tagged with its code — the learner
         // picks theirs (POST /courses/{id}/personality-type) and only that
         // one lesson is ever shown to them (see CourseController::show()).
@@ -138,7 +140,7 @@ class CareerFitCourseSeeder extends Seeder
         // everyone sees it) before the learner picks their type.
         $personalityTypes = $course->modules()->create(['title' => 'Discover Your Personality Type', 'sort_order' => $moduleIndex++]);
         $personalityTypes->lessons()->create([
-            'title' => 'Introduction to Discover Your Personality Type',
+            'title' => 'Matching Personality to Careers',
             'type' => 'video',
             'video_path' => 'https://drive.google.com/file/d/1B0XHj-NMrTZCRMoJoWg84Py5Iu4oIJt_/view',
             'is_mandatory' => true,
@@ -154,7 +156,7 @@ class CareerFitCourseSeeder extends Seeder
             ]);
         }
 
-        // Module 3: Part Three - Career Mapping
+        // Module 4: Career Mapping
         $partTwo = $course->modules()->create(['title' => 'Career Mapping – Design Your Future', 'sort_order' => $moduleIndex++]);
         $partTwo->lessons()->create([
             'title' => 'Career Mapping: Why This Matters',
@@ -178,7 +180,7 @@ class CareerFitCourseSeeder extends Seeder
             'sort_order' => 0,
         ]);
         $partTwo->lessons()->create([
-            'title' => 'Career Mapping: Learning Objectives & Outcomes',
+            'title' => 'Career Mapping: Build Your Career Road Map',
             'type' => 'rich_text',
             'content' => ['body' =>
                 "Learning Objectives\n\nBy the end of Part Two, you will be able to:\n".

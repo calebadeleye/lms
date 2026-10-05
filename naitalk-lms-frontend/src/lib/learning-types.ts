@@ -34,6 +34,8 @@ export interface LessonSummary {
 export interface CourseModuleSummary {
   id: number;
   title: string;
+  /** Course-level lessons (e.g. a welcome video) shown as "Introduction" and not numbered as a module. */
+  is_introduction: boolean;
   lessons: LessonSummary[];
 }
 
@@ -60,6 +62,7 @@ export interface LessonNavItem {
 export interface LessonModuleNav {
   id: number;
   title: string;
+  is_introduction: boolean;
   lessons: LessonNavItem[];
 }
 
@@ -135,4 +138,23 @@ export function formatPrice(cents: number | null | undefined, currency: string |
   // of taking down the whole page over what's just a formatting detail.
   if (!currency) return `${cents / 100}`;
   return new Intl.NumberFormat('en-NG', { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100);
+}
+
+/**
+ * Heading for each module, keyed by module id: "Module N: Title" for the
+ * numbered curriculum, and just the title for an introduction module, which
+ * doesn't take a number — so "Module 1" is the first module after it.
+ */
+export function moduleHeadings(modules: { id: number; title: string; is_introduction: boolean }[]): Map<number, string> {
+  const headings = new Map<number, string>();
+  let number = 0;
+
+  for (const courseModule of modules) {
+    headings.set(
+      courseModule.id,
+      courseModule.is_introduction ? courseModule.title : `Module ${++number}: ${courseModule.title}`
+    );
+  }
+
+  return headings;
 }

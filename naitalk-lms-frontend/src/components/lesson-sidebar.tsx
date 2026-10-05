@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { LessonModuleNav } from '@/lib/learning-types';
+import { moduleHeadings, type LessonModuleNav } from '@/lib/learning-types';
 
 const typeIcon: Record<string, string> = {
   video: '▶', rich_text: '📄', audio: '🎧', file: '📎',
@@ -7,11 +7,13 @@ const typeIcon: Record<string, string> = {
 };
 
 export function LessonSidebar({ modules }: { modules: LessonModuleNav[] }) {
+  const headings = moduleHeadings(modules);
+
   return (
     <nav className="divide-y divide-neutral-100 rounded-xl border border-neutral-200 bg-white">
-      {modules.map((module, index) => (
+      {modules.map((module) => (
         <div key={module.id}>
-          <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Module {index + 1}: {module.title}</p>
+          <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">{headings.get(module.id)}</p>
           <ul>
             {module.lessons.map((lesson) => (
               <li key={lesson.id}>

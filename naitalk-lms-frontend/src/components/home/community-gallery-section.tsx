@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { HOME_CONTENT } from '@/lib/home-content';
 import { BrandIcon, type BrandIconName } from '@/components/home/brand-icon';
 
@@ -42,6 +43,15 @@ export function CommunityGallerySection() {
               <p className="mx-auto mt-2 max-w-[165px] text-[11px] leading-[1.5] text-white/88">{descriptions[index]}</p>
             </article>
           ))}
+        </div>
+
+        <div className="mt-7 text-center">
+          <Link
+            href="/gallery"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-[#f4b728] px-6 text-sm font-extrabold text-[#172326] transition hover:-translate-y-0.5 hover:bg-[#e9aa18]"
+          >
+            View the photo gallery <span aria-hidden>→</span>
+          </Link>
         </div>
       </div>
     </section>

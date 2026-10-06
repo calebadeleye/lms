@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { BRANDING } from '@/lib/branding';
 import { getOptionalUser } from '@/lib/auth-server';
 import { SiteHeader } from '@/components/site-header';
@@ -30,7 +31,7 @@ export default async function EventsPage() {
 
         <div className="mt-10 space-y-10">
           {EVENTS.map((event) => (
-            <EventCard key={event.title} title={event.title} year={event.year} images={eventImageUrls(event)} driveUrl={event.driveUrl} />
+            <EventCard key={event.title} title={event.title} year={event.year} images={eventImageUrls(event)} driveUrl={event.driveUrl} galleryHref={event.galleryHref} />
           ))}
         </div>
       </main>
@@ -40,7 +41,19 @@ export default async function EventsPage() {
   );
 }
 
-function EventCard({ title, year, images, driveUrl }: { title: string; year: number; images: string[]; driveUrl: string }) {
+function EventCard({
+  title,
+  year,
+  images,
+  driveUrl,
+  galleryHref,
+}: {
+  title: string;
+  year: number;
+  images: string[];
+  driveUrl: string;
+  galleryHref?: string;
+}) {
   return (
     <article className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
       <div className={`grid gap-1 ${images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
@@ -53,14 +66,24 @@ function EventCard({ title, year, images, driveUrl }: { title: string; year: num
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--brand-accent)]">{year}</p>
           <h2 className="mt-1 text-lg font-bold text-neutral-900">{title}</h2>
         </div>
-        <a
-          href={driveUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 rounded-md border border-[var(--brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5"
-        >
-          See more &rarr;
-        </a>
+        <div className="flex flex-wrap gap-2">
+          {galleryHref && (
+            <Link
+              href={galleryHref}
+              className="inline-flex items-center gap-1 rounded-md bg-[var(--brand-primary)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+            >
+              View photos &rarr;
+            </Link>
+          )}
+          <a
+            href={driveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-md border border-[var(--brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5"
+          >
+            See more &rarr;
+          </a>
+        </div>
       </div>
     </article>
   );

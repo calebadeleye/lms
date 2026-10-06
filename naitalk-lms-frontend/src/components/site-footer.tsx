@@ -15,6 +15,7 @@ const quickLinks = [
 const resources = [
   { label: 'Blog', href: '/coming-soon?feature=Blog' },
   { label: 'Events', href: '/events' },
+  { label: 'Gallery', href: '/gallery' },
   { label: 'Downloads', href: '/coming-soon?feature=Downloads' },
   { label: 'FAQs', href: '/coming-soon?feature=FAQs' },
   { label: 'Contact Us', href: '/coming-soon?feature=Contact' },

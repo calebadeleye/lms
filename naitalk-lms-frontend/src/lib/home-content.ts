@@ -150,12 +150,13 @@ export const HOME_CONTENT = {
     eyebrow: 'Our Community Experience',
     heading: 'Learn. Connect. Grow. Create Impact.',
     items: [
-      { caption: 'Group Coaching Sessions', photo: { src: '/marketing/hero-career-fit.png', alt: 'Professionals taking part in group coaching' } as PhotoSlot },
-      { caption: 'Peer Learning', photo: { src: '/marketing/hero.jpg', alt: 'Two peers learning together' } as PhotoSlot },
-      { caption: 'Mentorship', photo: { src: '/marketing/community-3.jpg', alt: 'Mentorship conversation' } as PhotoSlot },
-      { caption: 'Workers Day Event', photo: { src: '/marketing/community-4.jpg', alt: 'Workers Day event celebration' } as PhotoSlot },
-      { caption: 'Transformational Workshops', photo: { src: '/marketing/community-1.jpg', alt: 'Collaborative learning workshop' } as PhotoSlot },
-      { caption: 'Personal & Career Development', photo: { src: '/marketing/community-2.jpg', alt: 'A professional focused on personal growth' } as PhotoSlot },
+      // Real photos from the HR GEMs May Day 2024 Hangout (see lib/gallery-content.ts).
+      { caption: 'Group Coaching Sessions', photo: { src: '/gallery/may-day-2024-hangout/06-panel-sm.jpg', alt: 'Five panellists sharing their experiences at the HR GEMs hangout' } as PhotoSlot },
+      { caption: 'Peer Learning', photo: { src: '/gallery/may-day-2024-hangout/08-networking-sm.jpg', alt: 'Two members deep in conversation at the HR GEMs hangout' } as PhotoSlot },
+      { caption: 'Mentorship', photo: { src: '/gallery/may-day-2024-hangout/14-speaker-sm.jpg', alt: 'A member sharing her story into a microphone' } as PhotoSlot },
+      { caption: 'Workers Day Event', photo: { src: '/gallery/may-day-2024-hangout/02-placards-group-sm.jpg', alt: 'Members holding "I am a coach" and "Impact" placards at the May Day hangout' } as PhotoSlot },
+      { caption: 'Transformational Workshops', photo: { src: '/gallery/may-day-2024-hangout/07-audience-sm.jpg', alt: 'A full audience listening to a speaker at the hangout' } as PhotoSlot },
+      { caption: 'Personal & Career Development', photo: { src: '/gallery/may-day-2024-hangout/09-i-am-a-coach-sm.jpg', alt: 'Two smiling members holding "I am a coach" placards' } as PhotoSlot },
     ],
   },
 

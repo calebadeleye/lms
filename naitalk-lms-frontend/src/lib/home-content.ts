@@ -30,7 +30,8 @@ export const HOME_CONTENT = {
       { icon: 'briefcase', label: 'Professionals Seeking a New Direction' },
     ] as { icon: 'graduate' | 'compass' | 'briefcase'; label: string }[],
     quote: 'Join 2,000+ purpose-driven minds transforming their lives',
-    photo: { src: '/marketing/community-2.jpg', alt: 'A confident professional woman working at her laptop in an office' } as PhotoSlot,
+    // Real photos from the HR GEMs 2026 event (see lib/gallery-content.ts).
+    photo: { src: '/gallery/workplace-transformation-2026/11-friends.jpg', alt: 'Three smiling HR GEMs members at the 2026 Workplace Transformation event, one in a yellow HR GEM Coach Network T-shirt' } as PhotoSlot,
     featureCards: [
       { icon: 'compass', title: 'Career Clarity', description: 'Discover your strengths, values and direction.' },
       { icon: 'people', title: 'Coaching Skills', description: 'Learn practical coaching and people skills.' },
@@ -56,8 +57,8 @@ export const HOME_CONTENT = {
         description: 'Understand your personality, strengths and values to discover career paths that align with who you are.',
         action: 'Explore Course',
         href: '/courses',
-        image: '/marketing/community-2.jpg',
-        imageAlt: 'A professional exploring her career path',
+        image: '/gallery/workplace-transformation-2026/07-question-time-sm.jpg',
+        imageAlt: 'An HR GEMs member sharing her thoughts into a microphone at the 2026 event',
         icon: 'compass',
       },
       {
@@ -65,8 +66,8 @@ export const HOME_CONTENT = {
         description: 'Build coaching skills, gain mentorship and learn to help others unlock their potential.',
         action: 'Explore Coaching',
         href: '/coaching',
-        image: '/marketing/community-4.jpg',
-        imageAlt: 'A mentoring session in a library',
+        image: '/gallery/workplace-transformation-2026/14-fireside-chat-sm.jpg',
+        imageAlt: 'Three speakers in a coaching conversation on stage at the 2026 event',
         icon: 'people',
       },
       {
@@ -74,8 +75,8 @@ export const HOME_CONTENT = {
         description: 'Join a thriving community of professionals who learn, grow and support each other to create greater impact.',
         action: 'Become a Member',
         href: '/membership',
-        image: '/marketing/community-5.jpg',
-        imageAlt: 'Professionals connecting at a learning event',
+        image: '/gallery/workplace-transformation-2026/16-group-photo-sm.jpg',
+        imageAlt: 'HR GEMs members gathered together for a group photo at the 2026 event',
         icon: 'community',
       },
     ],
@@ -90,7 +91,7 @@ export const HOME_CONTENT = {
       'We believe in the power of people, the beauty of collaboration and the impact of intentional growth.',
     ],
     quote: 'When great minds connect with purpose, transformation becomes inevitable.',
-    photo: { src: '/marketing/hero.jpg', alt: 'Two women learning and growing together' } as PhotoSlot,
+    photo: { src: '/gallery/workplace-transformation-2026/06-all-smiles.jpg', alt: 'Three smiling HR GEMs members seated in the audience at the 2026 event' } as PhotoSlot,
     values: [
       { title: 'Collaboration', description: 'We grow together and achieve more.', icon: 'people', color: 'teal' },
       { title: 'Love', description: 'We care deeply about people.', icon: 'heart', color: 'red' },

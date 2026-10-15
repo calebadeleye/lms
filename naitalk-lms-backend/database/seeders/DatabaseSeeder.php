@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             OwnerUserSeeder::class,
             InstructorAndTestimonialSeeder::class,
             CareerFitCourseSeeder::class,
+            WebinarSessionCoursesSeeder::class,
             MembershipAndCoachingSeeder::class,
         ]);
     }

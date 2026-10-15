@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 /**
  * Seeds the "Find Your Career Fit" course (the Career FIT™ framework), a
- * paid course at ₦2,500 (BOT asked for a price so learners take it
+ * paid course at ₦2,650 (BOT asked for a price so learners take it
  * seriously) — the one course in the catalogue now that the placeholder HR
  * course set has been removed (see InstructorAndTestimonialSeeder). Run
  * standalone with:
@@ -52,9 +52,9 @@ class CareerFitCourseSeeder extends Seeder
                 "Your future shouldn't be determined by chance—it should be shaped by clarity. This course will empower you to stop guessing, start discovering, and confidently pursue a career that reflects your strengths, personality, and purpose. Because when you find the right fit, you don't just build a career—you build a life of impact, fulfillment, and lasting success.",
             'status' => 'published',
             'pricing_type' => 'paid',
-            // Kobo, not naira: 250_000 = ₦2,500. Keep in sync with the
-            // 2026_10_02_000001 data migration that re-prices the live row.
-            'price_cents' => 250_000,
+            // Kobo, not naira: 265_000 = ₦2,650. Keep in sync with the
+            // 2026_10_15_000001 data migration that re-prices the live row.
+            'price_cents' => 265_000,
             'currency' => 'NGN',
             'difficulty_level' => 'beginner',
             'certificate_enabled' => true,

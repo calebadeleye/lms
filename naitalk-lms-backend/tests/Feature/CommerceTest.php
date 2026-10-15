@@ -256,12 +256,12 @@ it('lets a finance manager issue a refund', function () {
     expect($order->fresh()->status)->toBe('refunded');
 });
 
-it('starts a Paystack checkout for the ₦2,500 Career Fit course and enrols the buyer once the callback verifies it', function () {
+it('starts a Paystack checkout for the ₦2,650 Career Fit course and enrols the buyer once the callback verifies it', function () {
     $config = PaymentConfig::create(['provider' => 'paystack', 'mode' => 'managed', 'fee_bearer' => 'organization', 'status' => 'active']);
 
     $course = Course::create([
         'title' => 'Find Your Career Fit', 'slug' => 'find-your-career-fit', 'status' => 'published',
-        'pricing_type' => 'paid', 'price_cents' => 250_000, 'currency' => 'NGN', 'published_at' => now(),
+        'pricing_type' => 'paid', 'price_cents' => 265_000, 'currency' => 'NGN', 'published_at' => now(),
     ]);
     $student = makeUserWithRole('student');
 
@@ -270,7 +270,7 @@ it('starts a Paystack checkout for the ₦2,500 Career Fit course and enrols the
             'authorization_url' => 'https://checkout.paystack.com/abc', 'reference' => 'ref_career_fit',
         ]], 200),
         'api.paystack.co/transaction/verify/*' => Http::response(['data' => [
-            'status' => 'success', 'amount' => 250_000, 'currency' => 'NGN', 'reference' => 'ref_career_fit',
+            'status' => 'success', 'amount' => 265_000, 'currency' => 'NGN', 'reference' => 'ref_career_fit',
             'fees' => 3_750, 'paid_at' => now()->toIso8601String(),
         ]], 200),
     ]);
@@ -280,9 +280,9 @@ it('starts a Paystack checkout for the ₦2,500 Career Fit course and enrols the
         ->assertOk()
         ->assertJsonPath('data.authorization_url', 'https://checkout.paystack.com/abc');
 
-    // Paystack was asked for exactly ₦2,500 (250,000 kobo) in NGN.
+    // Paystack was asked for exactly ₦2,650 (265,000 kobo) in NGN.
     Http::assertSent(fn ($request) => str_ends_with($request->url(), '/transaction/initialize')
-        && $request['amount'] === 250_000 && $request['currency'] === 'NGN');
+        && $request['amount'] === 265_000 && $request['currency'] === 'NGN');
 
     $orderId = $response->json('data.order.id');
 

@@ -47,6 +47,8 @@ it('renders the email with both buttons', function () {
         // The branded template: logo, hero photo and sign-off.
         ->toContain('/branding/logo.png')
         ->toContain('/email/free-assessment-hero.jpg')
+        ->toContain('Come with us and take the next step.')
+        ->toContain('DISCOVER HOW TO GET A FULFILLING JOB AND MAKE MONEY WITH YOUR STRENGTHS.')
         ->toContain('Warm regards,');
 });
 

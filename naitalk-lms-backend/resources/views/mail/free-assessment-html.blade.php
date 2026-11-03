@@ -100,8 +100,8 @@
           <td width="64" valign="middle" align="center" style="padding:22px 0 22px 22px; font-size:40px; line-height:1;">📈</td>
           <td valign="middle" style="padding:22px 24px 22px 18px; border-left:2px solid #f4b728;">
             <p style="margin:0 0 4px; font-size:17px; font-weight:bold; color:#172326;">But don't stop at discovering your personality!</p>
-            <p style="margin:0 0 8px; font-size:15px; color:#3f4c4e;">Hurry and take the next step.</p>
-            <p style="margin:0; font-size:16px; font-weight:800; letter-spacing:0.3px; line-height:1.4; color:#006c70;">LEARN HOW TO GET A FULFILLING JOB AND MAKE MONEY WITH YOUR STRENGTHS.</p>
+            <p style="margin:0 0 8px; font-size:15px; color:#3f4c4e;">Come with us and take the next step.</p>
+            <p style="margin:0; font-size:16px; font-weight:800; letter-spacing:0.3px; line-height:1.4; color:#006c70;">DISCOVER HOW TO GET A FULFILLING JOB AND MAKE MONEY WITH YOUR STRENGTHS.</p>
           </td>
         </tr>
       </table>

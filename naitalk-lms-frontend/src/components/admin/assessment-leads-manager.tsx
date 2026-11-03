@@ -51,6 +51,13 @@ export function AssessmentLeadsManager({ initial, initialMeta }: { initial: Asse
         <div className="flex flex-wrap items-center gap-3">
           <SearchInput placeholder="Search name or email" onSearch={handleSearch} />
           <a
+            href="/api/v1/admin/assessment-leads/export-excel"
+            download="free-assessment-signups.xlsx"
+            className="rounded-md bg-[var(--brand-primary)] px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90"
+          >
+            Download Excel
+          </a>
+          <a
             href={exportHref}
             download={`free-assessment-leads.csv`}
             className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"

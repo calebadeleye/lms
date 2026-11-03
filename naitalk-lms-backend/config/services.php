@@ -47,6 +47,8 @@ return [
         'url' => env('FREE_ASSESSMENT_URL', 'https://bit.ly/MySelfTest'),
         // The paid course the email invites people to enrol in.
         'course_slug' => env('FREE_ASSESSMENT_COURSE_SLUG', 'find-your-career-fit'),
+        // Who is emailed (with an updated Excel file) for each new sign-up.
+        'notify_email' => env('FREE_ASSESSMENT_NOTIFY_EMAIL', 'info@hrgemscoachnetwork.com'),
     ],
 
     'frontend' => [

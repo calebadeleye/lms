@@ -4,6 +4,7 @@ namespace App\Domain\Marketing\Http\Controllers;
 
 use App\Domain\Marketing\Models\AssessmentLead;
 use App\Domain\Marketing\Notifications\FreeAssessmentNotification;
+use App\Domain\Marketing\Notifications\NewAssessmentLeadNotification;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -51,6 +52,7 @@ class AssessmentLeadController extends Controller
         RateLimiter::hit($limiterKey, 3600);
 
         $lead = AssessmentLead::firstOrNew(['email' => $email]);
+        $isNewLead = ! $lead->exists;
         $lead->fill([
             'full_name' => trim($data['full_name']),
             'source' => $data['source'] ?? $lead->source,
@@ -70,10 +72,42 @@ class AssessmentLeadController extends Controller
             $sent = false;
         }
 
+        if ($isNewLead) {
+            $this->notifyTeam($lead);
+        }
+
         return response()->json(['data' => array_filter([
             'email_sent' => $sent,
             'assessment_url' => $sent ? null : FreeAssessmentNotification::assessmentUrl(),
         ], fn ($v) => $v !== null)], 201);
+    }
+
+    /**
+     * Email the team about a new sign-up, with every sign-up attached as an
+     * Excel file. Its failure is reported but never affects the visitor.
+     */
+    private function notifyTeam(AssessmentLead $lead): void
+    {
+        $to = config('services.free_assessment.notify_email');
+
+        if (! $to) {
+            return;
+        }
+
+        try {
+            Notification::route('mail', $to)->notify(new NewAssessmentLeadNotification($lead));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    /** Admin download of every sign-up as an Excel file. */
+    public function exportExcel()
+    {
+        return response(AssessmentLead::spreadsheet(), 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="free-assessment-signups-'.now('Africa/Lagos')->format('Y-m-d').'.xlsx"',
+        ]);
     }
 
     /** Admin list, newest first, with optional search. */

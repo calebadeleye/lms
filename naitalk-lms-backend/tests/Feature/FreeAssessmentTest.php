@@ -2,6 +2,7 @@
 
 use App\Domain\Marketing\Models\AssessmentLead;
 use App\Domain\Marketing\Notifications\FreeAssessmentNotification;
+use App\Domain\Marketing\Notifications\NewAssessmentLeadNotification;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
@@ -120,4 +121,56 @@ it('lets staff with students.manage list and export leads, but not students', fu
 
     $csv = $this->actingAs($admin)->get('/api/v1/admin/assessment-leads/export')->assertOk()->streamedContent();
     expect($csv)->toContain('"Full name",Email,Source')->toContain('"Ada Obi",ada@example.com,home');
+});
+
+function xlsxSheetXml(string $bytes): string
+{
+    $path = tempnam(sys_get_temp_dir(), 'xlsx-test');
+    file_put_contents($path, $bytes);
+    $zip = new ZipArchive;
+    $zip->open($path);
+    $xml = $zip->getFromName('xl/worksheets/sheet1.xml');
+    $zip->close();
+    unlink($path);
+
+    return $xml;
+}
+
+it('emails the team about a new sign-up with an updated Excel file of everyone', function () {
+    Notification::fake();
+    AssessmentLead::create(['full_name' => 'Earlier Person', 'email' => 'earlier@example.com', 'source' => 'home']);
+
+    $this->postJson('/api/v1/assessment-leads', ['full_name' => 'Ada Obi', 'email' => 'ada@example.com', 'source' => 'landing'])->assertCreated();
+
+    Notification::assertSentOnDemand(NewAssessmentLeadNotification::class, function ($notification, $channels, AnonymousNotifiable $notifiable) {
+        $mail = $notification->toMail($notifiable);
+        $attachment = $mail->rawAttachments[0] ?? null;
+        $sheet = $attachment ? xlsxSheetXml($attachment['data']) : '';
+
+        return $notifiable->routes['mail'] === 'info@hrgemscoachnetwork.com'
+            && $mail->subject === 'New free assessment sign-up: Ada Obi'
+            && str_ends_with($attachment['name'], '.xlsx')
+            && str_contains($sheet, 'Ada Obi') && str_contains($sheet, 'ada@example.com')
+            && str_contains($sheet, 'Earlier Person') && str_contains($sheet, 'Free assessment page');
+    });
+});
+
+it('does not email the team again when the same person asks a second time', function () {
+    Notification::fake();
+
+    $this->postJson('/api/v1/assessment-leads', ['full_name' => 'Ada Obi', 'email' => 'ada@example.com'])->assertCreated();
+    $this->postJson('/api/v1/assessment-leads', ['full_name' => 'Ada Obi', 'email' => 'ada@example.com'])->assertCreated();
+
+    Notification::assertSentOnDemandTimes(NewAssessmentLeadNotification::class, 1);
+    Notification::assertSentOnDemandTimes(FreeAssessmentNotification::class, 2);
+});
+
+it('lets staff download every sign-up as an Excel file, but not students', function () {
+    AssessmentLead::create(['full_name' => 'Ada Obi', 'email' => 'ada@example.com', 'source' => 'home', 'last_requested_at' => now()]);
+
+    $this->actingAs(makeUserWithRole('student'))->get('/api/v1/admin/assessment-leads/export-excel')->assertForbidden();
+
+    $response = $this->actingAs(makeUserWithRole('administrator'))->get('/api/v1/admin/assessment-leads/export-excel')->assertOk();
+    expect($response->headers->get('Content-Type'))->toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    expect(xlsxSheetXml($response->getContent()))->toContain('Ada Obi')->toContain('Homepage');
 });

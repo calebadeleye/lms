@@ -242,6 +242,7 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
         Route::get('/students', [AdminStudentController::class, 'index']);
         Route::get('/assessment-leads', [AssessmentLeadController::class, 'index']);
         Route::get('/assessment-leads/export', [AssessmentLeadController::class, 'export']);
+        Route::get('/assessment-leads/export-excel', [AssessmentLeadController::class, 'exportExcel']);
         Route::delete('/students/{userId}', [AdminStudentController::class, 'destroy']);
         Route::post('/students/{userId}/reactivate', [AdminStudentController::class, 'reactivate']);
     });

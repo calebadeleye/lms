@@ -13,8 +13,7 @@
 <style>
   @media only screen and (max-width: 620px) {
     .container { width: 100% !important; }
-    .stack { display: block !important; width: auto !important; }
-    .hero-text { padding: 32px 24px 24px !important; }
+    .hero-text { padding: 28px 22px 24px !important; }
     .hero-title { font-size: 26px !important; }
     .hero-img { width: 100% !important; height: auto !important; }
     .pad { padding-left: 24px !important; padding-right: 24px !important; }
@@ -49,23 +48,18 @@
     </td>
   </tr>
 
-  {{-- Teal hero: headline + photo --}}
+  {{-- Teal hero: headline, then a full-width group photo --}}
   <tr>
-    <td style="background-color:#073d40;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td class="stack hero-text" width="58%" valign="middle" style="padding:36px 20px 36px 36px;">
-            <div class="hero-title" style="font-family:Georgia,'Times New Roman',serif; font-size:36px; line-height:1.15; font-weight:bold; color:#ffffff;">
-              Your <span style="background-color:#f4b728; color:#073d40; padding:0 8px; border-radius:6px;">FREE</span><br>
-              Personality Assessment Is Ready!
-            </div>
-            <div style="width:64px; height:4px; background-color:#f4b728; border-radius:2px; margin-top:18px; font-size:0; line-height:0;">&nbsp;</div>
-          </td>
-          <td class="stack" width="42%" valign="bottom" style="padding:0; border-left:6px solid #f4b728;">
-            <img class="hero-img" src="{{ $heroUrl }}" width="240" height="267" alt="An HR GEMs member sharing her thoughts at our 2026 event" style="display:block; border:0; width:240px; height:267px;">
-          </td>
-        </tr>
-      </table>
+    <td class="hero-text" align="center" style="background-color:#073d40; padding:34px 36px 30px;">
+      <div class="hero-title" style="font-family:Georgia,'Times New Roman',serif; font-size:34px; line-height:1.2; font-weight:bold; color:#ffffff;">
+        Your <span style="background-color:#f4b728; color:#073d40; padding:0 8px; border-radius:6px;">FREE</span> Personality Assessment Is Ready!
+      </div>
+      <div style="width:64px; height:4px; background-color:#f4b728; border-radius:2px; margin:18px auto 0; font-size:0; line-height:0;">&nbsp;</div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0; border-top:6px solid #f4b728; font-size:0; line-height:0;">
+      <img class="hero-img" src="{{ $heroUrl }}" width="600" height="400" alt="Three smiling HR GEMs team members in yellow HR GEM Coach Network T-shirts" style="display:block; border:0; width:600px; height:auto; max-width:100%;">
     </td>
   </tr>
 

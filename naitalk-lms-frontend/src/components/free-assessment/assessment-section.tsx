@@ -56,17 +56,17 @@ export function FreeAssessmentSection({
           </ul>
         </div>
 
-        <div className="relative lg:pb-14">
+        <div className="relative">
           <div className="overflow-hidden rounded-[28px] shadow-[0_24px_60px_rgba(7,61,64,0.18)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/gallery/workplace-transformation-2026/07-question-time.jpg"
-              alt="An HR GEMs member in yellow sharing her thoughts into a microphone at the 2026 event"
-              className="aspect-[4/3] w-full object-cover object-[50%_30%] lg:aspect-[4/5]"
+              src="/gallery/workplace-transformation-2026/02-yellow-team.jpg"
+              alt="Three smiling HR GEMs team members in yellow HR GEM Coach Network T-shirts, one holding an “I am a coach” placard"
+              className="aspect-[3/2] w-full object-cover object-top"
             />
           </div>
 
-          <div className="assessment-glow relative z-10 mx-auto -mt-16 w-[92%] max-w-[440px] rounded-[28px] border border-[#f4b728]/60 bg-white p-6 shadow-[0_24px_60px_rgba(7,61,64,0.16)] sm:p-8 lg:absolute lg:bottom-0 lg:left-[6%] lg:mt-0 lg:w-[380px] xl:left-[-10%] xl:w-[400px]">
+          <div className="assessment-glow relative z-10 mx-auto -mt-16 w-[92%] max-w-[440px] lg:-mt-20 rounded-[28px] border border-[#f4b728]/60 bg-white p-6 shadow-[0_24px_60px_rgba(7,61,64,0.16)] sm:p-8 lg:ml-0 lg:w-[400px] xl:ml-[-8%]">
             <h3 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-[#073d40] sm:text-[30px]">
               Start Your Free Assessment
             </h3>

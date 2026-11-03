@@ -7,12 +7,6 @@ const BENEFITS: { icon: BrandIconName; text: string }[] = [
   { icon: 'star', text: 'Take your next step with confidence' },
 ];
 
-const PILLARS: { icon: BrandIconName; label: string }[] = [
-  { icon: 'compass', label: 'Self-discovery' },
-  { icon: 'target', label: 'Career clarity' },
-  { icon: 'leaf', label: 'Personal growth' },
-];
-
 /**
  * The free personality assessment opt-in, used both as the /free-assessment
  * landing page and as a section of the homepage. `headingLevel` keeps the
@@ -80,17 +74,6 @@ export function FreeAssessmentSection({
             <AssessmentOptInForm source={source} />
           </div>
         </div>
-      </div>
-
-      <div className="relative border-t border-[#efe6cc] bg-[#fdf8ea]">
-        <ul className="mx-auto grid max-w-[1000px] grid-cols-3 px-3 py-8 sm:py-10">
-          {PILLARS.map((pillar, i) => (
-            <li key={pillar.label} className={`flex flex-col items-center gap-3 text-center ${i > 0 ? 'border-l border-[#f4b728]/50' : ''}`}>
-              <BrandIcon name={pillar.icon} className="h-9 w-9 text-[#e3a20f] sm:h-11 sm:w-11" />
-              <span className="text-[15px] font-extrabold text-[#073d40] sm:text-[22px]">{pillar.label}</span>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );

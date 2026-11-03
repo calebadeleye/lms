@@ -42,6 +42,13 @@ return [
         ],
     ],
 
+    // The free personality assessment opt-in (AssessmentLeadController).
+    'free_assessment' => [
+        'url' => env('FREE_ASSESSMENT_URL', 'https://bit.ly/MySelfTest'),
+        // The paid course the email invites people to enrol in.
+        'course_slug' => env('FREE_ASSESSMENT_COURSE_SLUG', 'find-your-career-fit'),
+    ],
+
     'frontend' => [
         'url' => env('FRONTEND_URL', 'http://localhost:3000'),
         'internal_secret' => env('FRONTEND_INTERNAL_SECRET'),

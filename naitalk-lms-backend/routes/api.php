@@ -29,6 +29,7 @@ use App\Domain\Learning\Http\Controllers\QuizAttemptController;
 use App\Domain\Learning\Http\Controllers\QuizController;
 use App\Domain\Learning\Http\Controllers\ReviewController;
 use App\Domain\Learning\Http\Controllers\WishlistController;
+use App\Domain\Marketing\Http\Controllers\AssessmentLeadController;
 use App\Domain\Membership\Http\Controllers\MembershipPlanController;
 use App\Domain\Site\Http\Controllers\TestimonialController;
 use Illuminate\Support\Facades\Route;
@@ -120,6 +121,10 @@ Route::get('/courses', [CourseController::class, 'index']);
 Route::get('/courses/{courseId}/reviews', [ReviewController::class, 'index'])->whereNumber('courseId');
 
 Route::get('/membership-plans', [MembershipPlanController::class, 'index']);
+
+// Public — the free personality assessment opt-in (rate-limited per email
+// inside the controller; see its docblock for why not per IP).
+Route::post('/assessment-leads', [AssessmentLeadController::class, 'store']);
 Route::get('/testimonials', [TestimonialController::class, 'index']);
 Route::get('/coaches', [CoachController::class, 'index']);
 Route::get('/coaches/{coachId}', [CoachController::class, 'show']);
@@ -235,6 +240,8 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
         Route::post('/assignment-submissions/{submissionId}/grade', [AssignmentController::class, 'grade']);
 
         Route::get('/students', [AdminStudentController::class, 'index']);
+        Route::get('/assessment-leads', [AssessmentLeadController::class, 'index']);
+        Route::get('/assessment-leads/export', [AssessmentLeadController::class, 'export']);
         Route::delete('/students/{userId}', [AdminStudentController::class, 'destroy']);
         Route::post('/students/{userId}/reactivate', [AdminStudentController::class, 'reactivate']);
     });

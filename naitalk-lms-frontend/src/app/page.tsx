@@ -5,6 +5,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { HeroSection } from '@/components/home/hero-section';
 import { ProgrammesSection } from '@/components/home/programmes-section';
 import { WhoWeAreSection } from '@/components/home/who-we-are-section';
+import { FreeAssessmentSection } from '@/components/free-assessment/assessment-section';
 import { CommunityGallerySection } from '@/components/home/community-gallery-section';
 import { TestimonialCarouselSection } from '@/components/home/testimonial-carousel-section';
 
@@ -20,6 +21,7 @@ export default async function HomePage() {
         <HeroSection />
         <ProgrammesSection />
         <WhoWeAreSection />
+        <FreeAssessmentSection source="home" />
         <CommunityGallerySection />
         <TestimonialCarouselSection />
       </main>

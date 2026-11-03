@@ -15,6 +15,7 @@ export const adminNav: NavItem[] = [
   { href: '/admin/applications', label: 'Membership Applications' },
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/students', label: 'Students' },
+  { href: '/admin/assessment-leads', label: 'Assessment Leads' },
   { href: '/admin/courses', label: 'Courses' },
   { href: '/admin/coaching', label: 'Coaching' },
   { href: '/admin/memberships', label: 'Membership Plans' },

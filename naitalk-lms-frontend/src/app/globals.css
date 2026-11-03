@@ -99,3 +99,34 @@ select {
     margin-right: calc((max(100vw, 1240px) - 1240px) / -2 - 2rem);
   }
 }
+
+/* Free assessment opt-in card: a soft gold glow that breathes, to draw the
+   eye to the form. Pauses while someone is typing, and is off entirely for
+   visitors who ask for reduced motion. */
+@keyframes assessment-glow {
+  /* Same three shadow layers at every step (base, ring, halo) so they
+     interpolate smoothly. The ring shows even over the yellow photo. */
+  0%,
+  100% {
+    box-shadow: 0 24px 60px rgba(7, 61, 64, 0.16), 0 0 0 0 rgba(244, 183, 40, 0), 0 0 0 0 rgba(244, 183, 40, 0);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 24px 60px rgba(7, 61, 64, 0.16), 0 0 0 4px rgba(244, 183, 40, 0.7), 0 0 48px 10px rgba(244, 183, 40, 0.45);
+    transform: scale(1.015);
+  }
+}
+
+.assessment-glow {
+  animation: assessment-glow 2.6s ease-in-out infinite;
+}
+
+.assessment-glow:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assessment-glow {
+    animation: none;
+  }
+}

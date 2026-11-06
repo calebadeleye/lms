@@ -47,7 +47,7 @@ it('renders the email with both buttons', function () {
         ->toContain('/courses/find-your-career-fit')
         // The branded template: logo, hero photo and sign-off.
         ->toContain('/branding/logo.png')
-        ->toContain('/email/free-assessment-group.jpg')
+        ->toContain('/email/free-assessment-youth.jpg')
         ->toContain('Come with us and take the next step.')
         ->toContain('DISCOVER HOW TO GET A FULFILLING JOB AND MAKE MONEY WITH YOUR STRENGTHS.')
         ->toContain('Warm regards,');

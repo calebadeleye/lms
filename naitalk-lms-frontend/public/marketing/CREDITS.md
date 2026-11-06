@@ -11,3 +11,4 @@ Sourced from [Pexels](https://www.pexels.com) — free to use, attribution not r
 - `community-5.jpg` — [Roxanne Minnish](https://www.pexels.com/@roxanne-minnish-2936023) ([source](https://www.pexels.com/photo/photo-of-a-woman-in-a-maroon-shirt-pasting-black-feathers-on-a-cardboard-7976629/))
 - `community-6.jpg` — [olia danilevich](https://www.pexels.com/@olia-danilevich) ([source](https://www.pexels.com/photo/a-graduate-holding-her-diploma-8093007/))
 - `more-stories.jpg` — [Stephen Westby](https://www.pexels.com/@stephen-westby-295716816) ([source](https://www.pexels.com/photo/man-in-yellow-and-white-shirt-13326901/))
+- `free-assessment-youth.jpg` (also `public/email/free-assessment-youth.jpg`) — [Monstera Production](https://www.pexels.com/@gabby-k) ([source](https://www.pexels.com/photo/group-of-people-standing-next-to-each-other-9433334/))

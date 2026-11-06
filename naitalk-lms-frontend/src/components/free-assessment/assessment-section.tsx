@@ -60,8 +60,8 @@ export function FreeAssessmentSection({
           <div className="overflow-hidden rounded-[28px] shadow-[0_24px_60px_rgba(7,61,64,0.18)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/gallery/workplace-transformation-2026/02-yellow-team.jpg"
-              alt="Three smiling HR GEMs team members in yellow HR GEM Coach Network T-shirts, one holding an “I am a coach” placard"
+              src="/marketing/free-assessment-youth.jpg"
+              alt="Five smiling young Black adults standing together against a teal wall"
               className="aspect-[3/2] w-full object-cover object-top"
             />
           </div>

@@ -59,7 +59,7 @@
   </tr>
   <tr>
     <td style="padding:0; border-top:6px solid #f4b728; font-size:0; line-height:0;">
-      <img class="hero-img" src="{{ $heroUrl }}" width="600" height="400" alt="Three smiling HR GEMs team members in yellow HR GEM Coach Network T-shirts" style="display:block; border:0; width:600px; height:auto; max-width:100%;">
+      <img class="hero-img" src="{{ $heroUrl }}" width="600" height="400" alt="Five smiling young Black adults standing together against a teal wall" style="display:block; border:0; width:600px; height:auto; max-width:100%;">
     </td>
   </tr>
 

@@ -37,7 +37,7 @@ class FreeAssessmentNotification extends Notification
                 'courseLink' => self::courseUrl(),
                 'siteUrl' => $siteUrl,
                 'logoUrl' => $siteUrl.'/branding/logo.png',
-                'heroUrl' => $siteUrl.'/email/free-assessment-group.jpg',
+                'heroUrl' => $siteUrl.'/email/free-assessment-youth.jpg',
             ]);
     }
 
